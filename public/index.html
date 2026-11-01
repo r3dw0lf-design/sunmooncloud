@@ -603,6 +603,46 @@
   @keyframes gmdrop { from { transform: translateY(-330%); } to { transform: none; } }
   @keyframes gmglow { to { filter: brightness(1.25); } }
   @media (prefers-reduced-motion: reduce) { .gm-disc.last, .gm-cell.last, .gm-disc.hit { animation: none; } }
+  /* ---- Partner app: invite + live chat ---- */
+  #win-partner { width: min(440px, 98vw); height: min(78vh, 640px); }
+  #win-partner .wbody { background: rgba(255,255,255,.35); font-family: Tahoma, "Segoe UI", Verdana, sans-serif; color: #12315f; display: flex; flex-direction: column; overflow: hidden; }
+  .pt-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 10px; gap: 8px; }
+  .pt-card { display: flex; flex-direction: column; gap: 8px; padding: 14px; border: 1px solid rgba(255,255,255,.9); border-radius: 10px; background: rgba(255,255,255,.62); box-shadow: 0 1px 4px rgba(0,40,110,.15); overflow: auto; }
+  .pt-card[hidden], #ptChat[hidden] { display: none; }
+  .pt-card h3 { margin: 0; font-size: 16px; color: #0a3d91; }
+  .pt-card p { margin: 0; font-size: 12.5px; line-height: 1.45; }
+  .pt-card label { font: bold 11px Tahoma, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: #4a6a9a; }
+  .pt-card input { padding: 8px 10px; border: 1px solid #8fb0e6; border-radius: 7px; font: 14px Tahoma, sans-serif; color: #12315f; background: #fff; min-width: 0; }
+  .pt-who { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; }
+  .pt-who div { display: flex; gap: 4px; }
+  .pt-who button { padding: 5px 12px; border: 1px solid #8fb0e6; border-radius: 7px; background: #fff; color: #12315f; font: 12px Tahoma, sans-serif; cursor: pointer; }
+  .pt-who button[aria-selected="true"] { background: #2f6fe0; color: #fff; border-color: #fff; }
+  #ptMsg { font-size: 12px; min-height: 16px; color: #1a6b35; }
+  #ptMsg.bad { color: #b3261e; }
+  #ptChat { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+  .pt-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.9); border-radius: 10px; background: rgba(255,255,255,.62); }
+  .pt-head b { font-size: 14px; color: #0a3d91; }
+  .pt-head small { margin-left: auto; font-size: 11.5px; color: #4a6a9a; }
+  #ptDot { width: 11px; height: 11px; border-radius: 50%; background: #9aa5b8; flex: none; box-shadow: inset 0 0 0 2px rgba(0,0,0,.15); }
+  #ptDot.on { background: #2fd66a; box-shadow: 0 0 6px #2fd66a; }
+  #ptDot.warn { background: #f0b429; }
+  #ptLog { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; padding: 8px; border-radius: 10px; background: rgba(255,255,255,.72); border: 1px solid #c3d3ee; user-select: text; -webkit-user-select: text; overscroll-behavior: contain; }
+  #ptLog .none { margin: auto; font-size: 12.5px; color: #7f95b8; text-align: center; }
+  .pt-m { max-width: 82%; padding: 6px 10px 4px; border-radius: 14px; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; white-space: pre-wrap; box-shadow: 0 1px 2px rgba(0,30,80,.18); animation: ptin .12s ease-out; }
+  .pt-m.me { align-self: flex-end; border-bottom-right-radius: 4px; }
+  .pt-m.them { align-self: flex-start; border-bottom-left-radius: 4px; }
+  .pt-m.sun { background: linear-gradient(#fff1b8, #ffd96a); color: #4a3500; }
+  .pt-m.moon { background: linear-gradient(#e3e9ff, #b9c8ff); color: #1c2a5e; }
+  .pt-m.pend { opacity: .6; }
+  .pt-m small { display: block; margin-top: 1px; text-align: right; font-size: 10px; opacity: .65; letter-spacing: .02em; }
+  .pt-m small .tk.seen { color: #1a7f3c; font-weight: bold; }
+  @keyframes ptin { from { transform: translateY(5px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+  #ptTyping { font-size: 12px; font-style: italic; color: #4a6a9a; padding: 0 6px; }
+  #ptTyping[hidden] { display: none; }
+  #ptForm { display: flex; gap: 6px; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  #ptIn { flex: 1; min-width: 0; padding: 9px 11px; border: 1px solid #8fb0e6; border-radius: 9px; font: 16px Tahoma, sans-serif; color: #12315f; background: #fff; }
+  #ptIn:focus { outline: 2px solid #2f6fe0; outline-offset: 0; }
+  @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
     background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
   #gmInvite[hidden] { display: none; }
@@ -861,6 +901,7 @@
     <button class="dt-icon" data-app="mail" type="button"><i class="bdg" id="mailBadge" hidden></i><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="4" y="10" width="40" height="28" rx="3" fill="#fff6d8" stroke="#8a7a4a" stroke-width="2"/><path d="M5 12l19 15 19-15" fill="none" stroke="#8a7a4a" stroke-width="2"/><text x="24" y="36" text-anchor="middle" font-size="13" fill="#ff6fae">&#9829;</text></svg><span>Mail</span></button>
     <button class="dt-icon" data-app="settings" type="button"><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="4" y="6" width="40" height="36" rx="4" fill="#dfe8f7" stroke="#5a7ab0" stroke-width="2"/><rect x="4" y="6" width="40" height="8" rx="3" fill="#3d7be0"/><g fill="#4a5f86"><circle cx="24" cy="29" r="8"/><rect x="22" y="17" width="4" height="6" rx="1"/><rect x="22" y="35" width="4" height="6" rx="1"/><rect x="12" y="27" width="6" height="4" rx="1"/><rect x="30" y="27" width="6" height="4" rx="1"/></g><circle cx="24" cy="29" r="3.5" fill="#dfe8f7"/></svg><span>Settings</span></button>
     <button class="dt-icon" data-app="games" type="button"><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="3" y="12" width="42" height="24" rx="12" fill="#4a5f86" stroke="#2b3b5c" stroke-width="2"/><rect x="11" y="21" width="12" height="4" rx="1" fill="#e8eefb"/><rect x="15" y="17" width="4" height="12" rx="1" fill="#e8eefb"/><circle cx="32" cy="19" r="3" fill="#ffd23a"/><circle cx="38" cy="25" r="3" fill="#ee3b3b"/><circle cx="32" cy="29" r="3" fill="#2fd66a"/></svg><span>Mini Games</span></button>
+    <button class="dt-icon" data-app="partner" type="button"><i class="bdg" id="ptBadge" hidden></i><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><path d="M5 8h26a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H17l-7 6v-6H5a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3z" fill="#ffd96a" stroke="#b88a10" stroke-width="2" stroke-linejoin="round"/><path d="M19 20h24a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3h-4v6l-7-6H19a3 3 0 0 1-3-3V23a3 3 0 0 1 3-3z" fill="#b9c8ff" stroke="#4a5fae" stroke-width="2" stroke-linejoin="round" transform="translate(0 -4)"/><path d="M31 31.5c-2-1.5-3.6-2.8-3.6-4.3a2 2 0 0 1 3.6-1.1 2 2 0 0 1 3.6 1.1c0 1.5-1.6 2.8-3.6 4.3z" fill="#e0457b" transform="translate(0 -3)"/></svg><span>Partner</span></button>
   </div>
   <section class="win" id="win-sun" hidden><div class="wtitle"><b>Sun &amp; Moon</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div><div class="wbody" id="wb-sun"></div></section>
   <section class="win" id="win-mail" hidden><div class="wtitle"><b>Mail</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
@@ -907,7 +948,25 @@
   <section class="win" id="win-games" hidden><div class="wtitle"><b>Mini Games</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
     <div class="wbody" id="wb-games"><div class="gm-wrap"><div class="gm-status" id="gmStatus"></div><div id="gmBody"></div>
       <div id="gmChat" hidden><h4>Chat</h4><div id="gmLog" role="log" aria-live="polite"></div><form id="gmChatForm" autocomplete="off"><input id="gmChatIn" maxlength="200" placeholder="Say something sweet..." aria-label="Chat message"><button class="gm-btn" type="submit">Send</button></form></div></div></div></section>
-  <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
+  <section class="win" id="win-partner" hidden><div class="wtitle"><b>Partner</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
+    <div class="wbody" id="wb-partner"><div class="pt-wrap">
+      <div id="ptInvite" class="pt-card" hidden>
+        <h3>Invite your partner</h3>
+        <p>Type their username and your anniversary. They get a request in Mail (and a pop-up if they are online). Once they accept, you are paired and this window turns into a live chat.</p>
+        <label for="ptTo">Their username</label><input id="ptTo" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. vijay">
+        <label for="ptDate">Anniversary</label><input id="ptDate" type="date">
+        <div class="pt-who"><span>Who is the moon?</span><div role="tablist"><button id="ptMoonThem" type="button" role="tab" aria-selected="true">Them</button><button id="ptMoonMe" type="button" role="tab" aria-selected="false">Me</button></div></div>
+        <button class="gm-btn" id="ptSend" type="button">Send invite</button>
+        <div id="ptMsg" role="status"></div>
+      </div>
+      <div id="ptChat" hidden>
+        <div class="pt-head"><i id="ptDot"></i><b id="ptName"></b><small id="ptState"></small></div>
+        <div id="ptLog" role="log" aria-live="polite"></div>
+        <div id="ptTyping" hidden></div>
+        <form id="ptForm" autocomplete="off"><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
+      </div>
+    </div></div></section>
+  <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="partner" type="button">Partner</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
   <div id="taskbar"><button id="startBtn" type="button">start</button><div id="tasks"></div><div id="tray"><button id="trayMail" type="button" hidden></button><button id="sfxBtn" type="button" title="Desktop sounds" aria-label="Desktop sounds" aria-pressed="true">&#9835;</button><span id="clock"></span></div></div>
 </div>
 <div id="bootsplash" hidden><div class="logo">Sun<span>&amp;</span>Moon<em>OS</em></div><div class="bar"><i></i></div><small>PHOSPHOR SYSTEMS SM-2000</small></div>
@@ -2516,11 +2575,12 @@ let toastTimer = 0;
 toastEl.addEventListener("click", () => {
   toastEl.hidden = true; clearTimeout(toastTimer);
   if (toastEl.dataset.go === "mail") { openApp("mail"); setTab("in"); }
+  else if (toastEl.dataset.go === "partner") openApp("partner");
 });
 function showToast(lines, go) {                                    // each line is [style, text]
   toastEl.textContent = ""; toastEl.dataset.go = go || "";
   for (const t of lines) { const d = document.createElement("div"); d.className = t[0]; d.textContent = t[1]; toastEl.appendChild(d); }
-  const hint = document.createElement("small"); hint.textContent = go === "mail" ? "TAP TO OPEN MAILBOX" : "TAP TO CLOSE"; toastEl.appendChild(hint);
+  const hint = document.createElement("small"); hint.textContent = go === "mail" ? "TAP TO OPEN MAILBOX" : go === "partner" ? "TAP TO OPEN CHAT" : "TAP TO CLOSE"; toastEl.appendChild(hint);
   toastEl.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, 12000);
   try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {}
 }
@@ -2888,7 +2948,7 @@ window.addEventListener("orientationchange", onResize);
 setupStage(wantPortrait());
 
 /* ================= the retro PC: boot, desktop, windows, taskbar ================= */
-const desk = $("desktop"), wins = { sun: $("win-sun"), mail: $("win-mail"), settings: $("win-settings"), games: $("win-games") }, taskBtns = {}, startMenu = $("startMenu");
+const desk = $("desktop"), wins = { sun: $("win-sun"), mail: $("win-mail"), settings: $("win-settings"), games: $("win-games"), partner: $("win-partner") }, taskBtns = {}, startMenu = $("startMenu");
 let zTop = 10;
 $("wb-sun").appendChild(document.querySelector(".rig"));                        // the whole sun & moon machine lives in its own window
 for (const el of [...document.querySelectorAll(".sect.half")]) $("mailWrap").appendChild(el);   // love letter + mailbox live in the Mail window
@@ -2902,7 +2962,7 @@ function focusWin(n) {
 }
 function addTask(n) {
   if (taskBtns[n]) return;
-  const b = document.createElement("button"); b.type = "button"; b.className = "task"; b.textContent = { sun: "Sun & Moon", mail: "Mail", settings: "Settings", games: "Mini Games" }[n];
+  const b = document.createElement("button"); b.type = "button"; b.className = "task"; b.textContent = { sun: "Sun & Moon", mail: "Mail", settings: "Settings", games: "Mini Games", partner: "Partner" }[n];
   b.addEventListener("click", () => { const w = wins[n]; if (w.hidden) { w.hidden = false; focusWin(n); } else if (w.classList.contains("active")) minApp(n); else focusWin(n); });
   $("tasks").appendChild(b); taskBtns[n] = b;
 }
@@ -2910,12 +2970,13 @@ function openApp(n) {
   const w = wins[n]; startMenu.hidden = true;
   if (w.hidden) {
     w.hidden = false; addTask(n);
-    if (!w.dataset.placed) { w.dataset.placed = "1"; w.style.left = Math.max(0, (innerWidth - w.offsetWidth) / 2 + (n === "mail" ? 60 : n === "settings" ? 110 : n === "games" ? 40 : 0)) + "px"; w.style.top = (n === "mail" ? 46 : n === "settings" ? 70 : n === "games" ? 56 : 14) + "px"; }
+    if (!w.dataset.placed) { w.dataset.placed = "1"; w.style.left = Math.max(0, (innerWidth - w.offsetWidth) / 2 + (n === "mail" ? 60 : n === "settings" ? 110 : n === "games" ? 40 : n === "partner" ? 90 : 0)) + "px"; w.style.top = (n === "mail" ? 46 : n === "settings" ? 70 : n === "games" ? 56 : n === "partner" ? 36 : 14) + "px"; }
   }
   focusWin(n);
   if (n === "sun" && !st.on) powerOn();                                         // opening the app plays the boot sequence
   if (n === "mail" && account.user) refreshInbox();
   if (n === "games") gamesOpened();
+  if (n === "partner") partnerOpened();
 }
 function minApp(n) { wins[n].hidden = true; focusWin("none"); }
 function sunStop() {
@@ -3055,7 +3116,7 @@ function icMenuMain() {
   if (a) {
     h += it("open", "Open") + it("rename", "Rename...") + `<div class="ichead">Icon size</div><div class="icrow">${it("z-s", "Small", z === "s")}${it("z-m", "Medium", z === "m")}${it("z-l", "Large", z === "l")}</div>`;
     h += it("label", s.h ? "Show label" : "Hide label");
-    if (a === "mail") h += it("badge", s.b ? "Show mail badge" : "Hide mail badge");
+    if (a === "mail" || a === "partner") h += it("badge", (s.b ? "Show " : "Hide ") + (a === "mail" ? "mail" : "chat") + " badge");
     h += it("reset1", "Reset this icon") + "<hr>";
   }
   icMenu.innerHTML = h + it("arrange", "Auto-arrange icons") + it("resetall", "Reset all icons");
@@ -3712,6 +3773,200 @@ window.addEventListener("pagehide", () => { if (account.user && !LOCAL.on) api("
   const _sp = syncPair;
   syncPair = function (p) { const before = pairKey(account.pair); _sp(p); if (before !== pairKey(account.pair)) { GM.game = null; GM.online = null; hideGameInvite(); renderGames(); presenceTick(); } };
 }
+/* ============================================================ PARTNER APP: invite + live chat
+   Chat runs over ONE WebSocket to a Cloudflare Durable Object (see worker.js, class PairRoom): a message goes
+   phone -> server -> phone with no polling. The socket stays open in the background (even with the window closed) so a
+   message pops up the instant it is sent. It reconnects by itself and re-sends anything typed while offline. */
+const PT = { ws: null, open: false, hello: false, tries: 0, retry: 0, pongAt: 0, msgs: [], seen: {}, online: false, pend: [], unread: 0, cid: 0,
+  typingIn: 0, typingOut: 0, sentTyping: 0, lastToast: 0, moon: "them" };
+const ptLog = $("ptLog"), ptIn = $("ptIn"), ptTo = $("ptTo"), ptDate = $("ptDate"), ptMsg = $("ptMsg"), ptBadge = $("ptBadge");
+const ptWanted = () => !!(account.user && account.pair && !LOCAL.on);
+const ptOther = () => (account.pair ? account.pair.with : "");
+const ptMe = () => (account.user ? account.user.username : "");
+const ptRole = name => (account.pair && String(name).toUpperCase().slice(0, 12) === account.pair.sun) ? "sun" : "moon";
+const ptViewing = () => !wins.partner.hidden && !document.hidden;
+const ptTime = at => { const d = new Date(at); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+
+function ptStatus() {
+  const dot = $("ptDot"), st = $("ptState");
+  if (!ptWanted()) { dot.className = ""; st.textContent = ""; return; }
+  if (!PT.open || !PT.hello) { dot.className = "warn"; st.textContent = navigator.onLine === false ? "offline - will send when back" : "connecting..."; }
+  else if (PT.online) { dot.className = "on"; st.textContent = "online"; }
+  else { dot.className = ""; st.textContent = "away"; }
+}
+function ptCount() {
+  const me = ptMe(), seen = PT.seen[me] || 0;
+  PT.unread = PT.msgs.filter(m => m.from !== me && m.id > seen).length;
+  ptBadge.hidden = PT.unread === 0 || ptViewing(); ptBadge.textContent = PT.unread > 99 ? "99+" : String(PT.unread);
+}
+function ptTicks() {
+  const other = PT.seen[ptOther()] || 0;
+  for (const el of ptLog.querySelectorAll(".pt-m.me")) {
+    const t = el.querySelector(".tk"); if (!t) continue;
+    if (el.classList.contains("pend")) { t.textContent = "..."; t.className = "tk"; }
+    else if (Number(el.dataset.id) <= other) { t.textContent = "\u2713\u2713"; t.className = "tk seen"; }
+    else { t.textContent = "\u2713"; t.className = "tk"; }
+  }
+}
+function ptEl(m, pend) {
+  const me = ptMe(), d = document.createElement("div");
+  d.className = "pt-m " + (m.from === me ? "me " : "them ") + ptRole(m.from) + (pend ? " pend" : "");
+  if (m.id) d.dataset.id = m.id; if (m.cid) d.dataset.cid = m.cid;
+  const t = document.createElement("span"); t.textContent = m.text; d.appendChild(t);
+  const sm = document.createElement("small"); sm.textContent = ptTime(m.at); d.appendChild(sm);
+  if (m.from === me) { const k = document.createElement("span"); k.className = "tk"; sm.append(" ", k); }
+  return d;
+}
+function ptNear() { return ptLog.scrollHeight - ptLog.scrollTop - ptLog.clientHeight < 90; }
+function ptBottom() { ptLog.scrollTop = ptLog.scrollHeight; }
+function ptRender() {
+  ptLog.textContent = "";
+  if (!PT.msgs.length && !PT.pend.length) { const n = document.createElement("div"); n.className = "none"; n.textContent = "No messages yet. Say hi to " + ptOther() + "!"; ptLog.appendChild(n); }
+  const f = document.createDocumentFragment();
+  for (const m of PT.msgs) f.appendChild(ptEl(m, false));
+  for (const p of PT.pend) f.appendChild(ptEl(p, true));
+  ptLog.appendChild(f); ptTicks(); ptBottom();
+}
+function ptAdd(m, pend) {                                             // one new bubble, added without redrawing the rest
+  const none = ptLog.querySelector(".none"); if (none) none.remove();
+  const stick = ptNear() || m.from === ptMe();
+  ptLog.appendChild(ptEl(m, pend)); ptTicks(); if (stick) ptBottom();
+}
+function ptSendSeen() {
+  const last = PT.msgs.length ? PT.msgs[PT.msgs.length - 1].id : 0, me = ptMe();
+  if (!last || last <= (PT.seen[me] || 0) || !PT.open || !PT.hello) return;
+  PT.seen[me] = last; try { PT.ws.send(JSON.stringify({ t: "seen", upTo: last })); } catch (e) {} ptCount();
+}
+function ptSeenIfViewing() { if (ptViewing()) ptSendSeen(); ptCount(); }
+function ptTyping(on) {
+  const el = $("ptTyping"); clearTimeout(PT.typingIn);
+  el.hidden = !on; if (on) { el.textContent = ptOther() + " is typing..."; PT.typingIn = setTimeout(() => { el.hidden = true; }, 4500); }
+}
+function ptHandle(m) {
+  const me = ptMe(), other = ptOther();
+  if (m.t === "hello") {
+    PT.hello = true; PT.msgs = Array.isArray(m.msgs) ? m.msgs : []; PT.seen = m.seen && typeof m.seen === "object" ? m.seen : {};
+    PT.online = Array.isArray(m.online) && m.online.includes(other);
+    const q = PT.pend; PT.pend = [];                                  // typed while offline (or sent just as the line dropped): send once, never twice
+    for (const p of q) { if (PT.msgs.some(x => x.from === me && x.text === p.text && x.at >= p.at - 5000)) continue; ptTransmit(p); }
+    ptRender(); ptSeenIfViewing(); ptStatus();
+  } else if (m.t === "msg" && m.msg) {
+    const g = m.msg; if (PT.msgs.some(x => x.id === g.id)) return;
+    PT.msgs.push(g);
+    if (g.from === me) {
+      const i = PT.pend.findIndex(p => p.cid === m.cid); if (i >= 0) PT.pend.splice(i, 1);
+      const el = m.cid ? ptLog.querySelector('.pt-m[data-cid="' + CSS.escape(m.cid) + '"]') : null;
+      if (el) { el.classList.remove("pend"); el.dataset.id = g.id; el.querySelector("small").firstChild.textContent = ptTime(g.at); ptTicks(); } else ptAdd(g, false);
+    } else {
+      ptTyping(false); ptAdd(g, false);
+      if (ptViewing()) { ptSendSeen(); sfx.seen(); }
+      else {
+        ptCount(); sfx.mail();
+        if (!desk.hidden && Date.now() - PT.lastToast > 4000) { PT.lastToast = Date.now(); showToast([["t-pair", other.toUpperCase() + ": " + g.text.slice(0, 60)]], "partner"); }
+      }
+    }
+  } else if (m.t === "typing" && m.u !== me) { ptTyping(m.on !== false);
+  } else if (m.t === "seen" && m.u !== me) { PT.seen[m.u] = m.upTo; ptTicks();
+  } else if (m.t === "presence" && m.u !== me) { PT.online = !!m.online; if (!m.online) ptTyping(false); ptStatus();
+  } else if (m.t === "slow") { ptMsg.textContent = ""; $("ptState").textContent = "slow down a little"; }
+}
+function ptTransmit(p) {
+  if (!PT.pend.includes(p)) PT.pend.push(p);
+  if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify({ t: "chat", cid: p.cid, text: p.text })); return; } catch (e) {} }
+  ptConnect();
+}
+function ptSend(text) {
+  text = String(text).replace(/\s+/g, " ").trim().slice(0, 1000); if (!text || !ptWanted()) return;
+  const p = { cid: Date.now().toString(36) + (++PT.cid), text, at: Date.now(), from: ptMe() };
+  ptAdd(p, true); ptTransmit(p); sfx.bloop();
+}
+function ptConnect() {
+  if (!ptWanted() || PT.ws) return;
+  let ws; try { ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/ws"); } catch (e) { return ptRetry(); }
+  PT.ws = ws; PT.open = false; PT.hello = false; ptStatus();
+  ws.onopen = () => { if (PT.ws !== ws) return; PT.open = true; PT.tries = 0; PT.pongAt = Date.now(); ptStatus(); };
+  ws.onmessage = ev => {
+    if (PT.ws !== ws) return;
+    if (ev.data === "pong") { PT.pongAt = Date.now(); return; }
+    let m; try { m = JSON.parse(ev.data); } catch (e) { return; } ptHandle(m);
+  };
+  ws.onclose = ev => {
+    if (PT.ws !== ws) return;
+    PT.ws = null; PT.open = false; PT.hello = false; PT.online = false; ptStatus();
+    if (ev.code === 4001) ptReset(); else ptRetry();
+  };
+  ws.onerror = () => {};
+}
+function ptRetry() { clearTimeout(PT.retry); if (!ptWanted()) return; PT.retry = setTimeout(ptConnect, Math.min(3000, 120 * Math.pow(2, PT.tries++))); }
+function ptReset() {
+  clearTimeout(PT.retry); const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; PT.online = false;
+  if (w) { try { w.close(); } catch (e) {} }
+  PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
+}
+setInterval(() => {                                                   // keep-alive + dead-line detection (a phone that lost signal never says goodbye)
+  if (!PT.ws || !PT.open) return;
+  if (Date.now() - PT.pongAt > 40000) { const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; try { w.close(); } catch (e) {} ptStatus(); ptConnect(); return; }
+  try { PT.ws.send("ping"); } catch (e) {}
+}, 15000);
+setInterval(() => { if (ptWanted()) { if (!PT.ws) ptConnect(); } else if (PT.ws || PT.msgs.length) ptReset(); }, 2000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { ptConnect(); ptSeenIfViewing(); } });
+window.addEventListener("online", () => { PT.tries = 0; ptConnect(); });
+window.addEventListener("pagehide", () => { try { if (PT.ws) PT.ws.close(1000, "bye"); } catch (e) {} });
+
+function ptSay(t, ok) { ptMsg.textContent = t; ptMsg.classList.toggle("bad", !ok && !!t); }
+function ptSetMoon(v) { PT.moon = v; $("ptMoonThem").setAttribute("aria-selected", v === "them"); $("ptMoonMe").setAttribute("aria-selected", v === "me"); }
+$("ptMoonThem").addEventListener("click", () => ptSetMoon("them")); $("ptMoonMe").addEventListener("click", () => ptSetMoon("me"));
+function renderPartner() {
+  const paired = !!account.pair;
+  $("ptInvite").hidden = paired; $("ptChat").hidden = !paired;
+  if (paired) {
+    $("ptName").textContent = account.pair.with;
+    if (LOCAL.on) { ptLog.textContent = ""; const n = document.createElement("div"); n.className = "none"; n.textContent = "Live chat needs the online server. It does not work in this offline copy."; ptLog.appendChild(n); $("ptIn").disabled = true; $("ptGo").disabled = true; }
+    else { $("ptIn").disabled = false; $("ptGo").disabled = false; if (!PT.msgs.length && !PT.pend.length && !PT.hello) { ptLog.textContent = ""; const n = document.createElement("div"); n.className = "none"; n.textContent = "Connecting..."; ptLog.appendChild(n); } }
+    ptStatus();
+  } else {
+    if (!ptDate.value && nDate.value) ptDate.value = nDate.value;
+    api("outbox").then(r => {                                       // a request already waiting? say so instead of showing an empty form
+      const w = (r.letters || []).find(l => l.type === "pair" && l.status === "pending");
+      if (w && !account.pair) ptSay("Waiting for " + w.to.toUpperCase() + " to accept your invite.", true);
+    }).catch(() => {});
+  }
+}
+function partnerOpened() {
+  renderPartner(); ptCount();
+  if (ptWanted()) { ptConnect(); if (PT.hello) { ptRender(); ptSeenIfViewing(); } if (!matchMedia("(pointer: coarse)").matches) setTimeout(() => ptIn.focus(), 60); }
+}
+$("ptSend").addEventListener("click", async () => {
+  const to = ptTo.value.trim().toLowerCase(), since = ptDate.value || nDate.value;
+  if (!USER_RE.test(to)) return ptSay(ERR.BAD_USERNAME);
+  if (!since) return ptSay("PICK YOUR ANNIVERSARY DATE FIRST.");
+  $("ptSend").disabled = true; ptSay("Sending...", true);
+  try {
+    await api("pair_request", { to, since, role: PT.moon === "me" ? "moon" : "sun" });
+    ptSay("Invite sent to " + to.toUpperCase() + ". This turns into a chat the moment they accept.", true); ptTo.value = "";
+    if (boxTab === "out") refreshOutbox();
+  } catch (err) { sessionGone(err); ptSay(PAIR_ERR[err.code] || ERR[err.code] || ERR.SERVER); }
+  $("ptSend").disabled = false;
+});
+ptTo.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("ptSend").click(); } });
+$("ptForm").addEventListener("submit", e => {
+  e.preventDefault(); const v = ptIn.value; if (!v.trim()) return;
+  ptIn.value = ""; clearTimeout(PT.typingOut); PT.sentTyping = 0; ptSend(v); ptIn.focus();   // clear + show + send in the same tick: nothing waits for the network
+});
+$("ptGo").addEventListener("pointerdown", e => e.preventDefault());                              // tapping Send keeps the phone keyboard open
+ptIn.addEventListener("input", () => {
+  if (!PT.open || !PT.hello) return; const now = Date.now();
+  if (now - PT.sentTyping > 2500) { PT.sentTyping = now; try { PT.ws.send(JSON.stringify({ t: "typing", on: true })); } catch (e) {} }
+  clearTimeout(PT.typingOut); PT.typingOut = setTimeout(() => { PT.sentTyping = 0; try { PT.ws.send(JSON.stringify({ t: "typing", on: false })); } catch (e) {} }, 3000);
+});
+wins.partner.addEventListener("pointerdown", () => setTimeout(ptSeenIfViewing, 0));
+{
+  const _sp2 = syncPair, _min = minApp, _close = closeApp;
+  syncPair = function (p) { const before = pairKey(account.pair); _sp2(p); if (before !== pairKey(account.pair)) { if (!account.pair) ptReset(); renderPartner(); ptConnect(); } };
+  minApp = function (n) { _min(n); if (n === "partner") ptCount(); };
+  closeApp = function (n) { _close(n); if (n === "partner") ptCount(); };
+}
+
 
 /* ---- chat while you play + faster updates ---- */
 let gmChatSig = "";

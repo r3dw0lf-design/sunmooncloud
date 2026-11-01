@@ -9,6 +9,7 @@
      SINGLE_SESSION=1   logging in on a new device logs the old one out */
 
 let DB;                                                       // the D1 database (bound as DB in wrangler.toml)
+let ROOM;                                                     // the live-chat Durable Object namespace (bound as ROOM in wrangler.toml)
 /* A tiny key-value layer on D1 (table kv: k, v, ver). It offers the same calls the old Netlify Blobs store did, including
    "write only if new" and "write only if unchanged" (ver is the etag), so every route below works as it was.
    Reads and deletes issued in the same tick are merged into ONE query, which keeps a request under Cloudflare's subrequest limit. */
@@ -41,6 +42,7 @@ const d1Store = () => ({
   async list({ prefix = "" } = {}) { const r = await DB.prepare("SELECT k FROM kv WHERE k >= ? AND k < ? ORDER BY k").bind(prefix, prefix + "\uffff").all(); return { blobs: r.results.map(x => ({ key: x.k })) }; },
 });
 import crypto from "node:crypto";
+import { DurableObject } from "cloudflare:workers";
 import { promisify } from "node:util";
 
 const scrypt = promisify(crypto.scrypt);
@@ -242,6 +244,9 @@ async function noteFail(username, code) {
 const GAMES = { ttt: "TIC-TAC-TOE", c4: "CONNECT 4" };
 const ONLINE_MS = 40000;                                       // a page pings every ~12s, so 40s of silence = offline
 const pairKey = (a, b) => [a, b].sort().join("~");
+async function clearRoom(a, b) {                              // unpairing wipes the chat and kicks any open chat connections
+  try { if (ROOM) await ROOM.get(ROOM.idFromName(pairKey(a, b))).fetch("https://room/clear", { method: "POST" }); } catch (e) { console.error(e); }
+}
 async function pairCtx(req) {
   const rec = (await needUser(req)).rec;
   if (!rec.pair) throw fail(409, "NOT_PAIRED");
@@ -515,6 +520,7 @@ const routes = {
     const other = me.pair.with;
     await mutate(me.username, r => { r.pair = null; return r; });
     await store().delete(`g/${pairKey(me.username, other)}`).catch(() => {});      // their game goes with the pairing
+    await clearRoom(me.username, other);                                            // ...and so does their chat
     try {
       await mutate(other, r => { if (r.pair && r.pair.with === me.username) r.pair = null; return r; });
       await notify(other, { kind: "unpaired", by: me.username });
@@ -685,6 +691,7 @@ const routes = {
     const gone = await getUser(u);
     if (!gone) throw fail(404, "NO_USER");
     if (gone.pair) await mutate(gone.pair.with, r => { if (r.pair && r.pair.with === u) r.pair = null; return r; }).catch(() => {});
+    if (gone.pair) await clearRoom(u, gone.pair.with);
     await st.delete("u/" + u);                                 // their logins stop working at once; the name becomes free again
     const { blobs } = await st.list({ prefix: `m/${u}/` });
     await Promise.all(blobs.map(x => st.delete(x.key)));       // and their inbox is erased
@@ -718,6 +725,107 @@ const routes = {
     return { ok: true };
   },
 };
+
+/* ---------------- live chat (WebSockets) ----------------
+   One Durable Object per pair. Both phones keep a WebSocket open to it, so a message goes phone -> object -> phone with
+   no polling and no database round trip in between (the message is saved in the background after it has been sent).
+   The object also relays "typing...", "seen" ticks and online/offline, all instantly. */
+const CHAT_KEEP = 300;
+const padSeq = n => String(n).padStart(10, "0");
+export class PairRoom extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    this.seq = 0; this.seen = {}; this.hits = new Map();
+    this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));   // keep-alive answered without waking the object
+    this.ctx.blockConcurrencyWhile(async () => {
+      this.seq = (await this.ctx.storage.get("seq")) || 0;
+      this.seen = (await this.ctx.storage.get("seen")) || {};
+    });
+  }
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname === "/clear") {
+      for (const w of this.ctx.getWebSockets()) { try { w.close(4001, "unpaired"); } catch (e) {} }
+      await this.ctx.storage.deleteAll(); this.seq = 0; this.seen = {};
+      return new Response("ok");
+    }
+    if (request.headers.get("Upgrade") !== "websocket") return new Response("Expected a WebSocket", { status: 426 });
+    const me = request.headers.get("X-SM-User") || "";
+    if (!me) return new Response("No user", { status: 400 });
+    const pair = new WebSocketPair(), client = pair[0], server = pair[1];
+    this.ctx.acceptWebSocket(server, [me]);
+    server.serializeAttachment({ u: me });
+    const rows = await this.ctx.storage.list({ prefix: "m:", reverse: true, limit: 100 });
+    server.send(JSON.stringify({ t: "hello", me, msgs: [...rows.values()].reverse(), seen: this.seen, online: this.online() }));
+    this.send({ t: "presence", u: me, online: true }, server);
+    return new Response(null, { status: 101, webSocket: client });
+  }
+  online() {
+    const set = new Set();
+    for (const w of this.ctx.getWebSockets()) if (w.readyState === 1) { const a = w.deserializeAttachment(); if (a && a.u) set.add(a.u); }
+    return [...set];
+  }
+  send(obj, except) {
+    const text = JSON.stringify(obj);
+    for (const w of this.ctx.getWebSockets()) { if (w !== except && w.readyState === 1) { try { w.send(text); } catch (e) {} } }
+  }
+  limited(user) {
+    const t = Date.now(), r = this.hits.get(user) || { n: 0, reset: t + 10000 };
+    if (t > r.reset) { r.n = 0; r.reset = t + 10000; }
+    r.n++; this.hits.set(user, r);
+    return r.n > 25;
+  }
+  async webSocketMessage(ws, data) {
+    if (typeof data !== "string" || data.length > 4000) return;
+    let m; try { m = JSON.parse(data); } catch (e) { return; }
+    if (!m || typeof m !== "object") return;
+    const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
+    if (m.t === "chat") {
+      const text = String(m.text || "").replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F]/g, "").trim().slice(0, 1000);
+      if (!text) return;
+      if (this.limited(me)) { try { ws.send(JSON.stringify({ t: "slow" })); } catch (e) {} return; }
+      const id = ++this.seq, msg = { id, from: me, text, at: Date.now() };
+      this.send({ t: "msg", msg, cid: String(m.cid || "").slice(0, 40) });                  // to everyone, the sender included (that is their "sent" tick)
+      const puts = { seq: id }; puts["m:" + padSeq(id)] = msg;
+      await this.ctx.storage.put(puts, { allowUnconfirmed: true });                          // saved in the background: nobody waits for the disk
+      if (id % 50 === 0) {
+        const old = await this.ctx.storage.list({ prefix: "m:", limit: 200, end: "m:" + padSeq(id - CHAT_KEEP) });
+        if (old.size) await this.ctx.storage.delete([...old.keys()]);
+      }
+    } else if (m.t === "typing") {
+      this.send({ t: "typing", u: me, on: m.on !== false }, ws);
+    } else if (m.t === "seen") {
+      const up = Math.min(this.seq, Math.max(0, parseInt(m.upTo, 10) || 0));
+      if (up > (this.seen[me] || 0)) {
+        this.seen[me] = up;
+        this.send({ t: "seen", u: me, upTo: up }, ws);
+        await this.ctx.storage.put("seen", this.seen, { allowUnconfirmed: true });
+      }
+    }
+  }
+  async webSocketClose(ws, code, reason) {
+    try { ws.close(code === 1005 || code === 1006 ? 1000 : code, "bye"); } catch (e) {}
+    this.gone(ws);
+  }
+  async webSocketError(ws) { this.gone(ws); }
+  gone(ws) {
+    const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
+    const still = this.ctx.getWebSockets(me).some(w => w !== ws && w.readyState === 1);
+    if (!still) { this.send({ t: "presence", u: me, online: false }, ws); this.send({ t: "typing", u: me, on: false }, ws); }
+  }
+}
+async function chatSocket(req, env) {                          // GET /api/ws - only a logged-in, paired person gets through, and only to their own pair's room
+  const err = (status, code) => new Response(JSON.stringify({ code }), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  if (req.method !== "GET" || req.headers.get("Upgrade") !== "websocket") return err(426, "SERVER");
+  const url = new URL(req.url), origin = req.headers.get("origin");
+  if (origin) { try { if (new URL(origin).host !== url.host) throw 0; } catch (e) { return err(403, "SERVER"); } }
+  if (!env.ROOM) return err(500, "SERVER");
+  const s = await sessionUser(req);
+  if (!s) return err(401, "UNAUTH");
+  if (!s.rec.pair) return err(409, "NOT_PAIRED");
+  const h = new Headers(req.headers); h.set("X-SM-User", s.rec.username);
+  return env.ROOM.get(env.ROOM.idFromName(pairKey(s.rec.username, s.rec.pair.with))).fetch(new Request(req, { headers: h }));
+}
 
 /* ---------------- entry point ---------------- */
 async function handle(req, context) {
@@ -757,8 +865,9 @@ export default {
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     const bad = () => new Response(JSON.stringify({ code: "SERVER" }), { status: 500, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
     if (!env.DB) return bad();
-    DB = env.DB; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
+    DB = env.DB; ROOM = env.ROOM; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
     try { await init(); } catch (e) { console.error(e); return bad(); }
+    if (url.pathname === "/api/ws") return chatSocket(request, env);
     return handle(request, { ip: request.headers.get("CF-Connecting-IP") });
   },
 };
