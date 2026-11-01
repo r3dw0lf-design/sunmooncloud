@@ -642,6 +642,44 @@
   #ptForm { display: flex; gap: 6px; padding-bottom: env(safe-area-inset-bottom, 0px); }
   #ptIn { flex: 1; min-width: 0; padding: 9px 11px; border: 1px solid #8fb0e6; border-radius: 9px; font: 16px Tahoma, sans-serif; color: #12315f; background: #fff; }
   #ptIn:focus { outline: 2px solid #2f6fe0; outline-offset: 0; }
+  .pt-wrap { position: relative; }
+  .pt-pick { display: flex; gap: 4px; }
+  .pt-pick input { flex: 1; }
+  #ptDrop { width: 38px; border: 1px solid #8fb0e6; border-radius: 7px; background: #fff; color: #12315f; font-size: 14px; cursor: pointer; }
+  #ptList { max-height: 200px; overflow-y: auto; border: 1px solid #8fb0e6; border-radius: 7px; background: #fff; }
+  #ptList[hidden] { display: none; }
+  .pt-u { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; padding: 9px 11px; border: 0; border-bottom: 1px solid #e6eefc; background: #fff; color: #12315f; font: 14px Tahoma, sans-serif; text-align: left; cursor: pointer; }
+  .pt-u:hover { background: #e8f0ff; }
+  .pt-u em { font-style: normal; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+  .pt-u.paired, .pt-u.paired:hover { background: #ffd0e4; color: #a3205a; cursor: not-allowed; }
+  .pt-none { padding: 10px; font-size: 12.5px; color: #7f95b8; }
+  .pt-key { font-size: 11px; color: #4a6a9a; }
+  .pt-key i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; border: 1px solid #8fb0e6; }
+  .pt-key i.f { background: #fff; } .pt-key i.p { background: #ffd0e4; border-color: #e58ab0; }
+  .pt-ic { width: 34px; height: 30px; border: 1px solid #fff; border-radius: 8px; background: linear-gradient(#5b9bff, #2f6fe0); font-size: 15px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,40,110,.3); }
+  .pt-ic:disabled { filter: grayscale(1); opacity: .45; cursor: not-allowed; }
+  .pt-head small { margin-left: auto; }
+  .pt-sys { align-self: center; font-size: 11.5px; color: #6a7fa5; background: rgba(255,255,255,.7); padding: 2px 10px; border-radius: 10px; }
+  #ptCall { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; background: #0b1630; color: #fff; border-radius: 8px; overflow: hidden; }
+  #ptCall[hidden] { display: none; }
+  #ptRemote { flex: 1; min-height: 0; width: 100%; object-fit: cover; background: #050a18; }
+  #ptCall.audio #ptRemote { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  #ptCall.audio { background: radial-gradient(circle at 50% 38%, #243a7a, #0b1630 70%); }
+  #ptLocal { position: absolute; right: 10px; top: 10px; width: 92px; height: 124px; object-fit: cover; border-radius: 10px; border: 2px solid #fff; background: #000; transform: scaleX(-1); box-shadow: 0 4px 14px #0008; z-index: 2; }
+  #ptCall.audio #ptLocal, #ptCall.camoff #ptLocal { display: none; }
+  #ptCallInfo { position: absolute; left: 0; right: 0; top: 14px; text-align: center; text-shadow: 0 1px 6px #000a; pointer-events: none; z-index: 1; }
+  #ptCall.audio #ptCallInfo { top: 34%; }
+  #ptCallInfo b { display: block; font-size: 20px; }
+  #ptCallInfo small { font-size: 13px; opacity: .85; }
+  .pt-ctl { position: absolute; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; gap: 10px; z-index: 3; }
+  .pt-ctl button { padding: 11px 16px; border: 1px solid #ffffff88; border-radius: 24px; background: #ffffff26; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; font: bold 13px Tahoma, sans-serif; cursor: pointer; }
+  .pt-ctl button.on { background: #fff; color: #12315f; }
+  .pt-ctl button.end { background: #e0301e; border-color: #fff; }
+  #ptCall.audio #ptCam { display: none; }
+  #ptRing { position: fixed; z-index: 9600; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
+  #ptRing[hidden] { display: none; }
+  #ptRing b { display: block; font-size: 16px; color: #0a3d91; margin-bottom: 2px; }
+  #ptRing p { margin: 0 0 10px; }
   @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
     background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
@@ -953,17 +991,26 @@
       <div id="ptInvite" class="pt-card" hidden>
         <h3>Invite your partner</h3>
         <p>Type their username and your anniversary. They get a request in Mail (and a pop-up if they are online). Once they accept, you are paired and this window turns into a live chat.</p>
-        <label for="ptTo">Their username</label><input id="ptTo" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. vijay">
+        <label for="ptTo">Pick who to invite</label>
+        <div class="pt-pick"><input id="ptTo" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Tap to pick, or type a name" role="combobox" aria-expanded="false" aria-controls="ptList"><button id="ptDrop" type="button" aria-label="Show all users">&#9662;</button></div>
+        <div id="ptList" role="listbox" hidden></div>
+        <small class="pt-key"><i class="f"></i> free to invite &nbsp; <i class="p"></i> already paired (can't be picked)</small>
         <label for="ptDate">Anniversary</label><input id="ptDate" type="date">
         <div class="pt-who"><span>Who is the moon?</span><div role="tablist"><button id="ptMoonThem" type="button" role="tab" aria-selected="true">Them</button><button id="ptMoonMe" type="button" role="tab" aria-selected="false">Me</button></div></div>
         <button class="gm-btn" id="ptSend" type="button">Send invite</button>
         <div id="ptMsg" role="status"></div>
       </div>
       <div id="ptChat" hidden>
-        <div class="pt-head"><i id="ptDot"></i><b id="ptName"></b><small id="ptState"></small></div>
+        <div class="pt-head"><i id="ptDot"></i><b id="ptName"></b><small id="ptState"></small><button class="pt-ic" id="ptVoice" type="button" title="Voice call" aria-label="Voice call">&#128222;</button><button class="pt-ic" id="ptVideo" type="button" title="Video call" aria-label="Video call">&#127909;</button></div>
         <div id="ptLog" role="log" aria-live="polite"></div>
         <div id="ptTyping" hidden></div>
         <form id="ptForm" autocomplete="off"><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
+      </div>
+      <div id="ptCall" hidden>
+        <video id="ptRemote" autoplay playsinline></video>
+        <video id="ptLocal" autoplay playsinline muted></video>
+        <div id="ptCallInfo"><b id="ptCallName"></b><small id="ptCallState"></small></div>
+        <div class="pt-ctl"><button id="ptMute" type="button">Mute</button><button id="ptCam" type="button">Camera off</button><button id="ptHang" type="button" class="end">End</button></div>
       </div>
     </div></div></section>
   <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="partner" type="button">Partner</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
@@ -973,6 +1020,8 @@
 
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <div id="gmInvite" role="alertdialog" aria-labelledby="gmInvT" hidden><b id="gmInvT"></b><p id="gmInvP"></p><div class="gm-row"><button class="gm-btn" id="gmInvYes" type="button">Play!</button><button class="gm-btn no" id="gmInvNo" type="button">Decline</button><button class="gm-btn alt" id="gmInvLater" type="button">Later</button></div></div>
+
+<div id="ptRing" role="alertdialog" aria-labelledby="ptRingT" hidden><b id="ptRingT"></b><p id="ptRingP"></p><div class="gm-row"><button class="gm-btn" id="ptRingYes" type="button">Answer</button><button class="gm-btn no" id="ptRingNo" type="button">Decline</button></div></div>
 
 <div id="adminPanel" hidden>
   <div class="adm">
@@ -3788,7 +3837,7 @@ const ptViewing = () => !wins.partner.hidden && !document.hidden;
 const ptTime = at => { const d = new Date(at); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
 
 function ptStatus() {
-  const dot = $("ptDot"), st = $("ptState");
+  const dot = $("ptDot"), st = $("ptState"); ptCallBtns();
   if (!ptWanted()) { dot.className = ""; st.textContent = ""; return; }
   if (!PT.open || !PT.hello) { dot.className = "warn"; st.textContent = navigator.onLine === false ? "offline - will send when back" : "connecting..."; }
   else if (PT.online) { dot.className = "on"; st.textContent = "online"; }
@@ -3867,7 +3916,8 @@ function ptHandle(m) {
     }
   } else if (m.t === "typing" && m.u !== me) { ptTyping(m.on !== false);
   } else if (m.t === "seen" && m.u !== me) { PT.seen[m.u] = m.upTo; ptTicks();
-  } else if (m.t === "presence" && m.u !== me) { PT.online = !!m.online; if (!m.online) ptTyping(false); ptStatus();
+  } else if (m.t === "presence" && m.u !== me) { PT.online = !!m.online; if (!m.online) { ptTyping(false); callPartnerGone(); } ptStatus();
+  } else if (m.t === "rtc") { callOnSig(m);
   } else if (m.t === "slow") { ptMsg.textContent = ""; $("ptState").textContent = "slow down a little"; }
 }
 function ptTransmit(p) {
@@ -3901,7 +3951,7 @@ function ptRetry() { clearTimeout(PT.retry); if (!ptWanted()) return; PT.retry =
 function ptReset() {
   clearTimeout(PT.retry); const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; PT.online = false;
   if (w) { try { w.close(); } catch (e) {} }
-  PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
+  callEnd(false); PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
 }
 setInterval(() => {                                                   // keep-alive + dead-line detection (a phone that lost signal never says goodbye)
   if (!PT.ws || !PT.open) return;
@@ -3926,6 +3976,7 @@ function renderPartner() {
     ptStatus();
   } else {
     if (!ptDate.value && nDate.value) ptDate.value = nDate.value;
+    ptLoadUsers();
     api("outbox").then(r => {                                       // a request already waiting? say so instead of showing an empty form
       const w = (r.letters || []).find(l => l.type === "pair" && l.status === "pending");
       if (w && !account.pair) ptSay("Waiting for " + w.to.toUpperCase() + " to accept your invite.", true);
@@ -3940,6 +3991,7 @@ $("ptSend").addEventListener("click", async () => {
   const to = ptTo.value.trim().toLowerCase(), since = ptDate.value || nDate.value;
   if (!USER_RE.test(to)) return ptSay(ERR.BAD_USERNAME);
   if (!since) return ptSay("PICK YOUR ANNIVERSARY DATE FIRST.");
+  if ((PT.users || []).some(x => x.u === to && x.paired)) return ptSay(PAIR_ERR.THEY_PAIRED);
   $("ptSend").disabled = true; ptSay("Sending...", true);
   try {
     await api("pair_request", { to, since, role: PT.moon === "me" ? "moon" : "sun" });
@@ -3966,6 +4018,162 @@ wins.partner.addEventListener("pointerdown", () => setTimeout(ptSeenIfViewing, 0
   minApp = function (n) { _min(n); if (n === "partner") ptCount(); };
   closeApp = function (n) { _close(n); if (n === "partner") ptCount(); };
 }
+/* ---- who can I invite? a drop-down of every account; the ones already paired are pink and can't be picked ---- */
+PT.users = []; PT.usersAt = 0;
+async function ptLoadUsers() {
+  PT.usersAt = Date.now();
+  try { PT.users = (await api("pair_users")).users || []; }
+  catch (e) { try { PT.users = (await api("users")).users.filter(u => u !== ptMe()).map(u => ({ u, paired: false })); } catch (e2) {} }
+  ptDraw();
+}
+function ptDraw() {
+  const q = ptTo.value.trim().toLowerCase(), box = $("ptList"); box.textContent = "";
+  const list = PT.users.filter(x => !q || x.u.includes(q)).sort((a, b) => (a.paired - b.paired) || a.u.localeCompare(b.u));
+  if (!list.length) { const n = document.createElement("div"); n.className = "pt-none"; n.textContent = PT.users.length ? "No account matches that." : "No other accounts yet."; box.appendChild(n); return; }
+  for (const x of list) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "pt-u" + (x.paired ? " paired" : ""); b.setAttribute("role", "option"); b.dataset.u = x.u;
+    if (x.paired) b.setAttribute("aria-disabled", "true");
+    const n = document.createElement("span"); n.textContent = x.u; const t = document.createElement("em"); t.textContent = x.paired ? "paired" : "free"; b.append(n, t); box.appendChild(b);
+  }
+}
+function ptList(show) { $("ptList").hidden = !show; ptTo.setAttribute("aria-expanded", String(show)); if (show) { if (Date.now() - PT.usersAt > 4000) ptLoadUsers(); else ptDraw(); } }
+ptTo.addEventListener("focus", () => ptList(true));
+ptTo.addEventListener("input", () => { ptList(true); ptSay(""); });
+$("ptDrop").addEventListener("click", () => ptList($("ptList").hidden));
+$("ptList").addEventListener("pointerdown", e => e.preventDefault());                              // picking must not blur the box first
+$("ptList").addEventListener("click", e => {
+  const b = e.target.closest(".pt-u"); if (!b) return;
+  if (b.classList.contains("paired")) return ptSay(b.dataset.u.toUpperCase() + " IS ALREADY PAIRED WITH SOMEONE.");
+  ptTo.value = b.dataset.u; ptSay(""); ptList(false);
+});
+document.addEventListener("pointerdown", e => { if (!$("ptList").hidden && !e.target.closest(".pt-pick, #ptList")) ptList(false); });
+setInterval(() => { if (!wins.partner.hidden && !document.hidden && account.user && !account.pair && !$("ptList").hidden) ptLoadUsers(); }, 6000);
+
+/* ============================================================ VOICE + VIDEO CALLS (WebRTC)
+   The call itself goes phone-to-phone. Only the small "hello / here's my address" messages travel through the same chat
+   WebSocket (instant). Both people need the page open. Without a TURN key (see README note) it uses STUN only. */
+const CALL = { st: "idle", media: "audio", pc: null, local: null, pendIce: [], ringTimer: 0, ringIv: 0, tick: 0, t0: 0 };
+const ptSig = o => { if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify(Object.assign({ t: "rtc" }, o))); return true; } catch (e) {} } return false; };
+function ptCallBtns() {
+  const ok = ptWanted() && PT.open && PT.hello && PT.online && CALL.st === "idle" && !!(window.RTCPeerConnection && navigator.mediaDevices);
+  for (const id of ["ptVoice", "ptVideo"]) { const b = $(id); b.hidden = LOCAL.on; b.disabled = !ok; b.title = (id === "ptVoice" ? "Voice call" : "Video call") + (ok ? "" : CALL.st !== "idle" ? " (already in a call)" : " (available when " + (ptOther() || "they") + " is online)"); }
+}
+function callNote(t) {                                                // a small grey line in the chat (and a toast if the window is closed)
+  if (!t) return;
+  if (!wins.partner.hidden) { const n = ptLog.querySelector(".none"); if (n) n.remove(); const d = document.createElement("div"); d.className = "pt-sys"; d.textContent = t; ptLog.appendChild(d); ptBottom(); }
+  else if (!desk.hidden) showToast([["t-pair", t]], "partner");
+}
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+function callSet(st) {
+  CALL.st = st; const box = $("ptCall"), info = $("ptCallState");
+  box.hidden = st === "idle" || st === "ringing"; box.classList.toggle("audio", CALL.media !== "video"); box.classList.remove("camoff");
+  $("ptCallName").textContent = ptOther();
+  clearInterval(CALL.tick);
+  if (st === "calling") info.textContent = "Calling...";
+  else if (st === "connecting") info.textContent = "Connecting...";
+  else if (st === "active") { CALL.t0 = Date.now(); info.textContent = "0:00"; CALL.tick = setInterval(() => { info.textContent = mmss(Date.now() - CALL.t0); }, 1000); }
+  $("ptMute").classList.remove("on"); $("ptMute").textContent = "Mute"; $("ptCam").classList.remove("on"); $("ptCam").textContent = "Camera off";
+  ptCallBtns();
+}
+const callMediaErr = e => e && (e.name === "NotAllowedError" || e.name === "SecurityError") ? "Allow microphone" + (CALL.media === "video" ? " and camera" : "") + " access to call." : e && e.name === "NotFoundError" ? "No microphone" + (CALL.media === "video" ? " or camera" : "") + " found." : "Couldn't start the call.";
+async function callIce() { try { return (await api("turn")).iceServers; } catch (e) { return [{ urls: "stun:stun.cloudflare.com:3478" }]; } }
+function callMedia(video) {
+  return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    video: video ? { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 } } : false });
+}
+function callPc(ice) {
+  const pc = new RTCPeerConnection({ iceServers: ice, bundlePolicy: "max-bundle" }); CALL.pc = pc; CALL.pendIce = [];
+  for (const t of CALL.local.getTracks()) pc.addTrack(t, CALL.local);
+  $("ptLocal").srcObject = CALL.local;
+  pc.onicecandidate = e => { if (e.candidate) ptSig({ k: "ice", d: e.candidate.toJSON() }); };
+  pc.ontrack = e => { const v = $("ptRemote"); if (v.srcObject !== e.streams[0]) { v.srcObject = e.streams[0]; } v.play().catch(() => {}); };
+  pc.onconnectionstatechange = () => {
+    if (CALL.pc !== pc) return; const s = pc.connectionState;
+    if (s === "connected" && CALL.st !== "active") { clearTimeout(CALL.ringTimer); callSet("active"); }
+    else if (s === "failed") callEnd(true, "Call failed: the network blocked a direct connection.");
+    else if (s === "disconnected") setTimeout(() => { if (CALL.pc === pc && pc.connectionState === "disconnected") callEnd(true, "Call connection lost."); }, 6000);
+  };
+  return pc;
+}
+async function callFlush() { const q = CALL.pendIce; CALL.pendIce = []; for (const c of q) { try { await CALL.pc.addIceCandidate(c); } catch (e) {} } }
+function callRingStop() { clearInterval(CALL.ringIv); $("ptRing").hidden = true; }
+function callEnd(notify, note) {
+  if (CALL.st === "idle" && !CALL.local && !CALL.pc) { if (note) callNote(note); return; }
+  const was = CALL.st, dur = CALL.t0 && was === "active" ? Date.now() - CALL.t0 : 0;
+  if (notify) ptSig({ k: "end" });
+  clearTimeout(CALL.ringTimer); callRingStop(); clearInterval(CALL.tick);
+  if (CALL.local) { for (const t of CALL.local.getTracks()) { try { t.stop(); } catch (e) {} } }
+  if (CALL.pc) { const pc = CALL.pc; CALL.pc = null; pc.onconnectionstatechange = null; pc.onicecandidate = null; pc.ontrack = null; try { pc.close(); } catch (e) {} }
+  CALL.local = null; CALL.pendIce = []; CALL.t0 = 0; CALL.st = "idle";
+  $("ptRemote").srcObject = null; $("ptLocal").srcObject = null; $("ptCall").hidden = true;
+  try { sfx.down(); } catch (e) {}
+  callNote(note || (dur ? "Call ended - " + mmss(dur) : was === "idle" ? "" : "Call ended."));
+  ptCallBtns();
+}
+function callPartnerGone() { if (CALL.st === "calling" || CALL.st === "ringing" || CALL.st === "connecting") callEnd(false, ptOther() + " went offline."); }
+async function callStart(media) {
+  if (CALL.st !== "idle") return;
+  if (!PT.open || !PT.hello) return callNote("Not connected yet - try again in a moment.");
+  if (!PT.online) return callNote(ptOther() + " isn't online right now.");
+  CALL.media = media; callSet("calling");                              // show it straight away, then ask for the mic/camera
+  try { CALL.local = await callMedia(media === "video"); } catch (e) { CALL.st = "idle"; $("ptCall").hidden = true; ptCallBtns(); return callNote(callMediaErr(e)); }
+  if (CALL.st !== "calling") { for (const t of CALL.local.getTracks()) t.stop(); CALL.local = null; return; }
+  $("ptLocal").srcObject = CALL.local;
+  if (!ptSig({ k: "ring", media })) return callEnd(false, "Not connected - try again.");
+  CALL.ringTimer = setTimeout(() => { if (CALL.st === "calling") callEnd(true, ptOther() + " didn't answer."); }, 45000);
+}
+function callOnSig(m) {
+  const k = m.k;
+  if (k === "ring") {
+    if (CALL.st !== "idle") { ptSig({ k: "busy" }); return; }
+    CALL.media = m.media === "video" ? "video" : "audio"; CALL.st = "ringing"; ptCallBtns();
+    $("ptRingT").textContent = ptOther().toUpperCase() + " IS CALLING"; $("ptRingP").textContent = CALL.media === "video" ? "Video call" : "Voice call"; $("ptRing").hidden = false;
+    const ring = () => { try { sfx.pair(); navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {} }; ring(); clearInterval(CALL.ringIv); CALL.ringIv = setInterval(ring, 1900);
+    clearTimeout(CALL.ringTimer); CALL.ringTimer = setTimeout(() => { if (CALL.st === "ringing") { ptSig({ k: "decline" }); callEnd(false, "Missed call from " + ptOther() + "."); } }, 45000);
+  } else if (k === "accept" && CALL.st === "calling") {
+    callSet("connecting"); clearTimeout(CALL.ringTimer);
+    (async () => {
+      try { const pc = callPc(await callIce()); const o = await pc.createOffer(); await pc.setLocalDescription(o); ptSig({ k: "offer", d: pc.localDescription.toJSON() }); }
+      catch (e) { callEnd(true, "Couldn't start the call."); }
+    })();
+  } else if (k === "offer" && CALL.pc && CALL.st === "connecting") {
+    (async () => {
+      try { const pc = CALL.pc; await pc.setRemoteDescription(m.d); await callFlush(); const a = await pc.createAnswer(); await pc.setLocalDescription(a); ptSig({ k: "answer", d: pc.localDescription.toJSON() }); }
+      catch (e) { callEnd(true, "Couldn't connect the call."); }
+    })();
+  } else if (k === "answer" && CALL.pc) {
+    (async () => { try { await CALL.pc.setRemoteDescription(m.d); await callFlush(); } catch (e) { callEnd(true, "Couldn't connect the call."); } })();
+  } else if (k === "ice" && CALL.pc && m.d) {
+    if (CALL.pc.remoteDescription) CALL.pc.addIceCandidate(m.d).catch(() => {}); else CALL.pendIce.push(m.d);
+  } else if (k === "decline") callEnd(false, ptOther() + " declined the call.");
+  else if (k === "busy") callEnd(false, ptOther() + " is on another call.");
+  else if (k === "unavailable") callEnd(false, ptOther() + " isn't online right now.");
+  else if (k === "end") callEnd(false, CALL.st === "ringing" ? "Missed call from " + ptOther() + "." : "");
+}
+async function callAnswer() {
+  if (CALL.st !== "ringing") return;
+  clearTimeout(CALL.ringTimer); callRingStop(); openApp("partner");
+  try { CALL.local = await callMedia(CALL.media === "video"); } catch (e) { ptSig({ k: "decline" }); const n = callMediaErr(e); CALL.st = "idle"; ptCallBtns(); return callNote(n); }
+  if (CALL.st !== "ringing") { for (const t of CALL.local.getTracks()) t.stop(); CALL.local = null; return; }
+  callSet("connecting");
+  try { callPc(await callIce()); ptSig({ k: "accept" }); } catch (e) { callEnd(true, "Couldn't start the call."); }
+}
+$("ptVoice").addEventListener("click", () => callStart("audio"));
+$("ptVideo").addEventListener("click", () => callStart("video"));
+$("ptRingYes").addEventListener("click", callAnswer);
+$("ptRingNo").addEventListener("click", () => { if (CALL.st !== "ringing") return; ptSig({ k: "decline" }); callEnd(false, "Declined the call."); });
+$("ptHang").addEventListener("click", () => callEnd(true));
+$("ptMute").addEventListener("click", () => {
+  if (!CALL.local) return; const on = !$("ptMute").classList.contains("on");
+  for (const t of CALL.local.getAudioTracks()) t.enabled = !on; $("ptMute").classList.toggle("on", on); $("ptMute").textContent = on ? "Unmute" : "Mute";
+});
+$("ptCam").addEventListener("click", () => {
+  if (!CALL.local) return; const on = !$("ptCam").classList.contains("on");
+  for (const t of CALL.local.getVideoTracks()) t.enabled = !on; $("ptCam").classList.toggle("on", on); $("ptCam").textContent = on ? "Camera on" : "Camera off"; $("ptCall").classList.toggle("camoff", on);
+});
+window.addEventListener("pagehide", () => { if (CALL.st !== "idle") ptSig({ k: "end" }); });
+ptCallBtns();
+
 
 
 /* ---- chat while you play + faster updates ---- */

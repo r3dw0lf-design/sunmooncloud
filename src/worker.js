@@ -9,6 +9,7 @@
      SINGLE_SESSION=1   logging in on a new device logs the old one out */
 
 let DB;                                                       // the D1 database (bound as DB in wrangler.toml)
+let TURN_ID = "", TURN_TOKEN = "", turnCache = null;                // optional Cloudflare TURN key (makes calls work on every network)
 let ROOM;                                                     // the live-chat Durable Object namespace (bound as ROOM in wrangler.toml)
 /* A tiny key-value layer on D1 (table kv: k, v, ver). It offers the same calls the old Netlify Blobs store did, including
    "write only if new" and "write only if unchanged" (ver is the etag), so every route below works as it was.
@@ -569,6 +570,30 @@ const routes = {
   },
 
   /* ---- online status: every page pings, and learns whether the partner is around and whether a game is waiting ---- */
+  async pair_users(req) {                                   // everyone you could invite, and who is already taken (shown pink in the Partner app)
+    const me = (await needUser(req)).rec.username, st = store();
+    const { blobs } = await st.list({ prefix: "u/" });
+    const names = blobs.map(b => b.key.slice(2)).filter(u => u !== me).slice(0, 400);
+    const recs = await Promise.all(names.map(u => st.get("u/" + u, { type: "json" })));
+    return { users: names.map((u, i) => ({ u, paired: !!(recs[i] && recs[i].pair) })).sort((a, b) => a.paired - b.paired || a.u.localeCompare(b.u)) };
+  },
+
+  async turn(req) {                                         // network helpers for voice/video calls (only for paired people)
+    await needUser(req);
+    const stun = { urls: "stun:stun.cloudflare.com:3478" };
+    if (!TURN_ID || !TURN_TOKEN) return { iceServers: [stun], relay: false };
+    if (turnCache && turnCache.exp > Date.now()) return turnCache.val;
+    try {
+      const r = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${TURN_ID}/credentials/generate`, { method: "POST",
+        headers: { Authorization: `Bearer ${TURN_TOKEN}`, "Content-Type": "application/json" }, body: JSON.stringify({ ttl: 86400 }) });
+      if (!r.ok) throw new Error("turn " + r.status);
+      const j = await r.json(), ice = Array.isArray(j.iceServers) ? j.iceServers : [j.iceServers];
+      const val = { iceServers: [stun, ...ice], relay: true };
+      turnCache = { val, exp: Date.now() + 3600000 };
+      return val;
+    } catch (e) { console.error(e); return { iceServers: [stun], relay: false }; }
+  },
+
   async presence(req, res, b) {
     const rec = (await needUser(req)).rec, me = rec.username, st = store();
     await st.setJSON(`p/${me}`, { at: b.off ? 0 : Date.now() });
@@ -735,7 +760,7 @@ const padSeq = n => String(n).padStart(10, "0");
 export class PairRoom extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
-    this.seq = 0; this.seen = {}; this.hits = new Map();
+    this.seq = 0; this.seen = {}; this.hits = new Map(); this.rtcHits = new Map();
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));   // keep-alive answered without waking the object
     this.ctx.blockConcurrencyWhile(async () => {
       this.seq = (await this.ctx.storage.get("seq")) || 0;
@@ -776,10 +801,11 @@ export class PairRoom extends DurableObject {
     return r.n > 25;
   }
   async webSocketMessage(ws, data) {
-    if (typeof data !== "string" || data.length > 4000) return;
+    if (typeof data !== "string" || data.length > 20000) return;
     let m; try { m = JSON.parse(data); } catch (e) { return; }
     if (!m || typeof m !== "object") return;
     const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
+    if (m.t !== "rtc" && data.length > 4000) return;
     if (m.t === "chat") {
       const text = String(m.text || "").replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F]/g, "").trim().slice(0, 1000);
       if (!text) return;
@@ -792,6 +818,17 @@ export class PairRoom extends DurableObject {
         const old = await this.ctx.storage.list({ prefix: "m:", limit: 200, end: "m:" + padSeq(id - CHAT_KEEP) });
         if (old.size) await this.ctx.storage.delete([...old.keys()]);
       }
+    } else if (m.t === "rtc") {                                // voice/video call signalling: just passed to the partner, instantly
+      const t = Date.now(), r = this.rtcHits.get(me) || { n: 0, reset: t + 10000 };
+      if (t > r.reset) { r.n = 0; r.reset = t + 10000; } r.n++; this.rtcHits.set(me, r); if (r.n > 400) return;
+      const k = String(m.k || "");
+      if (!["ring", "accept", "decline", "busy", "end", "offer", "answer", "ice"].includes(k)) return;
+      const d = m.d === undefined ? null : m.d;
+      if (JSON.stringify(d).length > 16000) return;
+      const others = this.ctx.getWebSockets().filter(w => w.readyState === 1 && ((w.deserializeAttachment() || {}).u || "") !== me);
+      if (!others.length) { if (k === "ring") { try { ws.send(JSON.stringify({ t: "rtc", k: "unavailable" })); } catch (e) {} } return; }
+      const text = JSON.stringify({ t: "rtc", k, d, media: m.media === "video" ? "video" : "audio", from: me });
+      for (const w of others) { try { w.send(text); } catch (e) {} }
     } else if (m.t === "typing") {
       this.send({ t: "typing", u: me, on: m.on !== false }, ws);
     } else if (m.t === "seen") {
@@ -865,7 +902,7 @@ export default {
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     const bad = () => new Response(JSON.stringify({ code: "SERVER" }), { status: 500, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
     if (!env.DB) return bad();
-    DB = env.DB; ROOM = env.ROOM; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
+    DB = env.DB; ROOM = env.ROOM; TURN_ID = env.TURN_KEY_ID || ""; TURN_TOKEN = env.TURN_KEY_API_TOKEN || ""; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
     try { await init(); } catch (e) { console.error(e); return bad(); }
     if (url.pathname === "/api/ws") return chatSocket(request, env);
     return handle(request, { ip: request.headers.get("CF-Connecting-IP") });
