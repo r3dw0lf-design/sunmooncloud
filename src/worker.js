@@ -1,4 +1,3 @@
-// @ts-nocheck  (plain JavaScript run by Cloudflare; this stops the editor showing type-checker warnings)
 /* Sun & Moon - account API as a Cloudflare Worker (served at /api/*, static files come from ./public).
    ONE shared list of accounts for everyone, stored in Cloudflare D1 (one SQLite table, strongly consistent).
    - A username is claimed with a "write only if new" call, so two people can never both get it,
@@ -10,6 +9,8 @@
      SINGLE_SESSION=1   logging in on a new device logs the old one out */
 
 let DB;                                                       // the D1 database (bound as DB in wrangler.toml)
+let TURN_ID = "", TURN_TOKEN = "", turnCache = null;                // optional Cloudflare TURN key (makes calls work on every network)
+let ROOM;                                                     // the live-chat Durable Object namespace (bound as ROOM in wrangler.toml)
 /* A tiny key-value layer on D1 (table kv: k, v, ver). It offers the same calls the old Netlify Blobs store did, including
    "write only if new" and "write only if unchanged" (ver is the etag), so every route below works as it was.
    Reads and deletes issued in the same tick are merged into ONE query, which keeps a request under Cloudflare's subrequest limit. */
@@ -29,8 +30,8 @@ async function flushDels() {
   catch (e) { q.forEach(x => x.rej(e)); }
 }
 const d1Store = () => ({
-  async get(k, _opts) { const r = await qGet(k); return r ? JSON.parse(r.v) : null; },
-  async getWithMetadata(k, _opts) { const r = await qGet(k); return r ? { data: JSON.parse(r.v), etag: String(r.ver) } : null; },
+  async get(k) { const r = await qGet(k); return r ? JSON.parse(r.v) : null; },
+  async getWithMetadata(k) { const r = await qGet(k); return r ? { data: JSON.parse(r.v), etag: String(r.ver) } : null; },
   async setJSON(k, val, o = {}) {
     const v = JSON.stringify(val); let r;
     if (o.onlyIfNew) r = await DB.prepare("INSERT INTO kv (k, v, ver) VALUES (?, ?, 1) ON CONFLICT(k) DO NOTHING").bind(k, v).run();
@@ -39,9 +40,10 @@ const d1Store = () => ({
     return { modified: r.meta.changes > 0 };
   },
   delete: k => qDel(k),
-  async list({ prefix = "" } = {}, _opts) { const r = await DB.prepare("SELECT k FROM kv WHERE k >= ? AND k < ? ORDER BY k").bind(prefix, prefix + "\uffff").all(); return { blobs: r.results.map(x => ({ key: x.k })) }; },
+  async list({ prefix = "" } = {}) { const r = await DB.prepare("SELECT k FROM kv WHERE k >= ? AND k < ? ORDER BY k").bind(prefix, prefix + "\uffff").all(); return { blobs: r.results.map(x => ({ key: x.k })) }; },
 });
 import crypto from "node:crypto";
+import { DurableObject } from "cloudflare:workers";
 import { promisify } from "node:util";
 
 const scrypt = promisify(crypto.scrypt);
@@ -243,6 +245,9 @@ async function noteFail(username, code) {
 const GAMES = { ttt: "TIC-TAC-TOE", c4: "CONNECT 4" };
 const ONLINE_MS = 40000;                                       // a page pings every ~12s, so 40s of silence = offline
 const pairKey = (a, b) => [a, b].sort().join("~");
+async function clearRoom(a, b) {                              // unpairing wipes the chat and kicks any open chat connections
+  try { if (ROOM) await ROOM.get(ROOM.idFromName(pairKey(a, b))).fetch("https://room/clear", { method: "POST" }); } catch (e) { console.error(e); }
+}
 async function pairCtx(req) {
   const rec = (await needUser(req)).rec;
   if (!rec.pair) throw fail(409, "NOT_PAIRED");
@@ -516,6 +521,7 @@ const routes = {
     const other = me.pair.with;
     await mutate(me.username, r => { r.pair = null; return r; });
     await store().delete(`g/${pairKey(me.username, other)}`).catch(() => {});      // their game goes with the pairing
+    await clearRoom(me.username, other);                                            // ...and so does their chat
     try {
       await mutate(other, r => { if (r.pair && r.pair.with === me.username) r.pair = null; return r; });
       await notify(other, { kind: "unpaired", by: me.username });
@@ -564,6 +570,30 @@ const routes = {
   },
 
   /* ---- online status: every page pings, and learns whether the partner is around and whether a game is waiting ---- */
+  async pair_users(req) {                                   // everyone you could invite, and who is already taken (shown pink in the Partner app)
+    const me = (await needUser(req)).rec.username, st = store();
+    const { blobs } = await st.list({ prefix: "u/" });
+    const names = blobs.map(b => b.key.slice(2)).filter(u => u !== me).slice(0, 400);
+    const recs = await Promise.all(names.map(u => st.get("u/" + u, { type: "json" })));
+    return { users: names.map((u, i) => ({ u, paired: !!(recs[i] && recs[i].pair) })).sort((a, b) => a.paired - b.paired || a.u.localeCompare(b.u)) };
+  },
+
+  async turn(req) {                                         // network helpers for voice/video calls (only for paired people)
+    await needUser(req);
+    const stun = { urls: "stun:stun.cloudflare.com:3478" };
+    if (!TURN_ID || !TURN_TOKEN) return { iceServers: [stun], relay: false };
+    if (turnCache && turnCache.exp > Date.now()) return turnCache.val;
+    try {
+      const r = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${TURN_ID}/credentials/generate`, { method: "POST",
+        headers: { Authorization: `Bearer ${TURN_TOKEN}`, "Content-Type": "application/json" }, body: JSON.stringify({ ttl: 86400 }) });
+      if (!r.ok) throw new Error("turn " + r.status);
+      const j = await r.json(), ice = Array.isArray(j.iceServers) ? j.iceServers : [j.iceServers];
+      const val = { iceServers: [stun, ...ice], relay: true };
+      turnCache = { val, exp: Date.now() + 3600000 };
+      return val;
+    } catch (e) { console.error(e); return { iceServers: [stun], relay: false }; }
+  },
+
   async presence(req, res, b) {
     const rec = (await needUser(req)).rec, me = rec.username, st = store();
     await st.setJSON(`p/${me}`, { at: b.off ? 0 : Date.now() });
@@ -636,54 +666,17 @@ const routes = {
     return { game };
   },
 
-  async game_chat(req, res, b) {                               // text, GIF or sticker, optionally as a reply
+  async game_chat(req, res, b) {                               // a short message to your partner while you play
     const { me, key } = await pairCtx(req);
     const text = String(b.text || "").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim().slice(0, 200);
-    const gif = typeof b.gif === "string" && /^https:\/\/(media[0-9]*|i)\.giphy\.com\/[A-Za-z0-9\/._-]{5,200}$/.test(b.gif) ? b.gif : "";
-    const stk = typeof b.stk === "string" && b.stk.length <= 60000 && /^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]{50,}$/.test(b.stk) ? b.stk : "";
-    if (!text && !gif && !stk) throw fail(400, "EMPTY");
+    if (!text) throw fail(400, "EMPTY");
     if (chatLimited(me)) throw fail(429, "TOO_MANY", { retry: 10 });
-    const id = crypto.randomUUID().slice(0, 8);
-    if (stk) await store().setJSON(`stk/${key}/${id}`, { img: stk });   // sticker pictures live apart from the chat so polling stays light
     const game = await casGame(key, g => {
       if (g.id !== String(b.gid) || (g.status !== "active" && g.status !== "done")) throw fail(409, "GAME_GONE");
-      const m = { id, from: me, text, at: Date.now() }, o = b.reply && (g.chat || []).find(x => x.id === String(b.reply));
-      if (gif) m.gif = gif; if (stk) m.sid = id;
-      if (o && !o.del) m.re = { id: o.id, from: o.from, snip: o.text ? o.text.slice(0, 60) : o.gif ? "GIF" : "Sticker" };
-      g.chat = (g.chat || []).concat(m).slice(-60);
+      g.chat = (g.chat || []).concat({ from: me, text, at: Date.now() }).slice(-40);
       return g;
     });
     return { game };
-  },
-
-  async game_react(req, res, b) {                              // tap an emoji on a message (same emoji again takes it back)
-    const { me, key } = await pairCtx(req), em = String(b.emoji || "");
-    if (!["\u2764\uFE0F", "\uD83D\uDE02", "\uD83D\uDE2E", "\uD83D\uDE22", "\uD83D\uDC4D", "\uD83D\uDD25"].includes(em)) throw fail(400, "EMPTY");
-    if (chatLimited(me)) throw fail(429, "TOO_MANY", { retry: 10 });
-    const game = await casGame(key, g => {
-      if (g.id !== String(b.gid)) throw fail(409, "GAME_GONE");
-      const m = (g.chat || []).find(x => x.id === String(b.id)); if (!m || m.del) return g;
-      m.r = m.r || {}; if (m.r[me] === em) delete m.r[me]; else m.r[me] = em;
-      return g;
-    });
-    return { game };
-  },
-
-  async game_unsend(req, res, b) {                             // take back your own message
-    const { me, key } = await pairCtx(req);
-    const game = await casGame(key, g => {
-      if (g.id !== String(b.gid)) throw fail(409, "GAME_GONE");
-      const m = (g.chat || []).find(x => x.id === String(b.id)); if (!m || m.from !== me) return g;
-      m.del = true; m.text = ""; delete m.gif; delete m.sid; delete m.re; delete m.r;
-      return g;
-    });
-    return { game };
-  },
-
-  async game_stk(req, res, b) {                                // fetch one sticker picture
-    const { key } = await pairCtx(req), v = await store().get(`stk/${key}/${String(b.sid || "").replace(/[^a-z0-9-]/gi, "")}`);
-    if (!v) throw fail(404, "EMPTY");
-    return { img: v.img };
   },
 
   async game_rematch(req) {                                    // same game again; whoever went second now goes first
@@ -723,6 +716,7 @@ const routes = {
     const gone = await getUser(u);
     if (!gone) throw fail(404, "NO_USER");
     if (gone.pair) await mutate(gone.pair.with, r => { if (r.pair && r.pair.with === u) r.pair = null; return r; }).catch(() => {});
+    if (gone.pair) await clearRoom(u, gone.pair.with);
     await st.delete("u/" + u);                                 // their logins stop working at once; the name becomes free again
     const { blobs } = await st.list({ prefix: `m/${u}/` });
     await Promise.all(blobs.map(x => st.delete(x.key)));       // and their inbox is erased
@@ -756,6 +750,139 @@ const routes = {
     return { ok: true };
   },
 };
+
+/* ---------------- live chat (WebSockets) ----------------
+   One Durable Object per pair. Both phones keep a WebSocket open to it, so a message goes phone -> object -> phone with
+   no polling and no database round trip in between (the message is saved in the background after it has been sent).
+   The object also relays "typing...", "seen" ticks and online/offline, all instantly. */
+const CHAT_KEEP = 300;
+const padSeq = n => String(n).padStart(10, "0");
+export class PairRoom extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    this.seq = 0; this.seen = {}; this.pseq = 0; this.hits = new Map(); this.rtcHits = new Map();
+    this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));   // keep-alive answered without waking the object
+    this.ctx.blockConcurrencyWhile(async () => {
+      this.seq = (await this.ctx.storage.get("seq")) || 0;
+      this.seen = (await this.ctx.storage.get("seen")) || {};
+      this.pseq = (await this.ctx.storage.get("pseq")) || 0;
+    });
+  }
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname === "/clear") {
+      for (const w of this.ctx.getWebSockets()) { try { w.close(4001, "unpaired"); } catch (e) {} }
+      await this.ctx.storage.deleteAll(); this.seq = 0; this.pseq = 0; this.seen = {};
+      return new Response("ok");
+    }
+    if (request.headers.get("Upgrade") !== "websocket") return new Response("Expected a WebSocket", { status: 426 });
+    const me = request.headers.get("X-SM-User") || "";
+    if (!me) return new Response("No user", { status: 400 });
+    const pair = new WebSocketPair(), client = pair[0], server = pair[1];
+    this.ctx.acceptWebSocket(server, [me]);
+    server.serializeAttachment({ u: me });
+    const rows = await this.ctx.storage.list({ prefix: "m:", reverse: true, limit: 100 });
+    server.send(JSON.stringify({ t: "hello", me, msgs: [...rows.values()].reverse(), seen: this.seen, online: this.online() }));
+    this.send({ t: "presence", u: me, online: true }, server);
+    return new Response(null, { status: 101, webSocket: client });
+  }
+  online() {
+    const set = new Set();
+    for (const w of this.ctx.getWebSockets()) if (w.readyState === 1) { const a = w.deserializeAttachment(); if (a && a.u) set.add(a.u); }
+    return [...set];
+  }
+  send(obj, except) {
+    const text = JSON.stringify(obj);
+    for (const w of this.ctx.getWebSockets()) { if (w !== except && w.readyState === 1) { try { w.send(text); } catch (e) {} } }
+  }
+  limited(user) {
+    const t = Date.now(), r = this.hits.get(user) || { n: 0, reset: t + 10000 };
+    if (t > r.reset) { r.n = 0; r.reset = t + 10000; }
+    r.n++; this.hits.set(user, r);
+    return r.n > 25;
+  }
+  async webSocketMessage(ws, data) {
+    if (typeof data !== "string" || data.length > 420000) return;
+    let m; try { m = JSON.parse(data); } catch (e) { return; }
+    if (!m || typeof m !== "object") return;
+    const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
+    if (m.t !== "rtc" && m.t !== "post" && data.length > 4000) return;
+    if (m.t === "chat") {
+      const text = String(m.text || "").replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F]/g, "").trim().slice(0, 1000);
+      if (!text) return;
+      if (this.limited(me)) { try { ws.send(JSON.stringify({ t: "slow" })); } catch (e) {} return; }
+      const id = ++this.seq, msg = { id, from: me, text, at: Date.now() };
+      this.send({ t: "msg", msg, cid: String(m.cid || "").slice(0, 40) });                  // to everyone, the sender included (that is their "sent" tick)
+      const puts = { seq: id }; puts["m:" + padSeq(id)] = msg;
+      await this.ctx.storage.put(puts, { allowUnconfirmed: true });                          // saved in the background: nobody waits for the disk
+      if (id % 50 === 0) {
+        const old = await this.ctx.storage.list({ prefix: "m:", limit: 200, end: "m:" + padSeq(id - CHAT_KEEP) });
+        if (old.size) await this.ctx.storage.delete([...old.keys()]);
+      }
+    } else if (m.t === "rtc") {                                // voice/video call signalling: just passed to the partner, instantly
+      const t = Date.now(), r = this.rtcHits.get(me) || { n: 0, reset: t + 10000 };
+      if (t > r.reset) { r.n = 0; r.reset = t + 10000; } r.n++; this.rtcHits.set(me, r); if (r.n > 400) return;
+      const k = String(m.k || "");
+      if (!["ring", "accept", "decline", "busy", "end", "offer", "answer", "ice"].includes(k)) return;
+      const d = m.d === undefined ? null : m.d;
+      if (JSON.stringify(d).length > 16000) return;
+      const others = this.ctx.getWebSockets().filter(w => w.readyState === 1 && ((w.deserializeAttachment() || {}).u || "") !== me);
+      if (!others.length) { if (k === "ring") { try { ws.send(JSON.stringify({ t: "rtc", k: "unavailable" })); } catch (e) {} } return; }
+      const text = JSON.stringify({ t: "rtc", k, d, media: m.media === "video" ? "video" : "audio", from: me });
+      for (const w of others) { try { w.send(text); } catch (e) {} }
+    } else if (m.t === "post") {                               // Moonsta feed: a photo (already shrunk by the phone) + caption
+      const img = String(m.img || ""), cap = String(m.cap || "").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, 300);
+      if (!/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(img) || img.length > 380000 || this.limited(me)) return;
+      const id = ++this.pseq, post = { id, from: me, img, cap, at: Date.now(), likes: [] };
+      await this.ctx.storage.put({ pseq: id, ["p:" + padSeq(id)]: post });
+      this.send({ t: "post", post });
+    } else if (m.t === "like") {
+      const key = "p:" + padSeq(parseInt(m.id, 10) || 0), post = await this.ctx.storage.get(key); if (!post) return;
+      const i = post.likes.indexOf(me); if (i >= 0) post.likes.splice(i, 1); else post.likes.push(me);
+      this.send({ t: "like", id: post.id, likes: post.likes });
+      await this.ctx.storage.put(key, post, { allowUnconfirmed: true });
+    } else if (m.t === "react") {                              // double-tap a chat bubble = heart
+      const key = "m:" + padSeq(parseInt(m.id, 10) || 0), msg = await this.ctx.storage.get(key); if (!msg) return;
+      msg.r = msg.r || {}; if (msg.r[me]) delete msg.r[me]; else msg.r[me] = "\u2764\uFE0F";
+      this.send({ t: "react", id: msg.id, r: msg.r });
+      await this.ctx.storage.put(key, msg, { allowUnconfirmed: true });
+    } else if (m.t === "feed") {
+      const rows = await this.ctx.storage.list({ prefix: "p:", reverse: true, limit: 24 });
+      for (const post of rows.values()) { try { ws.send(JSON.stringify({ t: "post", post, old: 1 })); } catch (e) {} }
+    } else if (m.t === "typing") {
+      this.send({ t: "typing", u: me, on: m.on !== false }, ws);
+    } else if (m.t === "seen") {
+      const up = Math.min(this.seq, Math.max(0, parseInt(m.upTo, 10) || 0));
+      if (up > (this.seen[me] || 0)) {
+        this.seen[me] = up;
+        this.send({ t: "seen", u: me, upTo: up }, ws);
+        await this.ctx.storage.put("seen", this.seen, { allowUnconfirmed: true });
+      }
+    }
+  }
+  async webSocketClose(ws, code, reason) {
+    try { ws.close(code === 1005 || code === 1006 ? 1000 : code, "bye"); } catch (e) {}
+    this.gone(ws);
+  }
+  async webSocketError(ws) { this.gone(ws); }
+  gone(ws) {
+    const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
+    const still = this.ctx.getWebSockets(me).some(w => w !== ws && w.readyState === 1);
+    if (!still) { this.send({ t: "presence", u: me, online: false }, ws); this.send({ t: "typing", u: me, on: false }, ws); }
+  }
+}
+async function chatSocket(req, env) {                          // GET /api/ws - only a logged-in, paired person gets through, and only to their own pair's room
+  const err = (status, code) => new Response(JSON.stringify({ code }), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  if (req.method !== "GET" || req.headers.get("Upgrade") !== "websocket") return err(426, "SERVER");
+  const url = new URL(req.url), origin = req.headers.get("origin");
+  if (origin) { try { if (new URL(origin).host !== url.host) throw 0; } catch (e) { return err(403, "SERVER"); } }
+  if (!env.ROOM) return err(500, "SERVER");
+  const s = await sessionUser(req);
+  if (!s) return err(401, "UNAUTH");
+  if (!s.rec.pair) return err(409, "NOT_PAIRED");
+  const h = new Headers(req.headers); h.set("X-SM-User", s.rec.username);
+  return env.ROOM.get(env.ROOM.idFromName(pairKey(s.rec.username, s.rec.pair.with))).fetch(new Request(req, { headers: h }));
+}
 
 /* ---------------- entry point ---------------- */
 async function handle(req, context) {
@@ -795,15 +922,9 @@ export default {
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     const bad = () => new Response(JSON.stringify({ code: "SERVER" }), { status: 500, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
     if (!env.DB) return bad();
-    DB = env.DB; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
+    DB = env.DB; ROOM = env.ROOM; TURN_ID = env.TURN_KEY_ID || ""; TURN_TOKEN = env.TURN_KEY_API_TOKEN || ""; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
     try { await init(); } catch (e) { console.error(e); return bad(); }
+    if (url.pathname === "/api/ws") return chatSocket(request, env);
     return handle(request, { ip: request.headers.get("CF-Connecting-IP") });
   },
 };
-
-/* Placeholder for the older chat-room class this Worker used to have. Cloudflare refuses a new deploy if a class that
-   already exists goes missing, so it stays here (does nothing, deletes nothing). */
-export class PairRoom {
-  constructor(state, env) {}
-  async fetch() { return new Response("Retired", { status: 410 }); }
-}

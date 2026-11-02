@@ -353,11 +353,6 @@
   #toast .t-open { color: #ffb000; text-shadow: 0 0 6px #ffb00055; }
   #toast .t-pair { color: #ff9ec7; }
   #toast div + div { margin-top: 3px; }
-  #toast .qr, #toast .qr * { pointer-events: auto; }
-  #toast .qr { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  #toast .qr input { flex: 1 1 150px; min-width: 0; font: inherit; font-size: 16px; padding: 7px 9px; background: #00160a; color: var(--glow); border: 1px solid #3dff8a66; border-radius: 4px; }
-  #toast .qr button { font: inherit; font-size: 13px; min-height: 36px; padding: 6px 10px; cursor: pointer; background: #0a3a1c; color: var(--glow); border: 1px solid #3dff8a66; border-radius: 4px; }
-  #toast .qr button:disabled { opacity: .5; }
   #toast small { display: block; opacity: .65; font-size: 10px; letter-spacing: .12em; margin-top: 4px; }
   @keyframes toastIn { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { #toast { animation: none; } }
@@ -608,6 +603,127 @@
   @keyframes gmdrop { from { transform: translateY(-330%); } to { transform: none; } }
   @keyframes gmglow { to { filter: brightness(1.25); } }
   @media (prefers-reduced-motion: reduce) { .gm-disc.last, .gm-cell.last, .gm-disc.hit { animation: none; } }
+  /* ---- Partner app: invite + live chat ---- */
+  #win-partner { width: min(440px, 98vw); height: min(78vh, 640px); }
+  #win-partner .wbody { background: rgba(255,255,255,.35); font-family: Tahoma, "Segoe UI", Verdana, sans-serif; color: #12315f; display: flex; flex-direction: column; overflow: hidden; }
+  .pt-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 10px; gap: 8px; }
+  .pt-card { display: flex; flex-direction: column; gap: 8px; padding: 14px; border: 1px solid rgba(255,255,255,.9); border-radius: 10px; background: rgba(255,255,255,.62); box-shadow: 0 1px 4px rgba(0,40,110,.15); overflow: auto; }
+  .pt-card[hidden], #ptChat[hidden] { display: none; }
+  .pt-card h3 { margin: 0; font-size: 16px; color: #0a3d91; }
+  .pt-card p { margin: 0; font-size: 12.5px; line-height: 1.45; }
+  .pt-card label { font: bold 11px Tahoma, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: #4a6a9a; }
+  .pt-card input { padding: 8px 10px; border: 1px solid #8fb0e6; border-radius: 7px; font: 14px Tahoma, sans-serif; color: #12315f; background: #fff; min-width: 0; }
+  .pt-who { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; }
+  .pt-who div { display: flex; gap: 4px; }
+  .pt-who button { padding: 5px 12px; border: 1px solid #8fb0e6; border-radius: 7px; background: #fff; color: #12315f; font: 12px Tahoma, sans-serif; cursor: pointer; }
+  .pt-who button[aria-selected="true"] { background: #2f6fe0; color: #fff; border-color: #fff; }
+  #ptMsg { font-size: 12px; min-height: 16px; color: #1a6b35; }
+  #ptMsg.bad { color: #b3261e; }
+  #ptChat { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+  .pt-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.9); border-radius: 10px; background: rgba(255,255,255,.62); }
+  .pt-head b { font-size: 14px; color: #0a3d91; }
+  .pt-head small { margin-left: auto; font-size: 11.5px; color: #4a6a9a; }
+  #ptDot { width: 11px; height: 11px; border-radius: 50%; background: #9aa5b8; flex: none; box-shadow: inset 0 0 0 2px rgba(0,0,0,.15); }
+  #ptDot.on { background: #2fd66a; box-shadow: 0 0 6px #2fd66a; }
+  #ptDot.warn { background: #f0b429; }
+  #ptLog { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; padding: 8px; border-radius: 10px; background: rgba(255,255,255,.72); border: 1px solid #c3d3ee; user-select: text; -webkit-user-select: text; overscroll-behavior: contain; }
+  #ptLog .none { margin: auto; font-size: 12.5px; color: #7f95b8; text-align: center; }
+  .pt-m { max-width: 82%; padding: 6px 10px 4px; border-radius: 14px; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; white-space: pre-wrap; box-shadow: 0 1px 2px rgba(0,30,80,.18); animation: ptin .12s ease-out; }
+  .pt-m.me { align-self: flex-end; border-bottom-right-radius: 4px; }
+  .pt-m.them { align-self: flex-start; border-bottom-left-radius: 4px; }
+  .pt-m.sun { background: linear-gradient(#fff1b8, #ffd96a); color: #4a3500; }
+  .pt-m.moon { background: linear-gradient(#e3e9ff, #b9c8ff); color: #1c2a5e; }
+  .pt-m.pend { opacity: .6; }
+  .pt-m small { display: block; margin-top: 1px; text-align: right; font-size: 10px; opacity: .65; letter-spacing: .02em; }
+  .pt-m small .tk.seen { color: #1a7f3c; font-weight: bold; }
+  @keyframes ptin { from { transform: translateY(5px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+  #ptTyping { font-size: 12px; font-style: italic; color: #4a6a9a; padding: 0 6px; }
+  #ptTyping[hidden] { display: none; }
+  #ptForm { display: flex; gap: 6px; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  #ptIn { flex: 1; min-width: 0; padding: 9px 11px; border: 1px solid #8fb0e6; border-radius: 9px; font: 16px Tahoma, sans-serif; color: #12315f; background: #fff; }
+  #ptIn:focus { outline: 2px solid #2f6fe0; outline-offset: 0; }
+  .pt-wrap { position: relative; }
+  .pt-pick { display: flex; gap: 4px; }
+  .pt-pick input { flex: 1; }
+  #ptDrop { width: 38px; border: 1px solid #8fb0e6; border-radius: 7px; background: #fff; color: #12315f; font-size: 14px; cursor: pointer; }
+  #ptList { max-height: 200px; overflow-y: auto; border: 1px solid #8fb0e6; border-radius: 7px; background: #fff; }
+  #ptList[hidden] { display: none; }
+  .pt-u { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; padding: 9px 11px; border: 0; border-bottom: 1px solid #e6eefc; background: #fff; color: #12315f; font: 14px Tahoma, sans-serif; text-align: left; cursor: pointer; }
+  .pt-u:hover { background: #e8f0ff; }
+  .pt-u em { font-style: normal; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+  .pt-u.paired, .pt-u.paired:hover { background: #ffd0e4; color: #a3205a; cursor: not-allowed; }
+  .pt-none { padding: 10px; font-size: 12.5px; color: #7f95b8; }
+  .pt-key { font-size: 11px; color: #4a6a9a; }
+  .pt-key i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; border: 1px solid #8fb0e6; }
+  .pt-key i.f { background: #fff; } .pt-key i.p { background: #ffd0e4; border-color: #e58ab0; }
+  .pt-ic { width: 34px; height: 30px; border: 1px solid #fff; border-radius: 8px; background: linear-gradient(#5b9bff, #2f6fe0); font-size: 15px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,40,110,.3); }
+  .pt-ic:disabled { filter: grayscale(1); opacity: .45; cursor: not-allowed; }
+  .pt-head small { margin-left: auto; }
+  .pt-sys { align-self: center; font-size: 11.5px; color: #6a7fa5; background: rgba(255,255,255,.7); padding: 2px 10px; border-radius: 10px; }
+  #ptCall { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; background: #0b1630; color: #fff; border-radius: 8px; overflow: hidden; }
+  #ptCall[hidden] { display: none; }
+  #ptRemote { flex: 1; min-height: 0; width: 100%; object-fit: cover; background: #050a18; }
+  #ptCall.audio #ptRemote { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  #ptCall.audio { background: radial-gradient(circle at 50% 38%, #243a7a, #0b1630 70%); }
+  #ptLocal { position: absolute; right: 10px; top: 10px; width: 92px; height: 124px; object-fit: cover; border-radius: 10px; border: 2px solid #fff; background: #000; transform: scaleX(-1); box-shadow: 0 4px 14px #0008; z-index: 2; }
+  #ptCall.audio #ptLocal, #ptCall.camoff #ptLocal { display: none; }
+  #ptCallInfo { position: absolute; left: 0; right: 0; top: 14px; text-align: center; text-shadow: 0 1px 6px #000a; pointer-events: none; z-index: 1; }
+  #ptCall.audio #ptCallInfo { top: 34%; }
+  #ptCallInfo b { display: block; font-size: 20px; }
+  #ptCallInfo small { font-size: 13px; opacity: .85; }
+  .pt-ctl { position: absolute; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; gap: 10px; z-index: 3; }
+  .pt-ctl button { padding: 11px 16px; border: 1px solid #ffffff88; border-radius: 24px; background: #ffffff26; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; font: bold 13px Tahoma, sans-serif; cursor: pointer; }
+  .pt-ctl button.on { background: #fff; color: #12315f; }
+  .pt-ctl button.end { background: #e0301e; border-color: #fff; }
+  #ptCall.audio #ptCam { display: none; }
+  #ptRing { position: fixed; z-index: 9600; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
+  #ptRing[hidden] { display: none; }
+  #ptRing b { display: block; font-size: 16px; color: #0a3d91; margin-bottom: 2px; }
+  #ptRing p { margin: 0 0 10px; }
+  .pt-tabs { display: flex; gap: 4px; }
+  .pt-tabs button { flex: 1; padding: 7px; border: 1px solid #8fb0e6; border-radius: 9px; background: #fff; color: #12315f; font: bold 12px Tahoma, sans-serif; cursor: pointer; }
+  .pt-tabs button[aria-selected="true"] { background: linear-gradient(135deg, #ffb347, #e0457b 55%, #6a4de0); color: #fff; border-color: #fff; }
+  #ptDays { font-size: 11px; color: #a3205a; background: #ffd0e4; border-radius: 9px; padding: 1px 8px; }
+  #ptFeed { display: none; flex: 1; min-height: 0; flex-direction: column; gap: 6px; }
+  #ptChat.feed #ptFeed { display: flex; }
+  #ptChat.feed #ptLog, #ptChat.feed #ptTyping, #ptChat.feed #ptForm { display: none; }
+  .pt-newpost { display: flex; gap: 6px; } .pt-newpost input { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font: 14px Tahoma, sans-serif; color: #12315f; background: #fff; }
+  #ptPosts { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+  .pt-post { background: #fff; border: 1px solid #c3d3ee; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,30,80,.15); }
+  .pt-post header { display: flex; justify-content: space-between; padding: 7px 10px; font-size: 13px; } .pt-post header small { opacity: .6; }
+  .pt-post .pic { position: relative; background: #000; }
+  .pt-post img { display: block; width: 100%; max-height: 360px; object-fit: contain; -webkit-user-drag: none; }
+  .pt-post .pop { position: absolute; left: 50%; top: 50%; font-size: 70px; transform: translate(-50%, -50%) scale(0); pointer-events: none; }
+  .pt-post .pop.go { animation: ptpop .7s ease-out; }
+  @keyframes ptpop { 30% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 100% { transform: translate(-50%, -80%) scale(1); opacity: 0; } }
+  .pt-post .acts { padding: 6px 10px 2px; } .pt-post .acts button { border: 0; background: none; font: 15px Tahoma, sans-serif; color: #12315f; cursor: pointer; }
+  .pt-post .acts button.on { color: #e0457b; }
+  .pt-post p { margin: 0; padding: 0 10px 9px; font-size: 13.5px; overflow-wrap: anywhere; }
+  .pt-m { position: relative; } .pt-m.hr { margin-bottom: 9px; }
+  .pt-r { position: absolute; right: 8px; bottom: -10px; background: #fff; border-radius: 10px; padding: 0 5px; font-size: 12px; color: #12315f; box-shadow: 0 1px 3px #0003; }
+  /* ---- Moonsta on phones: big touch targets, 16px inputs (no iOS zoom), keyboard-aware height ---- */
+  #win-partner, #win-partner button, #ptLog, #ptPosts { touch-action: manipulation; }
+  #ptFlip { display: none; } #ptCall:not(.audio) #ptFlip { display: inline-block; }
+  @media (pointer: fine) { #ptFlip { display: none !important; } }
+  @media (pointer: coarse), (max-width: 700px) {
+    .pt-wrap { padding: 8px; }
+    .pt-card input, .pt-pick input, #ptCap { font-size: 16px; min-height: 44px; }
+    .pt-who button, .pt-tabs button, #ptDrop, .pt-u, #ptSend { min-height: 44px; }
+    .pt-ic { width: 44px; height: 44px; font-size: 19px; }
+    #ptGo, .pt-newpost .gm-btn { min-height: 44px; min-width: 66px; display: inline-flex; align-items: center; justify-content: center; }
+    .pt-ctl { gap: 8px; } .pt-ctl button { min-height: 48px; padding: 12px 15px; font-size: 14px; }
+    #ptRing .gm-btn { min-height: 48px; flex: 1; font-size: 15px; }
+    #ptLocal { width: 84px; height: 112px; top: calc(10px + env(safe-area-inset-top, 0px)); }
+    #ptCallInfo { top: calc(14px + env(safe-area-inset-top, 0px)); }
+    .pt-post .acts button { min-height: 42px; padding: 0 8px; font-size: 18px; }
+    .pt-post img { max-height: 58vh; }
+    .pt-m { max-width: 88%; font-size: 15px; }
+    #ptList { max-height: 40vh; }
+  }
+  #win-partner.kb { height: var(--vvh, 100%) !important; top: var(--vvt, 0px) !important; }
+  #desktop.kb #taskbar { display: none; }
+  #win-partner.kb.short .pt-head, #win-partner.kb.short .pt-tabs { display: none; }
+  @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
     background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
   #gmInvite[hidden] { display: none; }
@@ -618,32 +734,12 @@
   #gmChat { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid rgba(255,255,255,.9); border-radius: 10px; background: rgba(255,255,255,.55); box-shadow: 0 1px 4px rgba(0,40,110,.15); }
   #gmChat[hidden] { display: none; }
   #gmChat h4 { margin: 0; font: bold 11px Tahoma, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #4a6a9a; }
-  #gmLog { height: 190px; touch-action: manipulation; -webkit-touch-callout: none; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 6px; border-radius: 7px; background: rgba(255,255,255,.7); border: 1px solid #c3d3ee; user-select: none; -webkit-user-select: none; }   /* no text selecting: double-tap is for liking */
+  #gmLog { height: 110px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 6px; border-radius: 7px; background: rgba(255,255,255,.7); border: 1px solid #c3d3ee; user-select: text; -webkit-user-select: text; }
   #gmLog .none { margin: auto; font-size: 12px; color: #7f95b8; }
   .gm-m { max-width: 82%; padding: 4px 9px; border-radius: 12px; font-size: 13px; line-height: 1.3; overflow-wrap: anywhere; }
   .gm-m.me { align-self: flex-end; background: linear-gradient(#5b9bff, #2f6fe0); color: #fff; border-bottom-right-radius: 3px; }
   .gm-m.them { align-self: flex-start; background: #fff; color: #12315f; border: 1px solid #c3d3ee; border-bottom-left-radius: 3px; }
-  #gmChatForm { display: flex; gap: 6px; flex-wrap: wrap; }
-  #gmChatIn { flex: 1 1 120px; }
-  .gm-m { position: relative; cursor: pointer; user-select: none; -webkit-user-select: none; }
-  .gm-m .tm { display: block; text-align: right; font-size: 9.5px; opacity: .65; margin-top: 1px; }
-  .gm-m .rq { font-size: 11px; opacity: .85; border-left: 3px solid currentColor; padding: 1px 6px; margin-bottom: 3px; border-radius: 3px; background: rgba(0,0,0,.08); }
-  .gm-m img.gf { display: block; max-width: 100%; max-height: 150px; border-radius: 8px; }
-  .gm-m.stk { background: none !important; border: 0 !important; padding: 0; } .gm-m.stk img { width: 110px; height: 110px; display: block; }
-  .gm-m.del { font-style: italic; opacity: .6; } .gm-m.hasrx { margin-bottom: 9px; }
-  .gm-m .rx { position: absolute; bottom: -10px; background: #fff; border: 1px solid #c3d3ee; border-radius: 10px; font-size: 12px; padding: 0 5px; line-height: 17px; color: #12315f; }
-  .gm-m.me .rx { right: 6px; } .gm-m.them .rx { left: 6px; }
-  .gm-bar { display: flex; flex-wrap: wrap; gap: 3px; padding: 3px 5px; background: #fff; border: 1px solid #c3d3ee; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,40,110,.2); }
-  .gm-bar.me { align-self: flex-end; } .gm-bar.them { align-self: flex-start; }
-  .gm-bar button, .gm-rb button { font: 12px Tahoma, sans-serif; min-width: 30px; min-height: 30px; border: 0; border-radius: 8px; background: none; cursor: pointer; color: #12315f; }
-  .gm-bar button:hover { background: #e4eeff; }
-  .gm-rb { display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 3px 8px; border-left: 3px solid #2f6fe0; background: rgba(255,255,255,.8); color: #12315f; border-radius: 4px; } .gm-rb[hidden], #gmPanel[hidden] { display: none; } .gm-rb span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #gmPanel { display: flex; flex-direction: column; gap: 6px; padding: 6px; background: rgba(255,255,255,.85); border: 1px solid #c3d3ee; border-radius: 8px; max-height: 270px; overflow-y: auto; }
-  #gmPanel input[type=text] { padding: 7px 10px; border: 1px solid #8fb0e6; border-radius: 7px; font: 16px Tahoma, sans-serif; }
-  .gm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; font-size: 12px; color: #4a6a9a; } .gm-grid img { width: 100%; height: 84px; object-fit: cover; border-radius: 6px; cursor: pointer; background: #e9f0fb; }
-  .gm-grid.stk img { object-fit: contain; } .gm-sk { position: relative; } .gm-sk button { position: absolute; top: 0; right: 0; border: 0; border-radius: 50%; width: 20px; height: 20px; background: #fff; cursor: pointer; line-height: 1; }
-  .gm-cv { width: min(100%, 256px); aspect-ratio: 1; align-self: center; background: repeating-conic-gradient(#e6edf8 0 25%, #fff 0 50%) 0 0 / 16px 16px; border: 1px solid #8fb0e6; border-radius: 8px; touch-action: none; }
-  .gm-tools { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; } .gm-sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #8fb0e6; cursor: pointer; padding: 0; }
+  #gmChatForm { display: flex; gap: 6px; }
   #gmChatIn { flex: 1; min-width: 0; padding: 7px 10px; border: 1px solid #8fb0e6; border-radius: 7px; font: 13px Tahoma, sans-serif; color: #12315f; background: #fff; }
   #gmChatIn:focus { outline: 2px solid #2f6fe0; outline-offset: 0; }
 
@@ -886,6 +982,7 @@
     <button class="dt-icon" data-app="mail" type="button"><i class="bdg" id="mailBadge" hidden></i><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="4" y="10" width="40" height="28" rx="3" fill="#fff6d8" stroke="#8a7a4a" stroke-width="2"/><path d="M5 12l19 15 19-15" fill="none" stroke="#8a7a4a" stroke-width="2"/><text x="24" y="36" text-anchor="middle" font-size="13" fill="#ff6fae">&#9829;</text></svg><span>Mail</span></button>
     <button class="dt-icon" data-app="settings" type="button"><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="4" y="6" width="40" height="36" rx="4" fill="#dfe8f7" stroke="#5a7ab0" stroke-width="2"/><rect x="4" y="6" width="40" height="8" rx="3" fill="#3d7be0"/><g fill="#4a5f86"><circle cx="24" cy="29" r="8"/><rect x="22" y="17" width="4" height="6" rx="1"/><rect x="22" y="35" width="4" height="6" rx="1"/><rect x="12" y="27" width="6" height="4" rx="1"/><rect x="30" y="27" width="6" height="4" rx="1"/></g><circle cx="24" cy="29" r="3.5" fill="#dfe8f7"/></svg><span>Settings</span></button>
     <button class="dt-icon" data-app="games" type="button"><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="3" y="12" width="42" height="24" rx="12" fill="#4a5f86" stroke="#2b3b5c" stroke-width="2"/><rect x="11" y="21" width="12" height="4" rx="1" fill="#e8eefb"/><rect x="15" y="17" width="4" height="12" rx="1" fill="#e8eefb"/><circle cx="32" cy="19" r="3" fill="#ffd23a"/><circle cx="38" cy="25" r="3" fill="#ee3b3b"/><circle cx="32" cy="29" r="3" fill="#2fd66a"/></svg><span>Mini Games</span></button>
+    <button class="dt-icon" data-app="partner" type="button"><i class="bdg" id="ptBadge" hidden></i><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><defs><linearGradient id="mgr" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#e0457b"/><stop offset="1" stop-color="#6a4de0"/></linearGradient></defs><rect x="3" y="3" width="42" height="42" rx="12" fill="url(#mgr)" stroke="#fff" stroke-width="2"/><path d="M29 11a14 14 0 1 0 8 22A11 11 0 0 1 29 11z" fill="#fff"/><circle cx="35" cy="14" r="2" fill="#fff"/></svg><span>Moonsta</span></button>
   </div>
   <section class="win" id="win-sun" hidden><div class="wtitle"><b>Sun &amp; Moon</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div><div class="wbody" id="wb-sun"></div></section>
   <section class="win" id="win-mail" hidden><div class="wtitle"><b>Mail</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
@@ -931,14 +1028,45 @@
     </div></div></section>
   <section class="win" id="win-games" hidden><div class="wtitle"><b>Mini Games</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
     <div class="wbody" id="wb-games"><div class="gm-wrap"><div class="gm-status" id="gmStatus"></div><div id="gmBody"></div>
-      <div id="gmChat" hidden><h4>Chat</h4><div id="gmLog" role="log" aria-live="polite"></div><div id="gmReplyBar" class="gm-rb" hidden><span id="gmReplyTxt"></span><button type="button" id="gmReplyX" aria-label="Cancel reply">\u00d7</button></div><div id="gmPanel" hidden></div><form id="gmChatForm" autocomplete="off"><button class="gm-btn" type="button" id="gmGifB">GIF</button><button class="gm-btn" type="button" id="gmStkB">Stickers</button><input id="gmChatIn" maxlength="200" placeholder="Say something sweet..." aria-label="Chat message"><button class="gm-btn" type="submit">Send</button></form></div></div></div></section>
-  <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
+      <div id="gmChat" hidden><h4>Chat</h4><div id="gmLog" role="log" aria-live="polite"></div><form id="gmChatForm" autocomplete="off"><input id="gmChatIn" maxlength="200" placeholder="Say something sweet..." aria-label="Chat message"><button class="gm-btn" type="submit">Send</button></form></div></div></div></section>
+  <section class="win" id="win-partner" hidden><div class="wtitle"><b>Moonsta</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
+    <div class="wbody" id="wb-partner"><div class="pt-wrap">
+      <div id="ptInvite" class="pt-card" hidden>
+        <h3>Invite your partner</h3>
+        <p>Type their username and your anniversary. They get a request in Mail (and a pop-up if they are online). Once they accept, you are paired and this window turns into a live chat.</p>
+        <label for="ptTo">Pick who to invite</label>
+        <div class="pt-pick"><input id="ptTo" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Tap to pick, or type a name" role="combobox" aria-expanded="false" aria-controls="ptList"><button id="ptDrop" type="button" aria-label="Show all users">&#9662;</button></div>
+        <div id="ptList" role="listbox" hidden></div>
+        <small class="pt-key"><i class="f"></i> free to invite &nbsp; <i class="p"></i> already paired (can't be picked)</small>
+        <label for="ptDate">Anniversary</label><input id="ptDate" type="date">
+        <div class="pt-who"><span>Who is the moon?</span><div role="tablist"><button id="ptMoonThem" type="button" role="tab" aria-selected="true">Them</button><button id="ptMoonMe" type="button" role="tab" aria-selected="false">Me</button></div></div>
+        <button class="gm-btn" id="ptSend" type="button">Send invite</button>
+        <div id="ptMsg" role="status"></div>
+      </div>
+      <div id="ptChat" hidden>
+        <div class="pt-head"><i id="ptDot"></i><b id="ptName"></b><span id="ptDays"></span><small id="ptState"></small><button class="pt-ic" id="ptVoice" type="button" title="Voice call" aria-label="Voice call">&#128222;</button><button class="pt-ic" id="ptVideo" type="button" title="Video call" aria-label="Video call">&#127909;</button></div>
+        <div class="pt-tabs" role="tablist"><button id="ptTabChat" type="button" role="tab" aria-selected="true">Chat</button><button id="ptTabFeed" type="button" role="tab" aria-selected="false">Feed</button></div>
+        <div id="ptLog" role="log" aria-live="polite"></div>
+        <div id="ptTyping" hidden></div>
+        <div id="ptFeed"><div class="pt-newpost"><input id="ptCap" maxlength="300" placeholder="Write a caption..." aria-label="Caption"><label class="gm-btn" for="ptPic">+ Photo</label><input id="ptPic" type="file" accept="image/*" hidden></div><div id="ptPosts"></div></div>
+        <form id="ptForm" autocomplete="off"><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
+      </div>
+      <div id="ptCall" hidden>
+        <video id="ptRemote" autoplay playsinline></video>
+        <video id="ptLocal" autoplay playsinline muted></video>
+        <div id="ptCallInfo"><b id="ptCallName"></b><small id="ptCallState"></small></div>
+        <div class="pt-ctl"><button id="ptMute" type="button">Mute</button><button id="ptCam" type="button">Camera off</button><button id="ptFlip" type="button">Flip</button><button id="ptHang" type="button" class="end">End</button></div>
+      </div>
+    </div></div></section>
+  <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="partner" type="button">Moonsta</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
   <div id="taskbar"><button id="startBtn" type="button">start</button><div id="tasks"></div><div id="tray"><button id="trayMail" type="button" hidden></button><button id="sfxBtn" type="button" title="Desktop sounds" aria-label="Desktop sounds" aria-pressed="true">&#9835;</button><span id="clock"></span></div></div>
 </div>
 <div id="bootsplash" hidden><div class="logo">Sun<span>&amp;</span>Moon<em>OS</em></div><div class="bar"><i></i></div><small>PHOSPHOR SYSTEMS SM-2000</small></div>
 
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <div id="gmInvite" role="alertdialog" aria-labelledby="gmInvT" hidden><b id="gmInvT"></b><p id="gmInvP"></p><div class="gm-row"><button class="gm-btn" id="gmInvYes" type="button">Play!</button><button class="gm-btn no" id="gmInvNo" type="button">Decline</button><button class="gm-btn alt" id="gmInvLater" type="button">Later</button></div></div>
+
+<div id="ptRing" role="alertdialog" aria-labelledby="ptRingT" hidden><b id="ptRingT"></b><p id="ptRingP"></p><div class="gm-row"><button class="gm-btn" id="ptRingYes" type="button">Answer</button><button class="gm-btn no" id="ptRingNo" type="button">Decline</button></div></div>
 
 <div id="adminPanel" hidden>
   <div class="adm">
@@ -2537,34 +2665,17 @@ phRender();
 
 let inboxData = [];
 const toastEl = $("toast"), seenNotif = new Set();
-let toastTimer = 0, toastTarget = null;          // toastTarget = who a quick reply from the popup goes to
-toastEl.addEventListener("click", e => {
-  if (e.target.closest && e.target.closest(".qr")) return;       // typing in the quick-reply box shouldn't close the popup
+let toastTimer = 0;
+toastEl.addEventListener("click", () => {
   toastEl.hidden = true; clearTimeout(toastTimer);
   if (toastEl.dataset.go === "mail") { openApp("mail"); setTab("in"); }
+  else if (toastEl.dataset.go === "partner") openApp("partner");
 });
 function showToast(lines, go) {                                    // each line is [style, text]
   toastEl.textContent = ""; toastEl.dataset.go = go || "";
   for (const t of lines) { const d = document.createElement("div"); d.className = t[0]; d.textContent = t[1]; toastEl.appendChild(d); }
-  const hint = document.createElement("small"); hint.textContent = go === "mail" ? "TAP TO OPEN MAILBOX" : "TAP TO CLOSE"; toastEl.appendChild(hint);
-  const tgt = toastTarget; toastTarget = null;
-  if (go === "mail" && tgt) {                                      // quick reply, right inside the popup
-    const f = document.createElement("div"); f.className = "qr";
-    const inp = document.createElement("input"); inp.type = "text"; inp.maxLength = 200; inp.autocomplete = "off"; inp.enterKeyHint = "send"; inp.placeholder = "Reply to " + tgt.to + "...";
-    const btn = document.createElement("button"); btn.type = "button"; btn.textContent = "SEND";
-    const fire = async raw => {
-      const txt = cleanLetter(raw).trim(); if (!txt) return; btn.disabled = true; clearTimeout(toastTimer);
-      try { await api("send", { to: tgt.to, text: txt, replyTo: tgt.replyTo }); f.textContent = "SENT TO " + tgt.to.toUpperCase(); toastTimer = setTimeout(() => { toastEl.hidden = true; }, 1800); if (typeof refreshOutbox === "function") refreshOutbox(); }
-      catch (err) { btn.disabled = false; inp.value = ""; inp.placeholder = (SEND_ERR[err.code] || ERR.SERVER || "COULDN'T SEND").slice(0, 40); }
-    };
-    btn.addEventListener("click", () => fire(inp.value));
-    inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); fire(inp.value); } });
-    inp.addEventListener("focus", () => clearTimeout(toastTimer));  // stay on screen while you type
-    f.append(inp, btn);
-    for (const q of ["THANKS!", "LOL", "OK"]) { const b = document.createElement("button"); b.type = "button"; b.textContent = q; b.addEventListener("click", () => fire(q)); f.appendChild(b); }
-    toastEl.appendChild(f);
-  }
-  toastEl.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, tgt ? 25000 : 12000);
+  const hint = document.createElement("small"); hint.textContent = go === "mail" ? "TAP TO OPEN MAILBOX" : go === "partner" ? "TAP TO OPEN CHAT" : "TAP TO CLOSE"; toastEl.appendChild(hint);
+  toastEl.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, 12000);
   try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {}
 }
 function handleNotifs(list) {                                     // "someone opened your letter" etc. - each kind is worded and coloured differently
@@ -2578,7 +2689,7 @@ function handleNotifs(list) {                                     // "someone op
     else if (n.kind === "unpaired") lines.push(["t-pair", "[PAIR] " + who + " ENDED THE PAIRING"]);
     else if (n.kind === "game_yes") { lines.push(["t-pair", "[GAME] " + who + " ACCEPTED - " + (n.snip || "LET'S PLAY") + "!"]); setTimeout(() => gmFetch(), 50); }
     else if (n.kind === "game_no") { lines.push(["t-pair", "[GAME] " + who + " DECLINED YOUR GAME INVITE"]); setTimeout(() => gmFetch(), 50); }
-    else if ((toastTarget = toastTarget || (n.by ? { to: String(n.by) } : null)), 1) lines.push(["t-open", "[OPENED] " + who + " OPENED YOUR LETTER" + (n.snip ? ": \"" + snipOf(n.snip, 34) + "\"" : "")]);
+    else lines.push(["t-open", "[OPENED] " + who + " OPENED YOUR LETTER" + (n.snip ? ": \"" + snipOf(n.snip, 34) + "\"" : "")]);
   }
   if (fresh.length > 4) lines.push(["t-open", "+ " + (fresh.length - 4) + " MORE UPDATES"]);
   api("ack", { ids: fresh.map(n => n.id) }).catch(() => {});
@@ -2601,7 +2712,6 @@ function announceNew(letters) {
   }
   for (const l of fresh.slice(0, 3)) {
     const who = l.from.toUpperCase();
-    if (!toastTarget && l.type !== "pair") toastTarget = { to: l.from, replyTo: l.id };
     if (l.type === "pair") lines.push(["t-pair", "[PAIR] PAIR REQUEST FROM " + who + " - SINCE " + l.since]);
     else if (l.re) lines.push(["t-new", "[REPLY] " + who + " REPLIED TO YOUR LETTER"]);
     else lines.push(["t-new", "[NEW] NEW LETTER FROM " + who]);
@@ -2611,7 +2721,7 @@ function announceNew(letters) {
 }
 async function refreshInbox() {
   try {
-    const r = await api("inbox"); inboxData = r.letters; renderInbox(); toastTarget = null;
+    const r = await api("inbox"); inboxData = r.letters; renderInbox();
     const lines = announceNew(r.letters).concat(r.notifs && r.notifs.length ? handleNotifs(r.notifs) : []);
     if (lines.length) showToast(lines.slice(0, 5), "mail");
     syncPair(r.pair || null);
@@ -2932,7 +3042,7 @@ window.addEventListener("orientationchange", onResize);
 setupStage(wantPortrait());
 
 /* ================= the retro PC: boot, desktop, windows, taskbar ================= */
-const desk = $("desktop"), wins = { sun: $("win-sun"), mail: $("win-mail"), settings: $("win-settings"), games: $("win-games") }, taskBtns = {}, startMenu = $("startMenu");
+const desk = $("desktop"), wins = { sun: $("win-sun"), mail: $("win-mail"), settings: $("win-settings"), games: $("win-games"), partner: $("win-partner") }, taskBtns = {}, startMenu = $("startMenu");
 let zTop = 10;
 $("wb-sun").appendChild(document.querySelector(".rig"));                        // the whole sun & moon machine lives in its own window
 for (const el of [...document.querySelectorAll(".sect.half")]) $("mailWrap").appendChild(el);   // love letter + mailbox live in the Mail window
@@ -2946,7 +3056,7 @@ function focusWin(n) {
 }
 function addTask(n) {
   if (taskBtns[n]) return;
-  const b = document.createElement("button"); b.type = "button"; b.className = "task"; b.textContent = { sun: "Sun & Moon", mail: "Mail", settings: "Settings", games: "Mini Games" }[n];
+  const b = document.createElement("button"); b.type = "button"; b.className = "task"; b.textContent = { sun: "Sun & Moon", mail: "Mail", settings: "Settings", games: "Mini Games", partner: "Moonsta" }[n];
   b.addEventListener("click", () => { const w = wins[n]; if (w.hidden) { w.hidden = false; focusWin(n); } else if (w.classList.contains("active")) minApp(n); else focusWin(n); });
   $("tasks").appendChild(b); taskBtns[n] = b;
 }
@@ -2954,12 +3064,13 @@ function openApp(n) {
   const w = wins[n]; startMenu.hidden = true;
   if (w.hidden) {
     w.hidden = false; addTask(n);
-    if (!w.dataset.placed) { w.dataset.placed = "1"; w.style.left = Math.max(0, (innerWidth - w.offsetWidth) / 2 + (n === "mail" ? 60 : n === "settings" ? 110 : n === "games" ? 40 : 0)) + "px"; w.style.top = (n === "mail" ? 46 : n === "settings" ? 70 : n === "games" ? 56 : 14) + "px"; }
+    if (!w.dataset.placed) { w.dataset.placed = "1"; w.style.left = Math.max(0, (innerWidth - w.offsetWidth) / 2 + (n === "mail" ? 60 : n === "settings" ? 110 : n === "games" ? 40 : n === "partner" ? 90 : 0)) + "px"; w.style.top = (n === "mail" ? 46 : n === "settings" ? 70 : n === "games" ? 56 : n === "partner" ? 36 : 14) + "px"; }
   }
   focusWin(n);
   if (n === "sun" && !st.on) powerOn();                                         // opening the app plays the boot sequence
   if (n === "mail" && account.user) refreshInbox();
   if (n === "games") gamesOpened();
+  if (n === "partner") partnerOpened();
 }
 function minApp(n) { wins[n].hidden = true; focusWin("none"); }
 function sunStop() {
@@ -3099,7 +3210,7 @@ function icMenuMain() {
   if (a) {
     h += it("open", "Open") + it("rename", "Rename...") + `<div class="ichead">Icon size</div><div class="icrow">${it("z-s", "Small", z === "s")}${it("z-m", "Medium", z === "m")}${it("z-l", "Large", z === "l")}</div>`;
     h += it("label", s.h ? "Show label" : "Hide label");
-    if (a === "mail") h += it("badge", s.b ? "Show mail badge" : "Hide mail badge");
+    if (a === "mail" || a === "partner") h += it("badge", (s.b ? "Show " : "Hide ") + (a === "mail" ? "mail" : "chat") + " badge");
     h += it("reset1", "Reset this icon") + "<hr>";
   }
   icMenu.innerHTML = h + it("arrange", "Auto-arrange icons") + it("resetall", "Reset all icons");
@@ -3756,106 +3867,483 @@ window.addEventListener("pagehide", () => { if (account.user && !LOCAL.on) api("
   const _sp = syncPair;
   syncPair = function (p) { const before = pairKey(account.pair); _sp(p); if (before !== pairKey(account.pair)) { GM.game = null; GM.online = null; hideGameInvite(); renderGames(); presenceTick(); } };
 }
+/* ============================================================ PARTNER APP: invite + live chat
+   Chat runs over ONE WebSocket to a Cloudflare Durable Object (see worker.js, class PairRoom): a message goes
+   phone -> server -> phone with no polling. The socket stays open in the background (even with the window closed) so a
+   message pops up the instant it is sent. It reconnects by itself and re-sends anything typed while offline. */
+const PT = { ws: null, open: false, hello: false, tries: 0, retry: 0, pongAt: 0, msgs: [], seen: {}, online: false, pend: [], unread: 0, cid: 0,
+  typingIn: 0, typingOut: 0, sentTyping: 0, lastToast: 0, moon: "them" };
+const ptLog = $("ptLog"), ptIn = $("ptIn"), ptTo = $("ptTo"), ptDate = $("ptDate"), ptMsg = $("ptMsg"), ptBadge = $("ptBadge");
+const ptWanted = () => !!(account.user && account.pair && !LOCAL.on);
+const ptOther = () => (account.pair ? account.pair.with : "");
+const ptMe = () => (account.user ? account.user.username : "");
+const ptRole = name => (account.pair && String(name).toUpperCase().slice(0, 12) === account.pair.sun) ? "sun" : "moon";
+const ptViewing = () => !wins.partner.hidden && !document.hidden;
+const ptTime = at => { const d = new Date(at); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+
+function ptStatus() {
+  const dot = $("ptDot"), st = $("ptState"); ptCallBtns();
+  if (!ptWanted()) { dot.className = ""; st.textContent = ""; return; }
+  if (!PT.open || !PT.hello) { dot.className = "warn"; st.textContent = navigator.onLine === false ? "offline - will send when back" : "connecting..."; }
+  else if (PT.online) { dot.className = "on"; st.textContent = "online"; }
+  else { dot.className = ""; st.textContent = "away"; }
+}
+function ptCount() {
+  const me = ptMe(), seen = PT.seen[me] || 0;
+  PT.unread = PT.msgs.filter(m => m.from !== me && m.id > seen).length;
+  ptBadge.hidden = PT.unread === 0 || ptViewing(); ptBadge.textContent = PT.unread > 99 ? "99+" : String(PT.unread);
+}
+function ptTicks() {
+  const other = PT.seen[ptOther()] || 0;
+  for (const el of ptLog.querySelectorAll(".pt-m.me")) {
+    const t = el.querySelector(".tk"); if (!t) continue;
+    if (el.classList.contains("pend")) { t.textContent = "..."; t.className = "tk"; }
+    else if (Number(el.dataset.id) <= other) { t.textContent = "\u2713\u2713"; t.className = "tk seen"; }
+    else { t.textContent = "\u2713"; t.className = "tk"; }
+  }
+}
+function ptEl(m, pend) {
+  const me = ptMe(), d = document.createElement("div");
+  d.className = "pt-m " + (m.from === me ? "me " : "them ") + ptRole(m.from) + (pend ? " pend" : "");
+  if (m.id) d.dataset.id = m.id; if (m.cid) d.dataset.cid = m.cid;
+  const t = document.createElement("span"); t.textContent = m.text; d.appendChild(t);
+  const sm = document.createElement("small"); sm.textContent = ptTime(m.at); d.appendChild(sm);
+  if (m.from === me) { const k = document.createElement("span"); k.className = "tk"; sm.append(" ", k); }
+  ptHeart(d, m.r);
+  return d;
+}
+function ptNear() { return ptLog.scrollHeight - ptLog.scrollTop - ptLog.clientHeight < 90; }
+function ptBottom() { ptLog.scrollTop = ptLog.scrollHeight; }
+function ptRender() {
+  ptLog.textContent = "";
+  if (!PT.msgs.length && !PT.pend.length) { const n = document.createElement("div"); n.className = "none"; n.textContent = "No messages yet. Say hi to " + ptOther() + "!"; ptLog.appendChild(n); }
+  const f = document.createDocumentFragment();
+  for (const m of PT.msgs) f.appendChild(ptEl(m, false));
+  for (const p of PT.pend) f.appendChild(ptEl(p, true));
+  ptLog.appendChild(f); ptTicks(); ptBottom();
+}
+function ptAdd(m, pend) {                                             // one new bubble, added without redrawing the rest
+  const none = ptLog.querySelector(".none"); if (none) none.remove();
+  const stick = ptNear() || m.from === ptMe();
+  ptLog.appendChild(ptEl(m, pend)); ptTicks(); if (stick) ptBottom();
+}
+function ptSendSeen() {
+  const last = PT.msgs.length ? PT.msgs[PT.msgs.length - 1].id : 0, me = ptMe();
+  if (!last || last <= (PT.seen[me] || 0) || !PT.open || !PT.hello) return;
+  PT.seen[me] = last; try { PT.ws.send(JSON.stringify({ t: "seen", upTo: last })); } catch (e) {} ptCount();
+}
+function ptSeenIfViewing() { if (ptViewing()) ptSendSeen(); ptCount(); }
+function ptTyping(on) {
+  const el = $("ptTyping"); clearTimeout(PT.typingIn);
+  el.hidden = !on; if (on) { el.textContent = ptOther() + " is typing..."; PT.typingIn = setTimeout(() => { el.hidden = true; }, 4500); }
+}
+function ptHandle(m) {
+  const me = ptMe(), other = ptOther();
+  if (m.t === "hello") {
+    PT.hello = true; PT.msgs = Array.isArray(m.msgs) ? m.msgs : []; PT.seen = m.seen && typeof m.seen === "object" ? m.seen : {};
+    PT.online = Array.isArray(m.online) && m.online.includes(other);
+    const q = PT.pend; PT.pend = [];                                  // typed while offline (or sent just as the line dropped): send once, never twice
+    for (const p of q) { if (PT.msgs.some(x => x.from === me && x.text === p.text && x.at >= p.at - 5000)) continue; ptTransmit(p); }
+    ptRender(); ptSeenIfViewing(); ptStatus();
+  } else if (m.t === "msg" && m.msg) {
+    const g = m.msg; if (PT.msgs.some(x => x.id === g.id)) return;
+    PT.msgs.push(g);
+    if (g.from === me) {
+      const i = PT.pend.findIndex(p => p.cid === m.cid); if (i >= 0) PT.pend.splice(i, 1);
+      const el = m.cid ? ptLog.querySelector('.pt-m[data-cid="' + CSS.escape(m.cid) + '"]') : null;
+      if (el) { el.classList.remove("pend"); el.dataset.id = g.id; el.querySelector("small").firstChild.textContent = ptTime(g.at); ptTicks(); } else ptAdd(g, false);
+    } else {
+      ptTyping(false); ptAdd(g, false);
+      if (ptViewing()) { ptSendSeen(); sfx.seen(); }
+      else {
+        ptCount(); sfx.mail();
+        if (!desk.hidden && Date.now() - PT.lastToast > 4000) { PT.lastToast = Date.now(); showToast([["t-pair", other.toUpperCase() + ": " + g.text.slice(0, 60)]], "partner"); }
+      }
+    }
+  } else if (m.t === "typing" && m.u !== me) { ptTyping(m.on !== false);
+  } else if (m.t === "seen" && m.u !== me) { PT.seen[m.u] = m.upTo; ptTicks();
+  } else if (m.t === "presence" && m.u !== me) { PT.online = !!m.online; if (!m.online) { ptTyping(false); callPartnerGone(); } ptStatus();
+  } else if (m.t === "post" && m.post) { ptPostUpsert(m.post, !m.old);
+  } else if (m.t === "like") { const o = PT.posts.get(m.id); if (o) { o.post.likes = m.likes; ptPostLike(o); }
+  } else if (m.t === "react") { const g = PT.msgs.find(x => x.id === m.id); if (g) g.r = m.r; const el = ptLog.querySelector('.pt-m[data-id="' + m.id + '"]'); if (el) ptHeart(el, m.r);
+  } else if (m.t === "rtc") { callOnSig(m);
+  } else if (m.t === "slow") { ptMsg.textContent = ""; $("ptState").textContent = "slow down a little"; }
+}
+function ptTransmit(p) {
+  if (!PT.pend.includes(p)) PT.pend.push(p);
+  if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify({ t: "chat", cid: p.cid, text: p.text })); return; } catch (e) {} }
+  ptConnect();
+}
+function ptSend(text) {
+  text = String(text).replace(/\s+/g, " ").trim().slice(0, 1000); if (!text || !ptWanted()) return;
+  const p = { cid: Date.now().toString(36) + (++PT.cid), text, at: Date.now(), from: ptMe() };
+  ptAdd(p, true); ptTransmit(p); sfx.bloop();
+}
+function ptConnect() {
+  if (!ptWanted() || PT.ws) return;
+  let ws; try { ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/ws"); } catch (e) { return ptRetry(); }
+  PT.ws = ws; PT.open = false; PT.hello = false; ptStatus();
+  ws.onopen = () => { if (PT.ws !== ws) return; PT.open = true; PT.tries = 0; PT.pongAt = Date.now(); ptStatus(); };
+  ws.onmessage = ev => {
+    if (PT.ws !== ws) return;
+    if (ev.data === "pong") { PT.pongAt = Date.now(); return; }
+    let m; try { m = JSON.parse(ev.data); } catch (e) { return; } ptHandle(m);
+  };
+  ws.onclose = ev => {
+    if (PT.ws !== ws) return;
+    PT.ws = null; PT.open = false; PT.hello = false; PT.online = false; ptStatus();
+    if (ev.code === 4001) ptReset(); else ptRetry();
+  };
+  ws.onerror = () => {};
+}
+function ptRetry() { clearTimeout(PT.retry); if (!ptWanted()) return; PT.retry = setTimeout(ptConnect, Math.min(3000, 120 * Math.pow(2, PT.tries++))); }
+function ptReset() {
+  clearTimeout(PT.retry); const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; PT.online = false;
+  if (w) { try { w.close(); } catch (e) {} }
+  callEnd(false); PT.posts.clear(); $("ptPosts").textContent = ""; PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
+}
+setInterval(() => {                                                   // keep-alive + dead-line detection (a phone that lost signal never says goodbye)
+  if (!PT.ws || !PT.open) return;
+  if (Date.now() - PT.pongAt > 40000) { const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; try { w.close(); } catch (e) {} ptStatus(); ptConnect(); return; }
+  try { PT.ws.send("ping"); } catch (e) {}
+}, 15000);
+setInterval(() => { if (ptWanted()) { if (!PT.ws) ptConnect(); } else if (PT.ws || PT.msgs.length) ptReset(); }, 2000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { ptConnect(); ptSeenIfViewing(); } });
+window.addEventListener("online", () => { PT.tries = 0; ptConnect(); });
+window.addEventListener("pagehide", () => { try { if (PT.ws) PT.ws.close(1000, "bye"); } catch (e) {} });
+
+function ptSay(t, ok) { ptMsg.textContent = t; ptMsg.classList.toggle("bad", !ok && !!t); }
+function ptSetMoon(v) { PT.moon = v; $("ptMoonThem").setAttribute("aria-selected", v === "them"); $("ptMoonMe").setAttribute("aria-selected", v === "me"); }
+$("ptMoonThem").addEventListener("click", () => ptSetMoon("them")); $("ptMoonMe").addEventListener("click", () => ptSetMoon("me"));
+function renderPartner() {
+  const paired = !!account.pair;
+  $("ptInvite").hidden = paired; $("ptChat").hidden = !paired;
+  if (paired) {
+    $("ptName").textContent = account.pair.with;
+    { const d = Math.floor((Date.now() - new Date(account.pair.since + "T00:00:00")) / 864e5); $("ptDays").textContent = d >= 0 ? "\u{1F49E} Day " + (d + 1) : ""; }
+    if (LOCAL.on) { ptLog.textContent = ""; const n = document.createElement("div"); n.className = "none"; n.textContent = "Live chat needs the online server. It does not work in this offline copy."; ptLog.appendChild(n); $("ptIn").disabled = true; $("ptGo").disabled = true; }
+    else { $("ptIn").disabled = false; $("ptGo").disabled = false; if (!PT.msgs.length && !PT.pend.length && !PT.hello) { ptLog.textContent = ""; const n = document.createElement("div"); n.className = "none"; n.textContent = "Connecting..."; ptLog.appendChild(n); } }
+    ptStatus();
+  } else {
+    if (!ptDate.value && nDate.value) ptDate.value = nDate.value;
+    ptLoadUsers();
+    api("outbox").then(r => {                                       // a request already waiting? say so instead of showing an empty form
+      const w = (r.letters || []).find(l => l.type === "pair" && l.status === "pending");
+      if (w && !account.pair) ptSay("Waiting for " + w.to.toUpperCase() + " to accept your invite.", true);
+    }).catch(() => {});
+  }
+}
+function partnerOpened() {
+  renderPartner(); ptCount();
+  if (ptWanted()) { ptConnect(); if (PT.hello) { ptRender(); ptSeenIfViewing(); } if (!matchMedia("(pointer: coarse)").matches) setTimeout(() => ptIn.focus(), 60); }
+}
+$("ptSend").addEventListener("click", async () => {
+  const to = ptTo.value.trim().toLowerCase(), since = ptDate.value || nDate.value;
+  if (!USER_RE.test(to)) return ptSay(ERR.BAD_USERNAME);
+  if (!since) return ptSay("PICK YOUR ANNIVERSARY DATE FIRST.");
+  if ((PT.users || []).some(x => x.u === to && x.paired)) return ptSay(PAIR_ERR.THEY_PAIRED);
+  $("ptSend").disabled = true; ptSay("Sending...", true);
+  try {
+    await api("pair_request", { to, since, role: PT.moon === "me" ? "moon" : "sun" });
+    ptSay("Invite sent to " + to.toUpperCase() + ". This turns into a chat the moment they accept.", true); ptTo.value = "";
+    if (boxTab === "out") refreshOutbox();
+  } catch (err) { sessionGone(err); ptSay(PAIR_ERR[err.code] || ERR[err.code] || ERR.SERVER); }
+  $("ptSend").disabled = false;
+});
+ptTo.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("ptSend").click(); } });
+$("ptForm").addEventListener("submit", e => {
+  e.preventDefault(); const v = ptIn.value; if (!v.trim()) return;
+  ptIn.value = ""; clearTimeout(PT.typingOut); PT.sentTyping = 0; ptSend(v); ptIn.focus();   // clear + show + send in the same tick: nothing waits for the network
+});
+$("ptGo").addEventListener("pointerdown", e => e.preventDefault());                              // tapping Send keeps the phone keyboard open
+ptIn.addEventListener("input", () => {
+  if (!PT.open || !PT.hello) return; const now = Date.now();
+  if (now - PT.sentTyping > 2500) { PT.sentTyping = now; try { PT.ws.send(JSON.stringify({ t: "typing", on: true })); } catch (e) {} }
+  clearTimeout(PT.typingOut); PT.typingOut = setTimeout(() => { PT.sentTyping = 0; try { PT.ws.send(JSON.stringify({ t: "typing", on: false })); } catch (e) {} }, 3000);
+});
+wins.partner.addEventListener("pointerdown", () => setTimeout(ptSeenIfViewing, 0));
+{
+  const _sp2 = syncPair, _min = minApp, _close = closeApp;
+  syncPair = function (p) { const before = pairKey(account.pair); _sp2(p); if (before !== pairKey(account.pair)) { if (!account.pair) ptReset(); renderPartner(); ptConnect(); } };
+  minApp = function (n) { _min(n); if (n === "partner") ptCount(); };
+  closeApp = function (n) { _close(n); if (n === "partner") ptCount(); };
+}
+/* ---- who can I invite? a drop-down of every account; the ones already paired are pink and can't be picked ---- */
+PT.users = []; PT.usersAt = 0;
+async function ptLoadUsers() {
+  PT.usersAt = Date.now();
+  try { PT.users = (await api("pair_users")).users || []; }
+  catch (e) { try { PT.users = (await api("users")).users.filter(u => u !== ptMe()).map(u => ({ u, paired: false })); } catch (e2) {} }
+  ptDraw();
+}
+function ptDraw() {
+  const q = ptTo.value.trim().toLowerCase(), box = $("ptList"); box.textContent = "";
+  const list = PT.users.filter(x => !q || x.u.includes(q)).sort((a, b) => (a.paired - b.paired) || a.u.localeCompare(b.u));
+  if (!list.length) { const n = document.createElement("div"); n.className = "pt-none"; n.textContent = PT.users.length ? "No account matches that." : "No other accounts yet."; box.appendChild(n); return; }
+  for (const x of list) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "pt-u" + (x.paired ? " paired" : ""); b.setAttribute("role", "option"); b.dataset.u = x.u;
+    if (x.paired) b.setAttribute("aria-disabled", "true");
+    const n = document.createElement("span"); n.textContent = x.u; const t = document.createElement("em"); t.textContent = x.paired ? "paired" : "free"; b.append(n, t); box.appendChild(b);
+  }
+}
+function ptList(show) { $("ptList").hidden = !show; ptTo.setAttribute("aria-expanded", String(show)); if (show) { if (Date.now() - PT.usersAt > 4000) ptLoadUsers(); else ptDraw(); } }
+ptTo.addEventListener("focus", () => ptList(true));
+ptTo.addEventListener("input", () => { ptList(true); ptSay(""); });
+$("ptDrop").addEventListener("click", () => ptList($("ptList").hidden));
+$("ptList").addEventListener("pointerdown", e => e.preventDefault());                              // picking must not blur the box first
+$("ptList").addEventListener("click", e => {
+  const b = e.target.closest(".pt-u"); if (!b) return;
+  if (b.classList.contains("paired")) return ptSay(b.dataset.u.toUpperCase() + " IS ALREADY PAIRED WITH SOMEONE.");
+  ptTo.value = b.dataset.u; ptSay(""); ptList(false);
+});
+document.addEventListener("pointerdown", e => { if (!$("ptList").hidden && !e.target.closest(".pt-pick, #ptList")) ptList(false); });
+setInterval(() => { if (!wins.partner.hidden && !document.hidden && account.user && !account.pair && !$("ptList").hidden) ptLoadUsers(); }, 6000);
+
+/* ============================================================ VOICE + VIDEO CALLS (WebRTC)
+   The call itself goes phone-to-phone. Only the small "hello / here's my address" messages travel through the same chat
+   WebSocket (instant). Both people need the page open. Without a TURN key (see README note) it uses STUN only. */
+const CALL = { st: "idle", media: "audio", pc: null, local: null, pendIce: [], ringTimer: 0, ringIv: 0, tick: 0, t0: 0 };
+const ptSig = o => { if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify(Object.assign({ t: "rtc" }, o))); return true; } catch (e) {} } return false; };
+function ptCallBtns() {
+  const ok = ptWanted() && PT.open && PT.hello && PT.online && CALL.st === "idle" && !!(window.RTCPeerConnection && navigator.mediaDevices);
+  for (const id of ["ptVoice", "ptVideo"]) { const b = $(id); b.hidden = LOCAL.on; b.disabled = !ok; b.title = (id === "ptVoice" ? "Voice call" : "Video call") + (ok ? "" : CALL.st !== "idle" ? " (already in a call)" : " (available when " + (ptOther() || "they") + " is online)"); }
+}
+function callNote(t) {                                                // a small grey line in the chat (and a toast if the window is closed)
+  if (!t) return;
+  if (!wins.partner.hidden) { const n = ptLog.querySelector(".none"); if (n) n.remove(); const d = document.createElement("div"); d.className = "pt-sys"; d.textContent = t; ptLog.appendChild(d); ptBottom(); }
+  else if (!desk.hidden) showToast([["t-pair", t]], "partner");
+}
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+function callSet(st) {
+  CALL.st = st; const box = $("ptCall"), info = $("ptCallState");
+  box.hidden = st === "idle" || st === "ringing"; box.classList.toggle("audio", CALL.media !== "video"); box.classList.remove("camoff");
+  $("ptCallName").textContent = ptOther();
+  clearInterval(CALL.tick);
+  if (st === "calling") info.textContent = "Calling...";
+  else if (st === "connecting") info.textContent = "Connecting...";
+  else if (st === "active") { wakeOn(); CALL.t0 = Date.now(); info.textContent = "0:00"; CALL.tick = setInterval(() => { info.textContent = mmss(Date.now() - CALL.t0); }, 1000); }
+  $("ptMute").classList.remove("on"); $("ptMute").textContent = "Mute"; $("ptCam").classList.remove("on"); $("ptCam").textContent = "Camera off";
+  ptCallBtns();
+}
+const callMediaErr = e => e && (e.name === "NotAllowedError" || e.name === "SecurityError") ? "Allow microphone" + (CALL.media === "video" ? " and camera" : "") + " access to call." : e && e.name === "NotFoundError" ? "No microphone" + (CALL.media === "video" ? " or camera" : "") + " found." : "Couldn't start the call.";
+async function callIce() { try { return (await api("turn")).iceServers; } catch (e) { return [{ urls: "stun:stun.cloudflare.com:3478" }]; } }
+function callMedia(video) {
+  return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    video: video ? { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 } } : false });
+}
+function callPc(ice) {
+  const pc = new RTCPeerConnection({ iceServers: ice, bundlePolicy: "max-bundle" }); CALL.pc = pc; CALL.pendIce = [];
+  for (const t of CALL.local.getTracks()) pc.addTrack(t, CALL.local);
+  $("ptLocal").srcObject = CALL.local;
+  pc.onicecandidate = e => { if (e.candidate) ptSig({ k: "ice", d: e.candidate.toJSON() }); };
+  pc.ontrack = e => { const v = $("ptRemote"); if (v.srcObject !== e.streams[0]) { v.srcObject = e.streams[0]; } v.play().catch(() => {}); };
+  pc.onconnectionstatechange = () => {
+    if (CALL.pc !== pc) return; const s = pc.connectionState;
+    if (s === "connected" && CALL.st !== "active") { clearTimeout(CALL.ringTimer); callSet("active"); }
+    else if (s === "failed") callEnd(true, "Call failed: the network blocked a direct connection.");
+    else if (s === "disconnected") setTimeout(() => { if (CALL.pc === pc && pc.connectionState === "disconnected") callEnd(true, "Call connection lost."); }, 6000);
+  };
+  return pc;
+}
+async function callFlush() { const q = CALL.pendIce; CALL.pendIce = []; for (const c of q) { try { await CALL.pc.addIceCandidate(c); } catch (e) {} } }
+function callRingStop() { clearInterval(CALL.ringIv); $("ptRing").hidden = true; }
+function callEnd(notify, note) {
+  if (CALL.st === "idle" && !CALL.local && !CALL.pc) { if (note) callNote(note); return; }
+  const was = CALL.st, dur = CALL.t0 && was === "active" ? Date.now() - CALL.t0 : 0;
+  if (notify) ptSig({ k: "end" });
+  clearTimeout(CALL.ringTimer); callRingStop(); clearInterval(CALL.tick); wakeOff();
+  if (CALL.local) { for (const t of CALL.local.getTracks()) { try { t.stop(); } catch (e) {} } }
+  if (CALL.pc) { const pc = CALL.pc; CALL.pc = null; pc.onconnectionstatechange = null; pc.onicecandidate = null; pc.ontrack = null; try { pc.close(); } catch (e) {} }
+  CALL.local = null; CALL.pendIce = []; CALL.t0 = 0; CALL.st = "idle";
+  $("ptRemote").srcObject = null; $("ptLocal").srcObject = null; $("ptCall").hidden = true;
+  try { sfx.down(); } catch (e) {}
+  callNote(note || (dur ? "Call ended - " + mmss(dur) : was === "idle" ? "" : "Call ended."));
+  ptCallBtns();
+}
+function callPartnerGone() { if (CALL.st === "calling" || CALL.st === "ringing" || CALL.st === "connecting") callEnd(false, ptOther() + " went offline."); }
+async function callStart(media) {
+  if (CALL.st !== "idle") return;
+  if (!PT.open || !PT.hello) return callNote("Not connected yet - try again in a moment.");
+  if (!PT.online) return callNote(ptOther() + " isn't online right now.");
+  CALL.media = media; callSet("calling");                              // show it straight away, then ask for the mic/camera
+  try { CALL.local = await callMedia(media === "video"); } catch (e) { CALL.st = "idle"; $("ptCall").hidden = true; ptCallBtns(); return callNote(callMediaErr(e)); }
+  if (CALL.st !== "calling") { for (const t of CALL.local.getTracks()) t.stop(); CALL.local = null; return; }
+  $("ptLocal").srcObject = CALL.local;
+  if (!ptSig({ k: "ring", media })) return callEnd(false, "Not connected - try again.");
+  CALL.ringTimer = setTimeout(() => { if (CALL.st === "calling") callEnd(true, ptOther() + " didn't answer."); }, 45000);
+}
+function callOnSig(m) {
+  const k = m.k;
+  if (k === "ring") {
+    if (CALL.st !== "idle") { ptSig({ k: "busy" }); return; }
+    CALL.media = m.media === "video" ? "video" : "audio"; CALL.st = "ringing"; ptCallBtns();
+    $("ptRingT").textContent = ptOther().toUpperCase() + " IS CALLING"; $("ptRingP").textContent = CALL.media === "video" ? "Video call" : "Voice call"; $("ptRing").hidden = false;
+    const ring = () => { try { sfx.pair(); navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {} }; ring(); clearInterval(CALL.ringIv); CALL.ringIv = setInterval(ring, 1900);
+    clearTimeout(CALL.ringTimer); CALL.ringTimer = setTimeout(() => { if (CALL.st === "ringing") { ptSig({ k: "decline" }); callEnd(false, "Missed call from " + ptOther() + "."); } }, 45000);
+  } else if (k === "accept" && CALL.st === "calling") {
+    callSet("connecting"); clearTimeout(CALL.ringTimer);
+    (async () => {
+      try { const pc = callPc(await callIce()); const o = await pc.createOffer(); await pc.setLocalDescription(o); ptSig({ k: "offer", d: pc.localDescription.toJSON() }); }
+      catch (e) { callEnd(true, "Couldn't start the call."); }
+    })();
+  } else if (k === "offer" && CALL.pc && CALL.st === "connecting") {
+    (async () => {
+      try { const pc = CALL.pc; await pc.setRemoteDescription(m.d); await callFlush(); const a = await pc.createAnswer(); await pc.setLocalDescription(a); ptSig({ k: "answer", d: pc.localDescription.toJSON() }); }
+      catch (e) { callEnd(true, "Couldn't connect the call."); }
+    })();
+  } else if (k === "answer" && CALL.pc) {
+    (async () => { try { await CALL.pc.setRemoteDescription(m.d); await callFlush(); } catch (e) { callEnd(true, "Couldn't connect the call."); } })();
+  } else if (k === "ice" && CALL.pc && m.d) {
+    if (CALL.pc.remoteDescription) CALL.pc.addIceCandidate(m.d).catch(() => {}); else CALL.pendIce.push(m.d);
+  } else if (k === "decline") callEnd(false, ptOther() + " declined the call.");
+  else if (k === "busy") callEnd(false, ptOther() + " is on another call.");
+  else if (k === "unavailable") callEnd(false, ptOther() + " isn't online right now.");
+  else if (k === "end") callEnd(false, CALL.st === "ringing" ? "Missed call from " + ptOther() + "." : "");
+}
+async function callAnswer() {
+  if (CALL.st !== "ringing") return;
+  clearTimeout(CALL.ringTimer); callRingStop(); openApp("partner");
+  try { CALL.local = await callMedia(CALL.media === "video"); } catch (e) { ptSig({ k: "decline" }); const n = callMediaErr(e); CALL.st = "idle"; ptCallBtns(); return callNote(n); }
+  if (CALL.st !== "ringing") { for (const t of CALL.local.getTracks()) t.stop(); CALL.local = null; return; }
+  callSet("connecting");
+  try { callPc(await callIce()); ptSig({ k: "accept" }); } catch (e) { callEnd(true, "Couldn't start the call."); }
+}
+$("ptVoice").addEventListener("click", () => callStart("audio"));
+$("ptVideo").addEventListener("click", () => callStart("video"));
+$("ptRingYes").addEventListener("click", callAnswer);
+$("ptRingNo").addEventListener("click", () => { if (CALL.st !== "ringing") return; ptSig({ k: "decline" }); callEnd(false, "Declined the call."); });
+$("ptHang").addEventListener("click", () => callEnd(true));
+$("ptMute").addEventListener("click", () => {
+  if (!CALL.local) return; const on = !$("ptMute").classList.contains("on");
+  for (const t of CALL.local.getAudioTracks()) t.enabled = !on; $("ptMute").classList.toggle("on", on); $("ptMute").textContent = on ? "Unmute" : "Mute";
+});
+$("ptCam").addEventListener("click", () => {
+  if (!CALL.local) return; const on = !$("ptCam").classList.contains("on");
+  for (const t of CALL.local.getVideoTracks()) t.enabled = !on; $("ptCam").classList.toggle("on", on); $("ptCam").textContent = on ? "Camera on" : "Camera off"; $("ptCall").classList.toggle("camoff", on);
+});
+window.addEventListener("pagehide", () => { if (CALL.st !== "idle") ptSig({ k: "end" }); });
+ptCallBtns();
+
+/* ============================================================ MOONSTA extras: photo feed + double-tap hearts */
+PT.posts = new Map(); PT.tab = "chat"; PT.feedWs = null;
+function ptHeart(el, r) {
+  const old = el.querySelector(".pt-r"); if (old) old.remove();
+  const n = r ? Object.keys(r).length : 0; el.classList.toggle("hr", n > 0);
+  if (n) { const b = document.createElement("span"); b.className = "pt-r"; b.textContent = "\u2764\uFE0F" + (n > 1 ? " " + n : ""); el.appendChild(b); }
+}
+function ptTab(t) {
+  PT.tab = t; $("ptChat").classList.toggle("feed", t === "feed");
+  $("ptTabChat").setAttribute("aria-selected", t === "chat"); $("ptTabFeed").setAttribute("aria-selected", t === "feed");
+  if (t === "feed") { if (PT.open && PT.hello && PT.feedWs !== PT.ws) { PT.feedWs = PT.ws; PT.ws.send(JSON.stringify({ t: "feed" })); } }
+  else { ptSeenIfViewing(); ptBottom(); }
+}
+$("ptTabChat").addEventListener("click", () => ptTab("chat")); $("ptTabFeed").addEventListener("click", () => ptTab("feed"));
+function ptLike(id) { if (PT.open && PT.hello) PT.ws.send(JSON.stringify({ t: "like", id })); }
+function ptPostLike(o) {
+  const me = ptMe(), on = o.post.likes.includes(me), b = o.el.querySelector(".acts button");
+  b.classList.toggle("on", on); b.textContent = (on ? "\u2764\uFE0F " : "\u2661 ") + (o.post.likes.length || "");
+}
+function ptPostUpsert(post, fresh) {
+  let o = PT.posts.get(post.id);
+  if (o) { o.post.likes = post.likes; return ptPostLike(o); }
+  const el = document.createElement("div"); el.className = "pt-post";
+  el.innerHTML = '<header><b></b><small></small></header><div class="pic"><img alt=""><span class="pop">\u2764\uFE0F</span></div><div class="acts"><button type="button"></button></div><p></p>';
+  el.querySelector("b").textContent = post.from; el.querySelector("small").textContent = new Date(post.at).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  el.querySelector("img").src = post.img; el.querySelector("p").textContent = post.cap || ""; if (!post.cap) el.querySelector("p").hidden = true;
+  o = { post, el }; PT.posts.set(post.id, o); ptPostLike(o);
+  const pop = el.querySelector(".pop");
+  const dbl = () => { if (!ptDbl()) return; if (!post.likes.includes(ptMe())) ptLike(post.id); pop.classList.remove("go"); void pop.offsetWidth; pop.classList.add("go"); }; const pic = el.querySelector(".pic"); pic.addEventListener("dblclick", dbl); onDouble(pic, ".pic", dbl);
+  el.querySelector(".acts button").addEventListener("click", () => ptLike(post.id));
+  const box = $("ptPosts"); let at = null;
+  for (const c of box.children) { if (Number(c.dataset.id) < post.id) { at = c; break; } }
+  el.dataset.id = post.id; box.insertBefore(el, at);
+  if (fresh && post.from !== ptMe() && !(ptViewing() && PT.tab === "feed")) { try { sfx.mail(); } catch (e) {} if (!desk.hidden) showToast([["t-pair", post.from.toUpperCase() + " POSTED A PHOTO"]], "partner"); }
+}
+function ptShrink(file) {
+  return new Promise((res, rej) => {
+    const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      URL.revokeObjectURL(u); const k = Math.min(1, 900 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      let q = .8, d = c.toDataURL("image/jpeg", q); while (d.length > 340000 && q > .3) { q -= .1; d = c.toDataURL("image/jpeg", q); }
+      d.length > 340000 ? rej(new Error("big")) : res(d);
+    };
+    im.onerror = rej; im.src = u;
+  });
+}
+$("ptPic").addEventListener("change", async () => {
+  const f = $("ptPic").files[0]; $("ptPic").value = ""; if (!f) return;
+  if (!PT.open || !PT.hello) return callNote("Not connected yet - try again in a moment.");
+  try { const img = await ptShrink(f); PT.ws.send(JSON.stringify({ t: "post", img, cap: $("ptCap").value })); $("ptCap").value = ""; }
+  catch (e) { callNote("Couldn't use that photo."); }
+});
+const ptReact = b => { if (b && b.dataset.id && PT.open && PT.hello && ptDbl()) PT.ws.send(JSON.stringify({ t: "react", id: Number(b.dataset.id) })); };
+ptLog.addEventListener("dblclick", e => ptReact(e.target.closest(".pt-m"))); onDouble(ptLog, ".pt-m", ptReact);
+
+/* ============================================================ MOONSTA on mobile */
+PT.dbl = 0;
+const ptDbl = () => { const n = Date.now(); if (n - PT.dbl < 500) return false; PT.dbl = n; return true; };
+function onDouble(el, sel, fn) {                                       // double-tap for touch screens (iOS never sends a dblclick)
+  let last = 0, lx = 0, ly = 0;
+  el.addEventListener("pointerup", e => {
+    if (e.pointerType === "mouse") return;
+    const t = e.target.closest(sel); if (!t) return; const n = Date.now();
+    if (n - last < 320 && Math.abs(e.clientX - lx) < 32 && Math.abs(e.clientY - ly) < 32) { last = 0; fn(t, e); } else { last = n; lx = e.clientX; ly = e.clientY; }
+  });
+}
+if (window.visualViewport) {                                            // phone keyboard: shrink the window to what is really visible so the message box never hides
+  const vv = visualViewport, w = $("win-partner");
+  const fit = () => {
+    const kb = innerWidth <= 700 && !wins.partner.hidden && vv.height < innerHeight - 120;
+    w.classList.toggle("kb", kb); desk.classList.toggle("kb", kb);
+    if (kb) { w.style.setProperty("--vvh", vv.height + "px"); w.style.setProperty("--vvt", vv.offsetTop + "px"); w.classList.toggle("short", vv.height < 460); window.scrollTo(0, 0); if (PT.tab === "chat") ptBottom(); }
+    else w.classList.remove("short");
+  };
+  vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit);
+}
+let wl = null;                                                          // keep the screen awake during a call
+async function wakeOn() { try { if (navigator.wakeLock && !wl) { wl = await navigator.wakeLock.request("screen"); wl.addEventListener("release", () => { wl = null; }); } } catch (e) {} }
+function wakeOff() { try { if (wl) wl.release(); } catch (e) {} wl = null; }
+function ptProbe() {                                                    // phones silently kill sockets in the background: check the line the moment you come back
+  if (!PT.ws || !PT.open) return ptConnect();
+  const w = PT.ws, t = Date.now(); try { w.send("ping"); } catch (e) {}
+  setTimeout(() => { if (PT.ws === w && PT.pongAt < t) { PT.ws = null; PT.open = false; PT.hello = false; try { w.close(); } catch (e) {} ptStatus(); ptConnect(); } }, 2500);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { ptProbe(); if (CALL.st === "active") wakeOn(); } });
+window.addEventListener("pageshow", ptProbe);
+let camFace = "user";
+$("ptFlip").addEventListener("click", async () => {                    // front/back camera
+  if (!CALL.local || !CALL.pc) return; const old = CALL.local.getVideoTracks()[0], prev = camFace; if (!old) return;
+  camFace = camFace === "user" ? "environment" : "user"; old.stop();
+  const get = f => navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: f }, width: { ideal: 640 }, height: { ideal: 480 } } });
+  let ns; try { ns = await get(camFace); } catch (e) { camFace = prev; try { ns = await get(prev); } catch (e2) { return callEnd(true, "Camera stopped working."); } callNote("Couldn't switch camera."); }
+  const nt = ns.getVideoTracks()[0], snd = CALL.pc && CALL.pc.getSenders().find(x => x.track && x.track.kind === "video");
+  if (snd) await snd.replaceTrack(nt).catch(() => {});
+  CALL.local.removeTrack(old); CALL.local.addTrack(nt); $("ptLocal").srcObject = CALL.local; $("ptLocal").style.transform = camFace === "user" ? "scaleX(-1)" : "none";
+});
+
+
+
 
 /* ---- chat while you play + faster updates ---- */
-let gmChatSig = "", gmMenu = null, gmReply = null, gmTap = { id: "", t: 0, tm: 0 };
-const GIPHY_KEY = "dc6zaTOxFJmzC";                               // GIPHY's public beta key. If GIF search ever stops working, paste your own free key from developers.giphy.com here
-const GM_REACTS = ["\u2764\uFE0F", "\uD83D\uDE02", "\uD83D\uDE2E", "\uD83D\uDE22", "\uD83D\uDC4D", "\uD83D\uDD25"], stkCache = new Map(), STK_KEY = "sunmoon-stickers";
-let myStk = []; try { myStk = JSON.parse(localStorage.getItem(STK_KEY) || "[]") || []; } catch (e) {}
-const saveStk = () => { try { localStorage.setItem(STK_KEY, JSON.stringify(myStk.slice(0, 30))); } catch (e) {} };
-const hhmm = t => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
-const gmSnip = m => m.text ? m.text.slice(0, 60) : m.gif ? "GIF" : "Sticker";
-const gmStk = sid => { if (!stkCache.has(sid)) stkCache.set(sid, api("game_stk", { sid }).then(r => r.img).catch(() => { stkCache.delete(sid); return ""; })); return stkCache.get(sid); };
-const gmRedraw = () => { gmChatSig = ""; renderChat(); };
-function gmSend(extra) {
-  if (!GM.game) return Promise.resolve();
-  return api("game_chat", Object.assign({ gid: GM.game.id, reply: gmReply ? gmReply.id : undefined }, extra)).then(r => { gmReply = null; gmBar(); gmSetGame(r.game); }).catch(gmErr);
-}
-const gmAct = (m, name, more) => api(name, Object.assign({ gid: GM.game.id, id: m.id }, more)).then(r => gmSetGame(r.game)).catch(gmErr);
-function gmBar() { const b = $("gmReplyBar"); b.hidden = !gmReply; if (gmReply) $("gmReplyTxt").textContent = "Replying to " + (gmReply.from === gmMe() ? "yourself" : gmReply.from) + ": " + gmReply.snip; }
-function gmTapMsg(m) {                                           // tap = open the menu, double-tap = like (nothing gets selected)
-  const now = Date.now();
-  if (gmTap.id === m.id && now - gmTap.t < 320) { clearTimeout(gmTap.tm); gmTap.t = 0; gmMenu = null; if (!(m.r && m.r[gmMe()] === GM_REACTS[0])) gmAct(m, "game_react", { emoji: GM_REACTS[0] }); else gmRedraw(); return; }
-  gmTap = { id: m.id, t: now, tm: setTimeout(() => { gmMenu = gmMenu === m.id ? null : m.id; gmRedraw(); }, 320) };
-}
-function gmMenuEl(m, mine) {
-  const bar = gel("div", "gm-bar " + (mine ? "me" : "them")), add = (txt, fn, title) => { const b = gel("button", "", txt); b.type = "button"; if (title) b.title = title; b.addEventListener("click", e => { e.stopPropagation(); gmMenu = null; fn(); }); bar.append(b); };
-  for (const e of GM_REACTS) add(e, () => gmAct(m, "game_react", { emoji: e }));
-  add("Reply", () => { gmReply = { id: m.id, from: m.from, snip: gmSnip(m) }; gmBar(); gmRedraw(); $("gmChatIn").focus(); });
-  if (mine) add("Unsend", () => gmAct(m, "game_unsend"));
-  return bar;
-}
+let gmChatSig = "";
 function renderChat() {
   const g = GM.game, box = $("gmChat"), live = !LOCAL.on && gmPartner() && g && (g.status === "active" || g.status === "done");
   box.hidden = !live; if (!live) { gmChatSig = ""; return; }
-  const list = g.chat || [], sig = g.id + "|" + gmMenu + "|" + list.map(m => (m.id || m.at) + (m.del ? "x" : "") + Object.values(m.r || {}).join("")).join(",");
+  const list = g.chat || [], sig = g.id + ":" + list.length + ":" + (list.length ? list[list.length - 1].at : 0);
   if (sig === gmChatSig) return; gmChatSig = sig;
   const log = $("gmLog"), stick = log.scrollTop + log.clientHeight >= log.scrollHeight - 30; log.textContent = "";
   if (!list.length) log.append(gel("div", "none", "No messages yet - say hi!"));
-  for (const m of list) {
-    const mine = m.from === gmMe(), rs = Object.values(m.r || {}), d = gel("div", "gm-m " + (mine ? "me" : "them") + (m.del ? " del" : "") + (m.sid ? " stk" : "") + (rs.length ? " hasrx" : ""));
-    if (m.del) d.textContent = "Message unsent";
-    else {
-      if (m.re) d.append(gel("div", "rq", (m.re.from === gmMe() ? "You" : m.re.from) + ": " + m.re.snip));
-      if (m.gif) { const i = gel("img", "gf"); i.src = m.gif; i.alt = "GIF"; i.loading = "lazy"; d.append(i); }
-      if (m.sid) { const i = gel("img", ""); i.alt = "Sticker"; gmStk(m.sid).then(u => { if (u) i.src = u; }); d.append(i); }
-      if (m.text) d.append(document.createTextNode(m.text));
-      d.append(gel("span", "tm", hhmm(m.at)));
-      if (rs.length) d.append(gel("span", "rx", [...new Set(rs)].join("") + (rs.length > 1 ? " " + rs.length : "")));
-      if (m.id) d.addEventListener("pointerup", e => { if (e.pointerType === "mouse" && e.button !== 0) return; gmTapMsg(m); });
-    }
-    log.append(d); if (gmMenu === m.id) log.append(gmMenuEl(m, mine));
-  }
+  for (const m of list) log.append(gel("div", "gm-m " + (m.from === gmMe() ? "me" : "them"), m.text));
   if (stick || list.length) log.scrollTop = log.scrollHeight;
 }
-$("gmLog").addEventListener("mousedown", e => { if (e.detail > 1) e.preventDefault(); });   // a double-click must never select text
-$("gmReplyX").addEventListener("click", () => { gmReply = null; gmBar(); });
-$("gmChatForm").addEventListener("submit", e => {
-  e.preventDefault(); const inp = $("gmChatIn"), text = inp.value.trim(); if (!text) return; inp.value = "";
-  gmSend({ text }).then(() => {}, () => { inp.value = text; });
+$("gmChatForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const inp = $("gmChatIn"), text = inp.value.trim(); if (!text || !GM.game) return;
+  inp.value = "";
+  try { const r = await api("game_chat", { gid: GM.game.id, text }); gmSetGame(r.game); }
+  catch (err) { inp.value = text; gmErr(err); }
 });
-const gmPanel = () => { const p = $("gmPanel"); p.textContent = ""; p.hidden = false; return p; };
-$("gmGifB").addEventListener("click", () => {                    // GIFs from GIPHY's public library
-  const p0 = $("gmPanel"); if (!p0.hidden && p0.dataset.k === "gif") { p0.hidden = true; return; }
-  const p = gmPanel(); p.dataset.k = "gif"; const q = gel("input", ""), grid = gel("div", "gm-grid"); q.type = "text"; q.placeholder = "Search GIFs..."; p.append(q, grid); let t = 0;
-  const load = async s => {
-    grid.textContent = "Loading...";
-    try {
-      const r = await fetch(`https://api.giphy.com/v1/gifs/${s ? "search" : "trending"}?api_key=${GIPHY_KEY}&limit=18&rating=pg-13${s ? "&q=" + encodeURIComponent(s) : ""}`); if (!r.ok) throw 0;
-      const j = await r.json(); grid.textContent = ""; if (!j.data || !j.data.length) { grid.textContent = "No GIFs found."; return; }
-      for (const x of j.data) { const sm = x.images && x.images.fixed_width_small, big = x.images && (x.images.downsized || x.images.fixed_width); if (!sm || !big) continue;
-        const i = gel("img", ""); i.src = sm.url; i.alt = x.title || "GIF"; i.addEventListener("click", () => { p.hidden = true; gmSend({ gif: big.url.split("?")[0] }); }); grid.append(i); }
-    } catch (err) { grid.textContent = "GIFs aren't available right now."; }
-  };
-  q.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => load(q.value.trim()), 400); }); load("");
-});
-function gmStickers() {
-  const p = gmPanel(); p.dataset.k = "stk"; const mk = gel("button", "gm-btn", "+ Make a sticker"), grid = gel("div", "gm-grid stk"); mk.type = "button"; mk.addEventListener("click", gmMaker); p.append(mk, grid);
-  if (!myStk.length) grid.textContent = "No stickers yet. Make one!";
-  myStk.forEach((s, i) => { const w = gel("div", "gm-sk"), im = gel("img", ""), x = gel("button", "", "\u00d7"); im.src = s; x.type = "button"; x.title = "Delete";
-    im.addEventListener("click", () => { p.hidden = true; gmSend({ stk: s }); }); x.addEventListener("click", () => { myStk.splice(i, 1); saveStk(); gmStickers(); }); w.append(im, x); grid.append(w); });
-}
-$("gmStkB").addEventListener("click", () => { const p = $("gmPanel"); if (!p.hidden && p.dataset.k === "stk") p.hidden = true; else gmStickers(); });
-function gmMaker() {                                             // draw your own sticker (or turn a photo into one), save it, send it
-  const p = gmPanel(); p.dataset.k = "mk"; const cv = gel("canvas", "gm-cv"), k = cv.getContext("2d"), tools = gel("div", "gm-tools"), acts = gel("div", "gm-tools");
-  cv.width = cv.height = 256; let col = "#e03a6a", size = 8, erase = false, down = false; const hist = [];
-  const snap = () => { hist.push(k.getImageData(0, 0, 256, 256)); if (hist.length > 15) hist.shift(); }, pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * 256 / r.width, (e.clientY - r.top) * 256 / r.height]; };
-  cv.addEventListener("pointerdown", e => { down = true; snap(); cv.setPointerCapture(e.pointerId); const [x, y] = pos(e); k.lineCap = k.lineJoin = "round"; k.lineWidth = size; k.strokeStyle = col; k.globalCompositeOperation = erase ? "destination-out" : "source-over"; k.beginPath(); k.moveTo(x, y); k.lineTo(x + .01, y); k.stroke(); });
-  cv.addEventListener("pointermove", e => { if (!down) return; const [x, y] = pos(e); k.lineTo(x, y); k.stroke(); });
-  for (const t of ["pointerup", "pointercancel"]) cv.addEventListener(t, () => { down = false; });
-  const btn = (txt, fn, par) => { const b = gel("button", "gm-btn", txt); b.type = "button"; b.addEventListener("click", fn); par.append(b); return b; };
-  for (const c of ["#e03a6a", "#ff9a2e", "#ffd23a", "#3ac26b", "#2f8fe0", "#8a5cf0", "#222222", "#ffffff"]) { const b = gel("button", "gm-sw"); b.type = "button"; b.style.background = c; b.setAttribute("aria-label", "Colour " + c); b.addEventListener("click", () => { col = c; erase = false; }); tools.append(b); }
-  const rg = gel("input", ""); rg.type = "range"; rg.min = 2; rg.max = 28; rg.value = size; rg.setAttribute("aria-label", "Brush size"); rg.addEventListener("input", () => { size = +rg.value; }); tools.append(rg);
-  btn("Eraser", () => { erase = !erase; }, tools); btn("Undo", () => { const h = hist.pop(); if (h) k.putImageData(h, 0, 0); }, tools); btn("Clear", () => { snap(); k.clearRect(0, 0, 256, 256); }, tools);
-  const fi = gel("input", ""); fi.type = "file"; fi.accept = "image/*"; fi.hidden = true;
-  fi.addEventListener("change", () => { const f = fi.files[0]; fi.value = ""; if (!f) return; const u = URL.createObjectURL(f), im = new Image();
-    im.onload = () => { URL.revokeObjectURL(u); snap(); k.globalCompositeOperation = "source-over"; k.save(); k.beginPath(); k.arc(128, 128, 124, 0, 7); k.clip(); const sc = Math.max(256 / im.naturalWidth, 256 / im.naturalHeight); k.drawImage(im, 128 - im.naturalWidth * sc / 2, 128 - im.naturalHeight * sc / 2, im.naturalWidth * sc, im.naturalHeight * sc); k.restore(); }; im.src = u; });
-  btn("Photo", () => fi.click(), tools);
-  const out = () => { for (const n of [160, 128, 96]) { const c = document.createElement("canvas"); c.width = c.height = n; c.getContext("2d").drawImage(cv, 0, 0, n, n); let d = c.toDataURL("image/webp", .85); if (!d.startsWith("data:image/webp")) d = c.toDataURL("image/png"); if (d.length <= 55000) return d; } return ""; };
-  const save = send => { const d = out(); if (!d) return gmSay("That sticker is too detailed. Try something simpler."); myStk.unshift(d); saveStk(); if (send) { p.hidden = true; gmSend({ stk: d }); } else gmStickers(); };
-  btn("Save", () => save(false), acts); btn("Save & send", () => save(true), acts); btn("Back", gmStickers, acts);
-  p.append(cv, tools, fi, acts);
-}
 {
   const _rg = renderGames; renderGames = function () { _rg(); renderChat(); };
   const _sg = gmSetGame;

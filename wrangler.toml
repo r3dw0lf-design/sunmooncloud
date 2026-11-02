@@ -1,4 +1,4 @@
-name = "sunmoon-v2"
+name = "sunmooncloud"
 main = "src/worker.js"
 compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat"]
@@ -8,10 +8,19 @@ directory = "./public"
 binding = "ASSETS"
 run_worker_first = ["/api/*"]
 
-# First deploy creates this database. Afterwards, add its id on the next line (database_id = "...") so it is pinned and always reused.
+# No database_id on purpose: wrangler creates the D1 database for you on the first deploy.
 [[d1_databases]]
 binding = "DB"
-database_name = "sunmoon-v2-db"
+database_name = "sunmoon"
+
+# Live chat: one Durable Object per couple (SQLite-backed, which is the kind the free plan allows).
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "PairRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PairRoom"]
 
 [observability.logs]
 enabled = true
