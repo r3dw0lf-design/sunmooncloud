@@ -799,3 +799,10 @@ export default {
     return handle(request, { ip: request.headers.get("CF-Connecting-IP") });
   },
 };
+
+/* Placeholder for the older chat-room class this Worker used to have. Cloudflare refuses a new deploy if a class that
+   already exists goes missing, so it stays here (does nothing, deletes nothing). */
+export class PairRoom {
+  constructor(state, env) {}
+  async fetch() { return new Response("Retired", { status: 410 }); }
+}
