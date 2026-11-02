@@ -23,3 +23,8 @@ persist = true
 enabled = false
 head_sampling_rate = 1
 persist = true
+
+# One-time clean-up: removes the old "PairRoom" chat-room storage left by an earlier version of this site.
+[[migrations]]
+tag = "remove-pairroom-1"
+deleted_classes = ["PairRoom"]
