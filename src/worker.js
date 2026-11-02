@@ -1,3 +1,4 @@
+// @ts-nocheck  (plain JavaScript run by Cloudflare; this stops the editor showing type-checker warnings)
 /* Sun & Moon - account API as a Cloudflare Worker (served at /api/*, static files come from ./public).
    ONE shared list of accounts for everyone, stored in Cloudflare D1 (one SQLite table, strongly consistent).
    - A username is claimed with a "write only if new" call, so two people can never both get it,
@@ -28,8 +29,8 @@ async function flushDels() {
   catch (e) { q.forEach(x => x.rej(e)); }
 }
 const d1Store = () => ({
-  async get(k) { const r = await qGet(k); return r ? JSON.parse(r.v) : null; },
-  async getWithMetadata(k) { const r = await qGet(k); return r ? { data: JSON.parse(r.v), etag: String(r.ver) } : null; },
+  async get(k, _opts) { const r = await qGet(k); return r ? JSON.parse(r.v) : null; },
+  async getWithMetadata(k, _opts) { const r = await qGet(k); return r ? { data: JSON.parse(r.v), etag: String(r.ver) } : null; },
   async setJSON(k, val, o = {}) {
     const v = JSON.stringify(val); let r;
     if (o.onlyIfNew) r = await DB.prepare("INSERT INTO kv (k, v, ver) VALUES (?, ?, 1) ON CONFLICT(k) DO NOTHING").bind(k, v).run();
@@ -38,7 +39,7 @@ const d1Store = () => ({
     return { modified: r.meta.changes > 0 };
   },
   delete: k => qDel(k),
-  async list({ prefix = "" } = {}) { const r = await DB.prepare("SELECT k FROM kv WHERE k >= ? AND k < ? ORDER BY k").bind(prefix, prefix + "\uffff").all(); return { blobs: r.results.map(x => ({ key: x.k })) }; },
+  async list({ prefix = "" } = {}, _opts) { const r = await DB.prepare("SELECT k FROM kv WHERE k >= ? AND k < ? ORDER BY k").bind(prefix, prefix + "\uffff").all(); return { blobs: r.results.map(x => ({ key: x.k })) }; },
 });
 import crypto from "node:crypto";
 import { promisify } from "node:util";
