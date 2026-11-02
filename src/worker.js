@@ -760,18 +760,19 @@ const padSeq = n => String(n).padStart(10, "0");
 export class PairRoom extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
-    this.seq = 0; this.seen = {}; this.hits = new Map(); this.rtcHits = new Map();
+    this.seq = 0; this.seen = {}; this.pseq = 0; this.hits = new Map(); this.rtcHits = new Map();
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));   // keep-alive answered without waking the object
     this.ctx.blockConcurrencyWhile(async () => {
       this.seq = (await this.ctx.storage.get("seq")) || 0;
       this.seen = (await this.ctx.storage.get("seen")) || {};
+      this.pseq = (await this.ctx.storage.get("pseq")) || 0;
     });
   }
   async fetch(request) {
     const url = new URL(request.url);
     if (url.pathname === "/clear") {
       for (const w of this.ctx.getWebSockets()) { try { w.close(4001, "unpaired"); } catch (e) {} }
-      await this.ctx.storage.deleteAll(); this.seq = 0; this.seen = {};
+      await this.ctx.storage.deleteAll(); this.seq = 0; this.pseq = 0; this.seen = {};
       return new Response("ok");
     }
     if (request.headers.get("Upgrade") !== "websocket") return new Response("Expected a WebSocket", { status: 426 });
@@ -801,11 +802,11 @@ export class PairRoom extends DurableObject {
     return r.n > 25;
   }
   async webSocketMessage(ws, data) {
-    if (typeof data !== "string" || data.length > 20000) return;
+    if (typeof data !== "string" || data.length > 420000) return;
     let m; try { m = JSON.parse(data); } catch (e) { return; }
     if (!m || typeof m !== "object") return;
     const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
-    if (m.t !== "rtc" && data.length > 4000) return;
+    if (m.t !== "rtc" && m.t !== "post" && data.length > 4000) return;
     if (m.t === "chat") {
       const text = String(m.text || "").replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F]/g, "").trim().slice(0, 1000);
       if (!text) return;
@@ -829,6 +830,25 @@ export class PairRoom extends DurableObject {
       if (!others.length) { if (k === "ring") { try { ws.send(JSON.stringify({ t: "rtc", k: "unavailable" })); } catch (e) {} } return; }
       const text = JSON.stringify({ t: "rtc", k, d, media: m.media === "video" ? "video" : "audio", from: me });
       for (const w of others) { try { w.send(text); } catch (e) {} }
+    } else if (m.t === "post") {                               // Moonsta feed: a photo (already shrunk by the phone) + caption
+      const img = String(m.img || ""), cap = String(m.cap || "").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, 300);
+      if (!/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(img) || img.length > 380000 || this.limited(me)) return;
+      const id = ++this.pseq, post = { id, from: me, img, cap, at: Date.now(), likes: [] };
+      await this.ctx.storage.put({ pseq: id, ["p:" + padSeq(id)]: post });
+      this.send({ t: "post", post });
+    } else if (m.t === "like") {
+      const key = "p:" + padSeq(parseInt(m.id, 10) || 0), post = await this.ctx.storage.get(key); if (!post) return;
+      const i = post.likes.indexOf(me); if (i >= 0) post.likes.splice(i, 1); else post.likes.push(me);
+      this.send({ t: "like", id: post.id, likes: post.likes });
+      await this.ctx.storage.put(key, post, { allowUnconfirmed: true });
+    } else if (m.t === "react") {                              // double-tap a chat bubble = heart
+      const key = "m:" + padSeq(parseInt(m.id, 10) || 0), msg = await this.ctx.storage.get(key); if (!msg) return;
+      msg.r = msg.r || {}; if (msg.r[me]) delete msg.r[me]; else msg.r[me] = "\u2764\uFE0F";
+      this.send({ t: "react", id: msg.id, r: msg.r });
+      await this.ctx.storage.put(key, msg, { allowUnconfirmed: true });
+    } else if (m.t === "feed") {
+      const rows = await this.ctx.storage.list({ prefix: "p:", reverse: true, limit: 24 });
+      for (const post of rows.values()) { try { ws.send(JSON.stringify({ t: "post", post, old: 1 })); } catch (e) {} }
     } else if (m.t === "typing") {
       this.send({ t: "typing", u: me, on: m.on !== false }, ws);
     } else if (m.t === "seen") {

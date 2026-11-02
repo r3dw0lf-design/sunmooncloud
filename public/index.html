@@ -680,6 +680,49 @@
   #ptRing[hidden] { display: none; }
   #ptRing b { display: block; font-size: 16px; color: #0a3d91; margin-bottom: 2px; }
   #ptRing p { margin: 0 0 10px; }
+  .pt-tabs { display: flex; gap: 4px; }
+  .pt-tabs button { flex: 1; padding: 7px; border: 1px solid #8fb0e6; border-radius: 9px; background: #fff; color: #12315f; font: bold 12px Tahoma, sans-serif; cursor: pointer; }
+  .pt-tabs button[aria-selected="true"] { background: linear-gradient(135deg, #ffb347, #e0457b 55%, #6a4de0); color: #fff; border-color: #fff; }
+  #ptDays { font-size: 11px; color: #a3205a; background: #ffd0e4; border-radius: 9px; padding: 1px 8px; }
+  #ptFeed { display: none; flex: 1; min-height: 0; flex-direction: column; gap: 6px; }
+  #ptChat.feed #ptFeed { display: flex; }
+  #ptChat.feed #ptLog, #ptChat.feed #ptTyping, #ptChat.feed #ptForm { display: none; }
+  .pt-newpost { display: flex; gap: 6px; } .pt-newpost input { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font: 14px Tahoma, sans-serif; color: #12315f; background: #fff; }
+  #ptPosts { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+  .pt-post { background: #fff; border: 1px solid #c3d3ee; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,30,80,.15); }
+  .pt-post header { display: flex; justify-content: space-between; padding: 7px 10px; font-size: 13px; } .pt-post header small { opacity: .6; }
+  .pt-post .pic { position: relative; background: #000; }
+  .pt-post img { display: block; width: 100%; max-height: 360px; object-fit: contain; -webkit-user-drag: none; }
+  .pt-post .pop { position: absolute; left: 50%; top: 50%; font-size: 70px; transform: translate(-50%, -50%) scale(0); pointer-events: none; }
+  .pt-post .pop.go { animation: ptpop .7s ease-out; }
+  @keyframes ptpop { 30% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 100% { transform: translate(-50%, -80%) scale(1); opacity: 0; } }
+  .pt-post .acts { padding: 6px 10px 2px; } .pt-post .acts button { border: 0; background: none; font: 15px Tahoma, sans-serif; color: #12315f; cursor: pointer; }
+  .pt-post .acts button.on { color: #e0457b; }
+  .pt-post p { margin: 0; padding: 0 10px 9px; font-size: 13.5px; overflow-wrap: anywhere; }
+  .pt-m { position: relative; } .pt-m.hr { margin-bottom: 9px; }
+  .pt-r { position: absolute; right: 8px; bottom: -10px; background: #fff; border-radius: 10px; padding: 0 5px; font-size: 12px; color: #12315f; box-shadow: 0 1px 3px #0003; }
+  /* ---- Moonsta on phones: big touch targets, 16px inputs (no iOS zoom), keyboard-aware height ---- */
+  #win-partner, #win-partner button, #ptLog, #ptPosts { touch-action: manipulation; }
+  #ptFlip { display: none; } #ptCall:not(.audio) #ptFlip { display: inline-block; }
+  @media (pointer: fine) { #ptFlip { display: none !important; } }
+  @media (pointer: coarse), (max-width: 700px) {
+    .pt-wrap { padding: 8px; }
+    .pt-card input, .pt-pick input, #ptCap { font-size: 16px; min-height: 44px; }
+    .pt-who button, .pt-tabs button, #ptDrop, .pt-u, #ptSend { min-height: 44px; }
+    .pt-ic { width: 44px; height: 44px; font-size: 19px; }
+    #ptGo, .pt-newpost .gm-btn { min-height: 44px; min-width: 66px; display: inline-flex; align-items: center; justify-content: center; }
+    .pt-ctl { gap: 8px; } .pt-ctl button { min-height: 48px; padding: 12px 15px; font-size: 14px; }
+    #ptRing .gm-btn { min-height: 48px; flex: 1; font-size: 15px; }
+    #ptLocal { width: 84px; height: 112px; top: calc(10px + env(safe-area-inset-top, 0px)); }
+    #ptCallInfo { top: calc(14px + env(safe-area-inset-top, 0px)); }
+    .pt-post .acts button { min-height: 42px; padding: 0 8px; font-size: 18px; }
+    .pt-post img { max-height: 58vh; }
+    .pt-m { max-width: 88%; font-size: 15px; }
+    #ptList { max-height: 40vh; }
+  }
+  #win-partner.kb { height: var(--vvh, 100%) !important; top: var(--vvt, 0px) !important; }
+  #desktop.kb #taskbar { display: none; }
+  #win-partner.kb.short .pt-head, #win-partner.kb.short .pt-tabs { display: none; }
   @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
     background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
@@ -939,7 +982,7 @@
     <button class="dt-icon" data-app="mail" type="button"><i class="bdg" id="mailBadge" hidden></i><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="4" y="10" width="40" height="28" rx="3" fill="#fff6d8" stroke="#8a7a4a" stroke-width="2"/><path d="M5 12l19 15 19-15" fill="none" stroke="#8a7a4a" stroke-width="2"/><text x="24" y="36" text-anchor="middle" font-size="13" fill="#ff6fae">&#9829;</text></svg><span>Mail</span></button>
     <button class="dt-icon" data-app="settings" type="button"><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="4" y="6" width="40" height="36" rx="4" fill="#dfe8f7" stroke="#5a7ab0" stroke-width="2"/><rect x="4" y="6" width="40" height="8" rx="3" fill="#3d7be0"/><g fill="#4a5f86"><circle cx="24" cy="29" r="8"/><rect x="22" y="17" width="4" height="6" rx="1"/><rect x="22" y="35" width="4" height="6" rx="1"/><rect x="12" y="27" width="6" height="4" rx="1"/><rect x="30" y="27" width="6" height="4" rx="1"/></g><circle cx="24" cy="29" r="3.5" fill="#dfe8f7"/></svg><span>Settings</span></button>
     <button class="dt-icon" data-app="games" type="button"><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><rect x="3" y="12" width="42" height="24" rx="12" fill="#4a5f86" stroke="#2b3b5c" stroke-width="2"/><rect x="11" y="21" width="12" height="4" rx="1" fill="#e8eefb"/><rect x="15" y="17" width="4" height="12" rx="1" fill="#e8eefb"/><circle cx="32" cy="19" r="3" fill="#ffd23a"/><circle cx="38" cy="25" r="3" fill="#ee3b3b"/><circle cx="32" cy="29" r="3" fill="#2fd66a"/></svg><span>Mini Games</span></button>
-    <button class="dt-icon" data-app="partner" type="button"><i class="bdg" id="ptBadge" hidden></i><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><path d="M5 8h26a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H17l-7 6v-6H5a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3z" fill="#ffd96a" stroke="#b88a10" stroke-width="2" stroke-linejoin="round"/><path d="M19 20h24a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3h-4v6l-7-6H19a3 3 0 0 1-3-3V23a3 3 0 0 1 3-3z" fill="#b9c8ff" stroke="#4a5fae" stroke-width="2" stroke-linejoin="round" transform="translate(0 -4)"/><path d="M31 31.5c-2-1.5-3.6-2.8-3.6-4.3a2 2 0 0 1 3.6-1.1 2 2 0 0 1 3.6 1.1c0 1.5-1.6 2.8-3.6 4.3z" fill="#e0457b" transform="translate(0 -3)"/></svg><span>Partner</span></button>
+    <button class="dt-icon" data-app="partner" type="button"><i class="bdg" id="ptBadge" hidden></i><svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true"><defs><linearGradient id="mgr" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#e0457b"/><stop offset="1" stop-color="#6a4de0"/></linearGradient></defs><rect x="3" y="3" width="42" height="42" rx="12" fill="url(#mgr)" stroke="#fff" stroke-width="2"/><path d="M29 11a14 14 0 1 0 8 22A11 11 0 0 1 29 11z" fill="#fff"/><circle cx="35" cy="14" r="2" fill="#fff"/></svg><span>Moonsta</span></button>
   </div>
   <section class="win" id="win-sun" hidden><div class="wtitle"><b>Sun &amp; Moon</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div><div class="wbody" id="wb-sun"></div></section>
   <section class="win" id="win-mail" hidden><div class="wtitle"><b>Mail</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
@@ -986,7 +1029,7 @@
   <section class="win" id="win-games" hidden><div class="wtitle"><b>Mini Games</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
     <div class="wbody" id="wb-games"><div class="gm-wrap"><div class="gm-status" id="gmStatus"></div><div id="gmBody"></div>
       <div id="gmChat" hidden><h4>Chat</h4><div id="gmLog" role="log" aria-live="polite"></div><form id="gmChatForm" autocomplete="off"><input id="gmChatIn" maxlength="200" placeholder="Say something sweet..." aria-label="Chat message"><button class="gm-btn" type="submit">Send</button></form></div></div></div></section>
-  <section class="win" id="win-partner" hidden><div class="wtitle"><b>Partner</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
+  <section class="win" id="win-partner" hidden><div class="wtitle"><b>Moonsta</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
     <div class="wbody" id="wb-partner"><div class="pt-wrap">
       <div id="ptInvite" class="pt-card" hidden>
         <h3>Invite your partner</h3>
@@ -1001,19 +1044,21 @@
         <div id="ptMsg" role="status"></div>
       </div>
       <div id="ptChat" hidden>
-        <div class="pt-head"><i id="ptDot"></i><b id="ptName"></b><small id="ptState"></small><button class="pt-ic" id="ptVoice" type="button" title="Voice call" aria-label="Voice call">&#128222;</button><button class="pt-ic" id="ptVideo" type="button" title="Video call" aria-label="Video call">&#127909;</button></div>
+        <div class="pt-head"><i id="ptDot"></i><b id="ptName"></b><span id="ptDays"></span><small id="ptState"></small><button class="pt-ic" id="ptVoice" type="button" title="Voice call" aria-label="Voice call">&#128222;</button><button class="pt-ic" id="ptVideo" type="button" title="Video call" aria-label="Video call">&#127909;</button></div>
+        <div class="pt-tabs" role="tablist"><button id="ptTabChat" type="button" role="tab" aria-selected="true">Chat</button><button id="ptTabFeed" type="button" role="tab" aria-selected="false">Feed</button></div>
         <div id="ptLog" role="log" aria-live="polite"></div>
         <div id="ptTyping" hidden></div>
+        <div id="ptFeed"><div class="pt-newpost"><input id="ptCap" maxlength="300" placeholder="Write a caption..." aria-label="Caption"><label class="gm-btn" for="ptPic">+ Photo</label><input id="ptPic" type="file" accept="image/*" hidden></div><div id="ptPosts"></div></div>
         <form id="ptForm" autocomplete="off"><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
       </div>
       <div id="ptCall" hidden>
         <video id="ptRemote" autoplay playsinline></video>
         <video id="ptLocal" autoplay playsinline muted></video>
         <div id="ptCallInfo"><b id="ptCallName"></b><small id="ptCallState"></small></div>
-        <div class="pt-ctl"><button id="ptMute" type="button">Mute</button><button id="ptCam" type="button">Camera off</button><button id="ptHang" type="button" class="end">End</button></div>
+        <div class="pt-ctl"><button id="ptMute" type="button">Mute</button><button id="ptCam" type="button">Camera off</button><button id="ptFlip" type="button">Flip</button><button id="ptHang" type="button" class="end">End</button></div>
       </div>
     </div></div></section>
-  <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="partner" type="button">Partner</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
+  <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="partner" type="button">Moonsta</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
   <div id="taskbar"><button id="startBtn" type="button">start</button><div id="tasks"></div><div id="tray"><button id="trayMail" type="button" hidden></button><button id="sfxBtn" type="button" title="Desktop sounds" aria-label="Desktop sounds" aria-pressed="true">&#9835;</button><span id="clock"></span></div></div>
 </div>
 <div id="bootsplash" hidden><div class="logo">Sun<span>&amp;</span>Moon<em>OS</em></div><div class="bar"><i></i></div><small>PHOSPHOR SYSTEMS SM-2000</small></div>
@@ -3011,7 +3056,7 @@ function focusWin(n) {
 }
 function addTask(n) {
   if (taskBtns[n]) return;
-  const b = document.createElement("button"); b.type = "button"; b.className = "task"; b.textContent = { sun: "Sun & Moon", mail: "Mail", settings: "Settings", games: "Mini Games", partner: "Partner" }[n];
+  const b = document.createElement("button"); b.type = "button"; b.className = "task"; b.textContent = { sun: "Sun & Moon", mail: "Mail", settings: "Settings", games: "Mini Games", partner: "Moonsta" }[n];
   b.addEventListener("click", () => { const w = wins[n]; if (w.hidden) { w.hidden = false; focusWin(n); } else if (w.classList.contains("active")) minApp(n); else focusWin(n); });
   $("tasks").appendChild(b); taskBtns[n] = b;
 }
@@ -3864,6 +3909,7 @@ function ptEl(m, pend) {
   const t = document.createElement("span"); t.textContent = m.text; d.appendChild(t);
   const sm = document.createElement("small"); sm.textContent = ptTime(m.at); d.appendChild(sm);
   if (m.from === me) { const k = document.createElement("span"); k.className = "tk"; sm.append(" ", k); }
+  ptHeart(d, m.r);
   return d;
 }
 function ptNear() { return ptLog.scrollHeight - ptLog.scrollTop - ptLog.clientHeight < 90; }
@@ -3917,6 +3963,9 @@ function ptHandle(m) {
   } else if (m.t === "typing" && m.u !== me) { ptTyping(m.on !== false);
   } else if (m.t === "seen" && m.u !== me) { PT.seen[m.u] = m.upTo; ptTicks();
   } else if (m.t === "presence" && m.u !== me) { PT.online = !!m.online; if (!m.online) { ptTyping(false); callPartnerGone(); } ptStatus();
+  } else if (m.t === "post" && m.post) { ptPostUpsert(m.post, !m.old);
+  } else if (m.t === "like") { const o = PT.posts.get(m.id); if (o) { o.post.likes = m.likes; ptPostLike(o); }
+  } else if (m.t === "react") { const g = PT.msgs.find(x => x.id === m.id); if (g) g.r = m.r; const el = ptLog.querySelector('.pt-m[data-id="' + m.id + '"]'); if (el) ptHeart(el, m.r);
   } else if (m.t === "rtc") { callOnSig(m);
   } else if (m.t === "slow") { ptMsg.textContent = ""; $("ptState").textContent = "slow down a little"; }
 }
@@ -3951,7 +4000,7 @@ function ptRetry() { clearTimeout(PT.retry); if (!ptWanted()) return; PT.retry =
 function ptReset() {
   clearTimeout(PT.retry); const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; PT.online = false;
   if (w) { try { w.close(); } catch (e) {} }
-  callEnd(false); PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
+  callEnd(false); PT.posts.clear(); $("ptPosts").textContent = ""; PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
 }
 setInterval(() => {                                                   // keep-alive + dead-line detection (a phone that lost signal never says goodbye)
   if (!PT.ws || !PT.open) return;
@@ -3971,6 +4020,7 @@ function renderPartner() {
   $("ptInvite").hidden = paired; $("ptChat").hidden = !paired;
   if (paired) {
     $("ptName").textContent = account.pair.with;
+    { const d = Math.floor((Date.now() - new Date(account.pair.since + "T00:00:00")) / 864e5); $("ptDays").textContent = d >= 0 ? "\u{1F49E} Day " + (d + 1) : ""; }
     if (LOCAL.on) { ptLog.textContent = ""; const n = document.createElement("div"); n.className = "none"; n.textContent = "Live chat needs the online server. It does not work in this offline copy."; ptLog.appendChild(n); $("ptIn").disabled = true; $("ptGo").disabled = true; }
     else { $("ptIn").disabled = false; $("ptGo").disabled = false; if (!PT.msgs.length && !PT.pend.length && !PT.hello) { ptLog.textContent = ""; const n = document.createElement("div"); n.className = "none"; n.textContent = "Connecting..."; ptLog.appendChild(n); } }
     ptStatus();
@@ -4071,7 +4121,7 @@ function callSet(st) {
   clearInterval(CALL.tick);
   if (st === "calling") info.textContent = "Calling...";
   else if (st === "connecting") info.textContent = "Connecting...";
-  else if (st === "active") { CALL.t0 = Date.now(); info.textContent = "0:00"; CALL.tick = setInterval(() => { info.textContent = mmss(Date.now() - CALL.t0); }, 1000); }
+  else if (st === "active") { wakeOn(); CALL.t0 = Date.now(); info.textContent = "0:00"; CALL.tick = setInterval(() => { info.textContent = mmss(Date.now() - CALL.t0); }, 1000); }
   $("ptMute").classList.remove("on"); $("ptMute").textContent = "Mute"; $("ptCam").classList.remove("on"); $("ptCam").textContent = "Camera off";
   ptCallBtns();
 }
@@ -4101,7 +4151,7 @@ function callEnd(notify, note) {
   if (CALL.st === "idle" && !CALL.local && !CALL.pc) { if (note) callNote(note); return; }
   const was = CALL.st, dur = CALL.t0 && was === "active" ? Date.now() - CALL.t0 : 0;
   if (notify) ptSig({ k: "end" });
-  clearTimeout(CALL.ringTimer); callRingStop(); clearInterval(CALL.tick);
+  clearTimeout(CALL.ringTimer); callRingStop(); clearInterval(CALL.tick); wakeOff();
   if (CALL.local) { for (const t of CALL.local.getTracks()) { try { t.stop(); } catch (e) {} } }
   if (CALL.pc) { const pc = CALL.pc; CALL.pc = null; pc.onconnectionstatechange = null; pc.onicecandidate = null; pc.ontrack = null; try { pc.close(); } catch (e) {} }
   CALL.local = null; CALL.pendIce = []; CALL.t0 = 0; CALL.st = "idle";
@@ -4173,6 +4223,105 @@ $("ptCam").addEventListener("click", () => {
 });
 window.addEventListener("pagehide", () => { if (CALL.st !== "idle") ptSig({ k: "end" }); });
 ptCallBtns();
+
+/* ============================================================ MOONSTA extras: photo feed + double-tap hearts */
+PT.posts = new Map(); PT.tab = "chat"; PT.feedWs = null;
+function ptHeart(el, r) {
+  const old = el.querySelector(".pt-r"); if (old) old.remove();
+  const n = r ? Object.keys(r).length : 0; el.classList.toggle("hr", n > 0);
+  if (n) { const b = document.createElement("span"); b.className = "pt-r"; b.textContent = "\u2764\uFE0F" + (n > 1 ? " " + n : ""); el.appendChild(b); }
+}
+function ptTab(t) {
+  PT.tab = t; $("ptChat").classList.toggle("feed", t === "feed");
+  $("ptTabChat").setAttribute("aria-selected", t === "chat"); $("ptTabFeed").setAttribute("aria-selected", t === "feed");
+  if (t === "feed") { if (PT.open && PT.hello && PT.feedWs !== PT.ws) { PT.feedWs = PT.ws; PT.ws.send(JSON.stringify({ t: "feed" })); } }
+  else { ptSeenIfViewing(); ptBottom(); }
+}
+$("ptTabChat").addEventListener("click", () => ptTab("chat")); $("ptTabFeed").addEventListener("click", () => ptTab("feed"));
+function ptLike(id) { if (PT.open && PT.hello) PT.ws.send(JSON.stringify({ t: "like", id })); }
+function ptPostLike(o) {
+  const me = ptMe(), on = o.post.likes.includes(me), b = o.el.querySelector(".acts button");
+  b.classList.toggle("on", on); b.textContent = (on ? "\u2764\uFE0F " : "\u2661 ") + (o.post.likes.length || "");
+}
+function ptPostUpsert(post, fresh) {
+  let o = PT.posts.get(post.id);
+  if (o) { o.post.likes = post.likes; return ptPostLike(o); }
+  const el = document.createElement("div"); el.className = "pt-post";
+  el.innerHTML = '<header><b></b><small></small></header><div class="pic"><img alt=""><span class="pop">\u2764\uFE0F</span></div><div class="acts"><button type="button"></button></div><p></p>';
+  el.querySelector("b").textContent = post.from; el.querySelector("small").textContent = new Date(post.at).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  el.querySelector("img").src = post.img; el.querySelector("p").textContent = post.cap || ""; if (!post.cap) el.querySelector("p").hidden = true;
+  o = { post, el }; PT.posts.set(post.id, o); ptPostLike(o);
+  const pop = el.querySelector(".pop");
+  const dbl = () => { if (!ptDbl()) return; if (!post.likes.includes(ptMe())) ptLike(post.id); pop.classList.remove("go"); void pop.offsetWidth; pop.classList.add("go"); }; const pic = el.querySelector(".pic"); pic.addEventListener("dblclick", dbl); onDouble(pic, ".pic", dbl);
+  el.querySelector(".acts button").addEventListener("click", () => ptLike(post.id));
+  const box = $("ptPosts"); let at = null;
+  for (const c of box.children) { if (Number(c.dataset.id) < post.id) { at = c; break; } }
+  el.dataset.id = post.id; box.insertBefore(el, at);
+  if (fresh && post.from !== ptMe() && !(ptViewing() && PT.tab === "feed")) { try { sfx.mail(); } catch (e) {} if (!desk.hidden) showToast([["t-pair", post.from.toUpperCase() + " POSTED A PHOTO"]], "partner"); }
+}
+function ptShrink(file) {
+  return new Promise((res, rej) => {
+    const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      URL.revokeObjectURL(u); const k = Math.min(1, 900 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      let q = .8, d = c.toDataURL("image/jpeg", q); while (d.length > 340000 && q > .3) { q -= .1; d = c.toDataURL("image/jpeg", q); }
+      d.length > 340000 ? rej(new Error("big")) : res(d);
+    };
+    im.onerror = rej; im.src = u;
+  });
+}
+$("ptPic").addEventListener("change", async () => {
+  const f = $("ptPic").files[0]; $("ptPic").value = ""; if (!f) return;
+  if (!PT.open || !PT.hello) return callNote("Not connected yet - try again in a moment.");
+  try { const img = await ptShrink(f); PT.ws.send(JSON.stringify({ t: "post", img, cap: $("ptCap").value })); $("ptCap").value = ""; }
+  catch (e) { callNote("Couldn't use that photo."); }
+});
+const ptReact = b => { if (b && b.dataset.id && PT.open && PT.hello && ptDbl()) PT.ws.send(JSON.stringify({ t: "react", id: Number(b.dataset.id) })); };
+ptLog.addEventListener("dblclick", e => ptReact(e.target.closest(".pt-m"))); onDouble(ptLog, ".pt-m", ptReact);
+
+/* ============================================================ MOONSTA on mobile */
+PT.dbl = 0;
+const ptDbl = () => { const n = Date.now(); if (n - PT.dbl < 500) return false; PT.dbl = n; return true; };
+function onDouble(el, sel, fn) {                                       // double-tap for touch screens (iOS never sends a dblclick)
+  let last = 0, lx = 0, ly = 0;
+  el.addEventListener("pointerup", e => {
+    if (e.pointerType === "mouse") return;
+    const t = e.target.closest(sel); if (!t) return; const n = Date.now();
+    if (n - last < 320 && Math.abs(e.clientX - lx) < 32 && Math.abs(e.clientY - ly) < 32) { last = 0; fn(t, e); } else { last = n; lx = e.clientX; ly = e.clientY; }
+  });
+}
+if (window.visualViewport) {                                            // phone keyboard: shrink the window to what is really visible so the message box never hides
+  const vv = visualViewport, w = $("win-partner");
+  const fit = () => {
+    const kb = innerWidth <= 700 && !wins.partner.hidden && vv.height < innerHeight - 120;
+    w.classList.toggle("kb", kb); desk.classList.toggle("kb", kb);
+    if (kb) { w.style.setProperty("--vvh", vv.height + "px"); w.style.setProperty("--vvt", vv.offsetTop + "px"); w.classList.toggle("short", vv.height < 460); window.scrollTo(0, 0); if (PT.tab === "chat") ptBottom(); }
+    else w.classList.remove("short");
+  };
+  vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit);
+}
+let wl = null;                                                          // keep the screen awake during a call
+async function wakeOn() { try { if (navigator.wakeLock && !wl) { wl = await navigator.wakeLock.request("screen"); wl.addEventListener("release", () => { wl = null; }); } } catch (e) {} }
+function wakeOff() { try { if (wl) wl.release(); } catch (e) {} wl = null; }
+function ptProbe() {                                                    // phones silently kill sockets in the background: check the line the moment you come back
+  if (!PT.ws || !PT.open) return ptConnect();
+  const w = PT.ws, t = Date.now(); try { w.send("ping"); } catch (e) {}
+  setTimeout(() => { if (PT.ws === w && PT.pongAt < t) { PT.ws = null; PT.open = false; PT.hello = false; try { w.close(); } catch (e) {} ptStatus(); ptConnect(); } }, 2500);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { ptProbe(); if (CALL.st === "active") wakeOn(); } });
+window.addEventListener("pageshow", ptProbe);
+let camFace = "user";
+$("ptFlip").addEventListener("click", async () => {                    // front/back camera
+  if (!CALL.local || !CALL.pc) return; const old = CALL.local.getVideoTracks()[0], prev = camFace; if (!old) return;
+  camFace = camFace === "user" ? "environment" : "user"; old.stop();
+  const get = f => navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: f }, width: { ideal: 640 }, height: { ideal: 480 } } });
+  let ns; try { ns = await get(camFace); } catch (e) { camFace = prev; try { ns = await get(prev); } catch (e2) { return callEnd(true, "Camera stopped working."); } callNote("Couldn't switch camera."); }
+  const nt = ns.getVideoTracks()[0], snd = CALL.pc && CALL.pc.getSenders().find(x => x.track && x.track.kind === "video");
+  if (snd) await snd.replaceTrack(nt).catch(() => {});
+  CALL.local.removeTrack(old); CALL.local.addTrack(nt); $("ptLocal").srcObject = CALL.local; $("ptLocal").style.transform = camFace === "user" ? "scaleX(-1)" : "none";
+});
+
 
 
 
