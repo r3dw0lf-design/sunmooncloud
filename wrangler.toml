@@ -13,15 +13,6 @@ run_worker_first = ["/api/*"]
 binding = "DB"
 database_name = "sunmoon"
 
-# Live chat: one Durable Object per couple (SQLite-backed, which is the kind the free plan allows).
-[[durable_objects.bindings]]
-name = "ROOM"
-class_name = "PairRoom"
-
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["PairRoom"]
-
 [observability.logs]
 enabled = true
 head_sampling_rate = 1
