@@ -1,4 +1,4 @@
-name = "sunmooncloud"
+name = "sunmoon-v2"
 main = "src/worker.js"
 compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat"]
@@ -8,10 +8,10 @@ directory = "./public"
 binding = "ASSETS"
 run_worker_first = ["/api/*"]
 
-# No database_id on purpose: wrangler creates the D1 database for you on the first deploy.
+# First deploy creates this database. Afterwards, add its id on the next line (database_id = "...") so it is pinned and always reused.
 [[d1_databases]]
 binding = "DB"
-database_name = "sunmoon"
+database_name = "sunmoon-v2-db"
 
 [observability.logs]
 enabled = true
@@ -23,8 +23,3 @@ persist = true
 enabled = false
 head_sampling_rate = 1
 persist = true
-
-# One-time clean-up: removes the old "PairRoom" chat-room storage left by an earlier version of this site.
-[[migrations]]
-tag = "remove-pairroom-1"
-deleted_classes = ["PairRoom"]
