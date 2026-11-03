@@ -723,6 +723,51 @@
   #win-partner.kb { height: var(--vvh, 100%) !important; top: var(--vvt, 0px) !important; }
   #desktop.kb #taskbar { display: none; }
   #win-partner.kb.short .pt-head, #win-partner.kb.short .pt-tabs { display: none; }
+  /* ---- Moonsta chat extras: replies, reactions, stickers, GIFs ---- */
+  .pt-m, #ptPosts .pic, .pt-head, .pt-tabs { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  .pt-m { touch-action: pan-y; transition: transform .18s; }
+  .pt-m.del { background: transparent !important; box-shadow: none; border: 1px dashed #9fb1d3; color: #7a8db0 !important; font-style: italic; }
+  .pt-m.bare { background: none !important; box-shadow: none; padding: 2px; } .pt-m.bare small { color: #12315f; }
+  .pt-m.flash { outline: 3px solid #e0457b; }
+  .pt-stk { display: block; width: 132px; height: 132px; object-fit: contain; }
+  .pt-img { display: block; max-width: 230px; max-height: 280px; width: 100%; border-radius: 10px; margin-bottom: 3px; background: #0001; object-fit: cover; }
+  .pt-q { margin: 0 0 4px; padding: 3px 8px; border-left: 3px solid #e0457b; background: #0000001a; border-radius: 6px; font-size: 12px; opacity: .85; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+  .pt-pq { display: flex; gap: 8px; align-items: center; margin: 0 0 4px; padding: 4px; background: #0000001a; border-radius: 8px; font-size: 12px; max-width: 230px; }
+  .pt-pq img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; background: #0003; flex: none; }
+  .pt-pq span { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .pt-more { display: none; position: absolute; top: -9px; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: #fff; color: #12315f; box-shadow: 0 1px 4px #0004; font-size: 14px; line-height: 20px; cursor: pointer; }
+  .pt-m.me .pt-more { left: -10px; } .pt-m.them .pt-more { right: -10px; }
+  @media (hover: hover) { .pt-m:hover .pt-more { display: block; } }
+  #ptMenu { position: absolute; z-index: 9; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #fff; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,25,70,.45); border: 1px solid #c3d3ee; min-width: 236px; }
+  #ptMenu[hidden], #ptReplyBar[hidden], #ptTray[hidden], #ptMaker[hidden] { display: none; }
+  #ptMenu .emo { display: flex; justify-content: space-between; }
+  #ptMenu .emo button { border: 0; background: none; font-size: 24px; padding: 4px; cursor: pointer; border-radius: 10px; min-width: 38px; min-height: 40px; }
+  #ptMenu .emo button:hover, #ptMenu [data-a]:hover { background: #eef3ff; }
+  #ptMenu [data-a] { border: 0; background: none; text-align: left; padding: 10px 12px; font: 14px Tahoma, sans-serif; color: #12315f; border-radius: 8px; cursor: pointer; min-height: 40px; }
+  #ptMenu [data-a="unsend"] { color: #b3261e; }
+  #ptReplyBar { display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 10px; border-left: 3px solid #e0457b; background: rgba(255,255,255,.85); border-radius: 8px; font-size: 12.5px; }
+  #ptReplyTxt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #ptReplyX { border: 0; background: none; font-size: 22px; width: 36px; height: 36px; cursor: pointer; color: #12315f; }
+  .pt-ib { flex: none; width: 42px; border: 1px solid #8fb0e6; border-radius: 9px; background: #fff; font-size: 19px; cursor: pointer; }
+  #ptTray { max-height: 44%; overflow-y: auto; padding: 6px; background: rgba(255,255,255,.88); border: 1px solid #c3d3ee; border-radius: 10px; display: flex; flex-direction: column; gap: 6px; }
+  #ptStkGrid, #ptGifGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; } #ptGifGrid { grid-template-columns: repeat(2, 1fr); }
+  #ptStkGrid[hidden], #ptGifBox[hidden] { display: none; }
+  .stk { position: relative; } .stk button, .stk-new { width: 100%; aspect-ratio: 1; border: 1px solid #c3d3ee; border-radius: 10px; background: #fff; padding: 2px; cursor: pointer; }
+  #ptGifGrid button { width: 100%; border: 1px solid #c3d3ee; border-radius: 10px; background: #fff; padding: 0; overflow: hidden; cursor: pointer; }
+  .stk img { width: 100%; height: 100%; object-fit: contain; display: block; } #ptGifGrid img { width: 100%; display: block; }
+  .stk-new { font-size: 30px; color: #6a4de0; }
+  .stk i { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #e0301e; color: #fff; font: 16px/24px Tahoma, sans-serif; text-align: center; font-style: normal; cursor: pointer; }
+  #ptGifQ { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font-size: 16px; margin-bottom: 6px; }
+  #ptMaker { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; background: #f4f7ff; border-radius: 8px; overflow-y: auto; color: #12315f; }
+  #ptMkCv { width: min(70vw, 256px); height: auto; aspect-ratio: 1; flex: none; background: repeating-conic-gradient(#e6ecfa 0 25%, #fff 0 50%) 0 0 / 16px 16px; border-radius: 14px; border: 1px solid #c3d3ee; }
+  #ptMaker .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  #ptMaker input[type=text] { width: min(80vw, 280px); box-sizing: border-box; padding: 9px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font-size: 16px; }
+  #ptMaker button:not(.gm-btn) { padding: 10px 14px; border: 1px solid #8fb0e6; border-radius: 9px; background: #fff; color: #12315f; font: 13px Tahoma, sans-serif; cursor: pointer; min-height: 44px; }
+  #ptChat.feed #ptTray, #ptChat.feed #ptReplyBar { display: none; }
+  .pt-post .rep { display: flex; gap: 6px; padding: 0 10px 10px; }
+  .pt-post .rep input { flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid #c3d3ee; border-radius: 18px; font-size: 16px; color: #12315f; }
+  .pt-post .rep button { border: 0; background: none; color: #2f6fe0; font: bold 13px Tahoma, sans-serif; cursor: pointer; min-width: 56px; }
+  @media (pointer: coarse), (max-width: 700px) { .pt-ib { width: 44px; min-height: 44px; } .stk i { width: 28px; height: 28px; line-height: 28px; } }
   @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
     background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
@@ -1025,6 +1070,8 @@
           </div>
         </div>
       </div>
+      <div id="ptMenu" role="menu" hidden><div class="emo"><button type="button" data-e="❤️">❤️</button><button type="button" data-e="😂">😂</button><button type="button" data-e="😮">😮</button><button type="button" data-e="😢">😢</button><button type="button" data-e="🔥">🔥</button><button type="button" data-e="👍">👍</button></div><button type="button" data-a="reply">Reply</button><button type="button" data-a="copy">Copy</button><button type="button" data-a="unsend">Unsend</button></div>
+      <div id="ptMaker" hidden><b>Make a sticker</b><canvas id="ptMkCv" width="256" height="256"></canvas><input id="ptMkZoom" type="range" min="1" max="3" step=".05" value="1" aria-label="Zoom"><input id="ptMkTxt" type="text" maxlength="24" placeholder="Add text (optional)" aria-label="Sticker text"><div class="row"><label class="gm-btn" for="ptMkFile">Choose photo</label><input id="ptMkFile" type="file" accept="image/*" hidden><button id="ptMkShape" type="button">Rounded</button></div><div class="row"><button class="gm-btn" id="ptMkSend" type="button">Save &amp; send</button><button id="ptMkSave" type="button">Save</button><button id="ptMkX" type="button">Cancel</button></div></div>
     </div></div></section>
   <section class="win" id="win-games" hidden><div class="wtitle"><b>Mini Games</b><span class="wbtns"><button class="wbtn m" data-w="min" type="button" aria-label="Minimize">_</button><button class="wbtn" data-w="max" type="button" aria-label="Maximize">&#9633;</button><button class="wbtn x" data-w="close" type="button" aria-label="Close">&times;</button></span></div>
     <div class="wbody" id="wb-games"><div class="gm-wrap"><div class="gm-status" id="gmStatus"></div><div id="gmBody"></div>
@@ -1049,7 +1096,9 @@
         <div id="ptLog" role="log" aria-live="polite"></div>
         <div id="ptTyping" hidden></div>
         <div id="ptFeed"><div class="pt-newpost"><input id="ptCap" maxlength="300" placeholder="Write a caption..." aria-label="Caption"><label class="gm-btn" for="ptPic">+ Photo</label><input id="ptPic" type="file" accept="image/*" hidden></div><div id="ptPosts"></div></div>
-        <form id="ptForm" autocomplete="off"><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
+        <div id="ptReplyBar" hidden><span id="ptReplyTxt"></span><button id="ptReplyX" type="button" aria-label="Cancel reply">&times;</button></div>
+        <div id="ptTray" hidden><div class="pt-tabs" role="tablist"><button id="ptTrStk" type="button" role="tab" aria-selected="true">Stickers</button><button id="ptTrGif" type="button" role="tab" aria-selected="false" hidden>GIF</button></div><div id="ptStkGrid"></div><div id="ptGifBox" hidden><input id="ptGifQ" type="search" placeholder="Search GIFs..." aria-label="Search GIFs"><div id="ptGifGrid"></div></div></div>
+        <form id="ptForm" autocomplete="off"><button class="pt-ib" id="ptStk" type="button" aria-label="Stickers and GIFs">&#9786;</button><button class="pt-ib" id="ptImgB" type="button" aria-label="Send a photo">&#128444;</button><input id="ptImgIn" type="file" accept="image/*" hidden><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
       </div>
       <div id="ptCall" hidden>
         <video id="ptRemote" autoplay playsinline></video>
@@ -3904,11 +3953,20 @@ function ptTicks() {
 }
 function ptEl(m, pend) {
   const me = ptMe(), d = document.createElement("div");
-  d.className = "pt-m " + (m.from === me ? "me " : "them ") + ptRole(m.from) + (pend ? " pend" : "");
+  d.className = "pt-m " + (m.from === me ? "me " : "them ") + ptRole(m.from) + (pend ? " pend" : "") + (m.kind === "sticker" || m.kind === "gif" ? " bare" : "") + (m.del ? " del" : "");
   if (m.id) d.dataset.id = m.id; if (m.cid) d.dataset.cid = m.cid;
-  const t = document.createElement("span"); t.textContent = m.text; d.appendChild(t);
+  const add = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; d.appendChild(e); return e; };
+  if (m.del) add("span", "", "Message unsent");
+  else {
+    if (m.reply) { const q = add("div", "pt-q", m.reply.from + ": " + (m.reply.text || (m.reply.kind === "sticker" ? "Sticker" : m.reply.kind === "gif" ? "GIF" : "Photo"))); q.dataset.go = m.reply.id; }
+    if (m.post) { const q = add("div", "pt-pq"), im = document.createElement("img"); im.alt = ""; im.dataset.med = "p" + m.post.id; ptMedFill(im); const t = document.createElement("span"); t.textContent = (m.post.from === me ? "Your photo" : m.post.from + "'s photo") + (m.post.cap ? ": " + m.post.cap : ""); q.append(im, t); }
+    if (m.kind === "gif") { const im = add("img", "pt-stk"); im.alt = "GIF"; im.src = m.url; im.draggable = false; }
+    else if (m.kind) { const im = add("img", m.kind === "sticker" ? "pt-stk" : "pt-img"); im.alt = m.kind === "sticker" ? "Sticker" : "Photo"; im.draggable = false; if (m.id) { im.dataset.med = "b" + m.id; ptMedFill(im); } else im.src = m.img; }
+    if (m.text) add("span", "", m.text);
+  }
   const sm = document.createElement("small"); sm.textContent = ptTime(m.at); d.appendChild(sm);
   if (m.from === me) { const k = document.createElement("span"); k.className = "tk"; sm.append(" ", k); }
+  if (!m.del) { const b = add("button", "pt-more", "\u22EF"); b.type = "button"; b.setAttribute("aria-label", "Message options"); }
   ptHeart(d, m.r);
   return d;
 }
@@ -3940,24 +3998,25 @@ function ptTyping(on) {
 function ptHandle(m) {
   const me = ptMe(), other = ptOther();
   if (m.t === "hello") {
-    PT.hello = true; PT.msgs = Array.isArray(m.msgs) ? m.msgs : []; PT.seen = m.seen && typeof m.seen === "object" ? m.seen : {};
+    PT.asked = new Set(); PT.hello = true; PT.msgs = Array.isArray(m.msgs) ? m.msgs : []; PT.seen = m.seen && typeof m.seen === "object" ? m.seen : {};
     PT.online = Array.isArray(m.online) && m.online.includes(other);
     const q = PT.pend; PT.pend = [];                                  // typed while offline (or sent just as the line dropped): send once, never twice
-    for (const p of q) { if (PT.msgs.some(x => x.from === me && x.text === p.text && x.at >= p.at - 5000)) continue; ptTransmit(p); }
+    for (const p of q) { if (PT.msgs.some(x => x.from === me && x.text === p.text && (x.kind || "") === (p.kind || "") && x.at >= p.at - 5000)) continue; ptTransmit(p); }
     ptRender(); ptSeenIfViewing(); ptStatus();
   } else if (m.t === "msg" && m.msg) {
     const g = m.msg; if (PT.msgs.some(x => x.id === g.id)) return;
+    if (m.img) PT.med.set("b" + g.id, m.img);
     PT.msgs.push(g);
     if (g.from === me) {
       const i = PT.pend.findIndex(p => p.cid === m.cid); if (i >= 0) PT.pend.splice(i, 1);
       const el = m.cid ? ptLog.querySelector('.pt-m[data-cid="' + CSS.escape(m.cid) + '"]') : null;
-      if (el) { el.classList.remove("pend"); el.dataset.id = g.id; el.querySelector("small").firstChild.textContent = ptTime(g.at); ptTicks(); } else ptAdd(g, false);
+      if (el) { el.classList.remove("pend"); el.dataset.id = g.id; el.querySelectorAll("img.pt-img,img.pt-stk").forEach(i => { if (g.kind !== "gif") i.dataset.med = "b" + g.id; }); el.querySelector("small").firstChild.textContent = ptTime(g.at); ptTicks(); } else ptAdd(g, false);
     } else {
       ptTyping(false); ptAdd(g, false);
       if (ptViewing()) { ptSendSeen(); sfx.seen(); }
       else {
         ptCount(); sfx.mail();
-        if (!desk.hidden && Date.now() - PT.lastToast > 4000) { PT.lastToast = Date.now(); showToast([["t-pair", other.toUpperCase() + ": " + g.text.slice(0, 60)]], "partner"); }
+        if (!desk.hidden && Date.now() - PT.lastToast > 4000) { PT.lastToast = Date.now(); showToast([["t-pair", other.toUpperCase() + ": " + (g.text || (g.kind === "sticker" ? "sent a sticker" : g.kind === "gif" ? "sent a GIF" : g.kind === "img" ? "sent a photo" : "")).slice(0, 60)]], "partner"); }
       }
     }
   } else if (m.t === "typing" && m.u !== me) { ptTyping(m.on !== false);
@@ -3966,17 +4025,22 @@ function ptHandle(m) {
   } else if (m.t === "post" && m.post) { ptPostUpsert(m.post, !m.old);
   } else if (m.t === "like") { const o = PT.posts.get(m.id); if (o) { o.post.likes = m.likes; ptPostLike(o); }
   } else if (m.t === "react") { const g = PT.msgs.find(x => x.id === m.id); if (g) g.r = m.r; const el = ptLog.querySelector('.pt-m[data-id="' + m.id + '"]'); if (el) ptHeart(el, m.r);
+  } else if (m.t === "del") { const g = PT.msgs.find(x => x.id === m.id); if (g) { g.del = true; g.text = ""; g.kind = ""; g.reply = g.post = null; const el = ptLog.querySelector('.pt-m[data-id="' + m.id + '"]'); if (el) el.replaceWith(ptEl(g, false)); ptTicks(); }
+    if (PT.reply && PT.reply.id === m.id) ptReplyClear();
+  } else if (m.t === "med") { PT.med.set(m.k + m.id, m.img); document.querySelectorAll('img[data-med="' + m.k + m.id + '"]').forEach(i => { i.src = m.img; });
   } else if (m.t === "rtc") { callOnSig(m);
   } else if (m.t === "slow") { ptMsg.textContent = ""; $("ptState").textContent = "slow down a little"; }
 }
 function ptTransmit(p) {
   if (!PT.pend.includes(p)) PT.pend.push(p);
-  if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify({ t: "chat", cid: p.cid, text: p.text })); return; } catch (e) {} }
+  if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify({ t: "chat", cid: p.cid, text: p.text, kind: p.kind, img: p.img, url: p.url, reply: p.reply ? p.reply.id : 0, post: p.post ? p.post.id : 0 })); return; } catch (e) {} }
   ptConnect();
 }
-function ptSend(text) {
-  text = String(text).replace(/\s+/g, " ").trim().slice(0, 1000); if (!text || !ptWanted()) return;
-  const p = { cid: Date.now().toString(36) + (++PT.cid), text, at: Date.now(), from: ptMe() };
+function ptSend(text, x) {
+  x = x || {}; text = String(text || "").replace(/\s+/g, " ").trim().slice(0, 1000); if ((!text && !x.kind) || !ptWanted()) return;
+  const p = { cid: Date.now().toString(36) + (++PT.cid), text, at: Date.now(), from: ptMe(), kind: x.kind || "", img: x.img || "", url: x.url || "" };
+  if (PT.reply && !x.post) { p.reply = PT.reply; ptReplyClear(); }
+  if (x.post) { const o = PT.posts.get(x.post); p.post = { id: x.post, from: o ? o.post.from : "", cap: o ? (o.post.cap || "").slice(0, 60) : "" }; }
   ptAdd(p, true); ptTransmit(p); sfx.bloop();
 }
 function ptConnect() {
@@ -4000,7 +4064,7 @@ function ptRetry() { clearTimeout(PT.retry); if (!ptWanted()) return; PT.retry =
 function ptReset() {
   clearTimeout(PT.retry); const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; PT.online = false;
   if (w) { try { w.close(); } catch (e) {} }
-  callEnd(false); PT.posts.clear(); $("ptPosts").textContent = ""; PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
+  callEnd(false); PT.reply = null; $("ptReplyBar").hidden = true; PT.posts.clear(); $("ptPosts").textContent = ""; PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
 }
 setInterval(() => {                                                   // keep-alive + dead-line detection (a phone that lost signal never says goodbye)
   if (!PT.ws || !PT.open) return;
@@ -4034,7 +4098,7 @@ function renderPartner() {
   }
 }
 function partnerOpened() {
-  renderPartner(); ptCount();
+  renderPartner(); ptCount(); ptGifProbe();
   if (ptWanted()) { ptConnect(); if (PT.hello) { ptRender(); ptSeenIfViewing(); } if (!matchMedia("(pointer: coarse)").matches) setTimeout(() => ptIn.focus(), 60); }
 }
 $("ptSend").addEventListener("click", async () => {
@@ -4247,10 +4311,13 @@ function ptPostUpsert(post, fresh) {
   let o = PT.posts.get(post.id);
   if (o) { o.post.likes = post.likes; return ptPostLike(o); }
   const el = document.createElement("div"); el.className = "pt-post";
-  el.innerHTML = '<header><b></b><small></small></header><div class="pic"><img alt=""><span class="pop">\u2764\uFE0F</span></div><div class="acts"><button type="button"></button></div><p></p>';
+  el.innerHTML = '<header><b></b><small></small></header><div class="pic"><img alt=""><span class="pop">\u2764\uFE0F</span></div><div class="acts"><button type="button"></button></div><p></p><div class="rep"><input maxlength="300" placeholder="Reply to this photo..." aria-label="Reply to photo"><button type="button">Send</button></div>';
   el.querySelector("b").textContent = post.from; el.querySelector("small").textContent = new Date(post.at).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   el.querySelector("img").src = post.img; el.querySelector("p").textContent = post.cap || ""; if (!post.cap) el.querySelector("p").hidden = true;
   o = { post, el }; PT.posts.set(post.id, o); ptPostLike(o);
+  { const ri = el.querySelector(".rep input"), rb = el.querySelector(".rep button");
+    const go = () => { const t = ri.value.trim(); if (!t) return; ptSend(t, { post: post.id }); ri.value = ""; rb.textContent = "Sent \u2713"; setTimeout(() => { rb.textContent = "Send"; }, 1400); };
+    rb.addEventListener("click", go); ri.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); go(); } }); }
   const pop = el.querySelector(".pop");
   const dbl = () => { if (!ptDbl()) return; if (!post.likes.includes(ptMe())) ptLike(post.id); pop.classList.remove("go"); void pop.offsetWidth; pop.classList.add("go"); }; const pic = el.querySelector(".pic"); pic.addEventListener("dblclick", dbl); onDouble(pic, ".pic", dbl);
   el.querySelector(".acts button").addEventListener("click", () => ptLike(post.id));
@@ -4321,6 +4388,131 @@ $("ptFlip").addEventListener("click", async () => {                    // front/
   if (snd) await snd.replaceTrack(nt).catch(() => {});
   CALL.local.removeTrack(old); CALL.local.addTrack(nt); $("ptLocal").srcObject = CALL.local; $("ptLocal").style.transform = camFace === "user" ? "scaleX(-1)" : "none";
 });
+
+/* ============================================================ MOONSTA chat like Instagram: replies, reactions, unsend, photos, stickers, GIFs */
+PT.med = new Map(); PT.asked = new Set(); PT.reply = null; PT.menuFor = null;
+const ptWrap = document.querySelector(".pt-wrap");
+function ptMedFill(im) {                                               // photos/stickers are fetched only when a bubble needs them
+  const k = im.dataset.med; if (!k) return;
+  let v = PT.med.get(k);
+  if (!v && k[0] === "p") { const o = PT.posts.get(Number(k.slice(1))); if (o) v = o.post.img; }
+  if (v) { im.src = v; return; }
+  if (PT.asked.has(k) || !PT.open || !PT.hello) return; PT.asked.add(k);
+  try { PT.ws.send(JSON.stringify({ t: "med", k: k[0], id: Number(k.slice(1)) })); } catch (e) {}
+}
+function ptReplyClear() { PT.reply = null; $("ptReplyBar").hidden = true; }
+function ptReplyMsg(g) {
+  if (!g || g.del) return;
+  PT.reply = { id: g.id, from: g.from, text: (g.text || "").slice(0, 100), kind: g.kind || "" };
+  $("ptReplyTxt").textContent = "Replying to " + (g.from === ptMe() ? "yourself" : g.from) + ": " + (g.text ? g.text.slice(0, 60) : g.kind === "sticker" ? "Sticker" : g.kind === "gif" ? "GIF" : "Photo");
+  $("ptReplyBar").hidden = false; ptIn.focus();
+}
+const ptMsgOf = b => b && b.dataset.id ? PT.msgs.find(x => x.id === Number(b.dataset.id)) : null;
+$("ptReplyX").addEventListener("click", ptReplyClear);
+
+/* long-press (or right-click, or the ... button) = menu; swipe sideways = reply; double-tap = heart */
+function ptMenuOpen(b) {
+  const g = ptMsgOf(b); if (!g || g.del) return; PT.menuFor = g;
+  const m = $("ptMenu"), wr = ptWrap.getBoundingClientRect(), r = b.getBoundingClientRect(), mine = g.from === ptMe();
+  m.querySelector('[data-a="copy"]').hidden = !g.text; m.querySelector('[data-a="unsend"]').hidden = !mine; m.hidden = false;
+  const mw = m.offsetWidth, mh = m.offsetHeight; let top = r.top - wr.top - mh - 6; if (top < 4) top = r.bottom - wr.top + 6; top = Math.max(4, Math.min(top, wr.height - mh - 4));
+  m.style.top = top + "px"; m.style.left = Math.max(4, Math.min(mine ? r.right - wr.left - mw : r.left - wr.left, wr.width - mw - 4)) + "px";
+}
+$("ptMenu").addEventListener("click", e => {
+  const g = PT.menuFor, em = e.target.closest("[data-e]"), ac = e.target.closest("[data-a]"); if (!g) return; $("ptMenu").hidden = true;
+  if (em && PT.open && PT.hello) PT.ws.send(JSON.stringify({ t: "react", id: g.id, e: em.dataset.e }));
+  else if (ac && ac.dataset.a === "reply") ptReplyMsg(g);
+  else if (ac && ac.dataset.a === "copy") { try { navigator.clipboard.writeText(g.text); } catch (er) {} }
+  else if (ac && ac.dataset.a === "unsend" && PT.open && PT.hello) PT.ws.send(JSON.stringify({ t: "del", id: g.id }));
+});
+document.addEventListener("pointerdown", e => { if (!$("ptMenu").hidden && !e.target.closest("#ptMenu")) $("ptMenu").hidden = true; });
+ptLog.addEventListener("scroll", () => { $("ptMenu").hidden = true; }, { passive: true });
+ptLog.addEventListener("contextmenu", e => { const b = e.target.closest(".pt-m"); if (b) { e.preventDefault(); ptMenuOpen(b); } });
+ptLog.addEventListener("mousedown", e => { if (e.detail > 1 && e.target.closest(".pt-m")) e.preventDefault(); });      // a double-click must never select the text
+ptLog.addEventListener("click", e => {
+  const mo = e.target.closest(".pt-more"); if (mo) return ptMenuOpen(mo.closest(".pt-m"));
+  const q = e.target.closest(".pt-q"); if (!q) return;
+  const t = ptLog.querySelector('.pt-m[data-id="' + q.dataset.go + '"]'); if (t) { t.scrollIntoView({ block: "center", behavior: "smooth" }); t.classList.add("flash"); setTimeout(() => t.classList.remove("flash"), 1300); }
+});
+{
+  let st = null;
+  ptLog.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse") return; const b = e.target.closest(".pt-m"); if (!b || b.classList.contains("del") || e.target.closest(".pt-more")) return;
+    st = { b, x: e.clientX, y: e.clientY, moved: false, swipe: 0, t: setTimeout(() => { if (st && !st.moved) { try { navigator.vibrate && navigator.vibrate(15); } catch (er) {} ptMenuOpen(b); st.fired = true; } }, 450) };
+  });
+  ptLog.addEventListener("pointermove", e => {
+    if (!st) return; const dx = e.clientX - st.x, dy = e.clientY - st.y;
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) { st.moved = true; clearTimeout(st.t); }
+    if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.5) { st.b.style.transition = "none"; st.b.style.transform = "translateX(" + Math.max(-70, Math.min(70, dx)) + "px)"; st.swipe = dx; }
+  });
+  const end = () => { if (!st) return; clearTimeout(st.t); const b = st.b; b.style.transition = ""; b.style.transform = ""; if (Math.abs(st.swipe) >= 56) ptReplyMsg(ptMsgOf(b)); st = null; };
+  ptLog.addEventListener("pointerup", end); ptLog.addEventListener("pointercancel", end);
+}
+
+/* photos in chat */
+$("ptImgB").addEventListener("click", () => $("ptImgIn").click());
+$("ptImgIn").addEventListener("change", async () => {
+  const f = $("ptImgIn").files[0]; $("ptImgIn").value = ""; if (!f) return;
+  try { ptSend("", { kind: "img", img: await ptShrink(f) }); } catch (e) { callNote("Couldn't use that photo."); }
+});
+
+/* stickers (you make them from your own photos) + GIFs */
+const stkKey = () => "moonsta.stk." + ptMe();
+const stkLoad = () => { try { return JSON.parse(localStorage.getItem(stkKey()) || "[]"); } catch (e) { return []; } };
+const stkSave = a => { try { localStorage.setItem(stkKey(), JSON.stringify(a.slice(-24))); return true; } catch (e) { return false; } };
+function stkGrid() {
+  const g = $("ptStkGrid"); g.textContent = "";
+  const add = document.createElement("button"); add.type = "button"; add.className = "stk-new"; add.textContent = "+"; add.setAttribute("aria-label", "Make a sticker"); add.onclick = mkOpen; g.appendChild(add);
+  for (const d of stkLoad().slice().reverse()) {
+    const w = document.createElement("div"), b = document.createElement("button"), im = document.createElement("img"), x = document.createElement("i"); w.className = "stk";
+    b.type = "button"; im.src = d; im.alt = "Sticker"; b.appendChild(im); b.onclick = () => { ptSend("", { kind: "sticker", img: d }); ptTray(false); };
+    x.textContent = "\u00d7"; x.setAttribute("role", "button"); x.setAttribute("aria-label", "Delete sticker"); x.onclick = e => { e.stopPropagation(); stkSave(stkLoad().filter(s => s !== d)); stkGrid(); };
+    w.append(b, x); g.appendChild(w);
+  }
+}
+function ptTray(show) { $("ptTray").hidden = !show; if (show) ptTrTab("stk"); }
+function ptTrTab(t) { $("ptStkGrid").hidden = t !== "stk"; $("ptGifBox").hidden = t !== "gif"; $("ptTrStk").setAttribute("aria-selected", t === "stk"); $("ptTrGif").setAttribute("aria-selected", t === "gif"); if (t === "stk") stkGrid(); else gifLoad(""); }
+$("ptStk").addEventListener("click", () => ptTray($("ptTray").hidden)); $("ptTrStk").addEventListener("click", () => ptTrTab("stk")); $("ptTrGif").addEventListener("click", () => ptTrTab("gif"));
+let gifT = 0, gifOn;
+function ptGifProbe() { if (gifOn !== undefined || !ptWanted()) return; gifOn = false; api("gifs", { probe: 1 }).then(r => { gifOn = !!r.enabled; $("ptTrGif").hidden = !gifOn; }).catch(() => {}); }
+async function gifLoad(q) {
+  const g = $("ptGifGrid"); g.textContent = "Loading...";
+  try {
+    const r = await api("gifs", { q }); g.textContent = r.gifs.length ? "" : "No GIFs found.";
+    for (const x of r.gifs) { const b = document.createElement("button"), im = document.createElement("img"); b.type = "button"; im.src = x.p; im.loading = "lazy"; im.alt = "GIF"; b.appendChild(im); b.onclick = () => { ptSend("", { kind: "gif", url: x.u }); ptTray(false); }; g.appendChild(b); }
+  } catch (e) { g.textContent = "GIFs aren't available right now."; }
+}
+$("ptGifQ").addEventListener("input", () => { clearTimeout(gifT); gifT = setTimeout(() => gifLoad($("ptGifQ").value.trim()), 350); });
+
+/* sticker maker: pick a photo, zoom, add text, choose a shape */
+const MK = { img: null, shape: "round" };
+const mkRR = (x, a, b, w, h, r) => { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); };
+function mkDraw() {
+  const c = $("ptMkCv"), x = c.getContext("2d"), S = 256, r = MK.shape === "circle" ? (S - 12) / 2 : MK.shape === "square" ? 8 : 44;
+  x.clearRect(0, 0, S, S);
+  if (!MK.img) { x.fillStyle = "#6a7fa5"; x.font = "16px Tahoma, sans-serif"; x.textAlign = "center"; x.fillText("Choose a photo", S / 2, S / 2); return; }
+  x.save(); mkRR(x, 6, 6, S - 12, S - 12, r); x.clip();
+  const k = Math.max(S / MK.img.width, S / MK.img.height) * Number($("ptMkZoom").value), w = MK.img.width * k, h = MK.img.height * k; x.drawImage(MK.img, (S - w) / 2, (S - h) / 2, w, h); x.restore();
+  mkRR(x, 6, 6, S - 12, S - 12, r); x.lineWidth = 9; x.strokeStyle = "#fff"; x.stroke();
+  const t = $("ptMkTxt").value.trim();
+  if (t) { x.font = "bold 34px Tahoma, Arial, sans-serif"; x.textAlign = "center"; x.lineJoin = "round"; x.lineWidth = 8; x.strokeStyle = "#12315f"; x.strokeText(t, S / 2, S - 34, S - 40); x.fillStyle = "#fff"; x.fillText(t, S / 2, S - 34, S - 40); }
+}
+function mkOpen() { MK.img = null; $("ptMkTxt").value = ""; $("ptMkZoom").value = 1; $("ptMaker").hidden = false; mkDraw(); }
+function mkExport() {
+  const c = $("ptMkCv"); let d = c.toDataURL("image/webp", .82);
+  if (!d.startsWith("data:image/webp")) { const t = document.createElement("canvas"); t.width = t.height = 176; t.getContext("2d").drawImage(c, 0, 0, 176, 176); d = t.toDataURL("image/png"); }
+  return d.length > 150000 ? null : d;
+}
+$("ptMkFile").addEventListener("change", () => { const f = $("ptMkFile").files[0]; $("ptMkFile").value = ""; if (!f) return; const u = URL.createObjectURL(f), im = new Image(); im.onload = () => { MK.img = im; URL.revokeObjectURL(u); mkDraw(); }; im.src = u; });
+$("ptMkZoom").addEventListener("input", mkDraw); $("ptMkTxt").addEventListener("input", mkDraw);
+$("ptMkShape").addEventListener("click", () => { MK.shape = MK.shape === "round" ? "circle" : MK.shape === "circle" ? "square" : "round"; $("ptMkShape").textContent = MK.shape === "round" ? "Rounded" : MK.shape === "circle" ? "Circle" : "Square"; mkDraw(); });
+$("ptMkX").addEventListener("click", () => { $("ptMaker").hidden = true; });
+async function mkFinish(send) {
+  if (!MK.img) return; const d = mkExport(); if (!d) return callNote("That sticker is too big - try zooming out.");
+  if (!stkSave(stkLoad().concat(d))) callNote("Phone storage is full - delete a sticker first.");
+  $("ptMaker").hidden = true; if (send) ptSend("", { kind: "sticker", img: d }); stkGrid();
+}
+$("ptMkSend").addEventListener("click", () => mkFinish(true)); $("ptMkSave").addEventListener("click", () => mkFinish(false));
 
 
 

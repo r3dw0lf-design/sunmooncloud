@@ -9,3 +9,7 @@ Deploy: `npx wrangler deploy`
   Dashboard > Realtime > TURN Server > Create. Then add two secrets to the Worker:
   `TURN_KEY_ID` and `TURN_KEY_API_TOKEN` (Settings > Variables and Secrets), or:
   `npx wrangler secret put TURN_KEY_ID` / `npx wrangler secret put TURN_KEY_API_TOKEN`
+
+## GIFs (optional)
+The GIF button only appears when a free Giphy key is set: create one at developers.giphy.com, then
+`npx wrangler secret put GIPHY_API_KEY`. Without it everything else (stickers, photos, replies...) still works.

@@ -10,6 +10,7 @@
 
 let DB;                                                       // the D1 database (bound as DB in wrangler.toml)
 let TURN_ID = "", TURN_TOKEN = "", turnCache = null;                // optional Cloudflare TURN key (makes calls work on every network)
+let GIPHY_KEY = "";
 let ROOM;                                                     // the live-chat Durable Object namespace (bound as ROOM in wrangler.toml)
 /* A tiny key-value layer on D1 (table kv: k, v, ver). It offers the same calls the old Netlify Blobs store did, including
    "write only if new" and "write only if unchanged" (ver is the etag), so every route below works as it was.
@@ -578,6 +579,19 @@ const routes = {
     return { users: names.map((u, i) => ({ u, paired: !!(recs[i] && recs[i].pair) })).sort((a, b) => a.paired - b.paired || a.u.localeCompare(b.u)) };
   },
 
+  async gifs(req, res, b) {                                 // GIF search through Giphy (needs the free GIPHY_API_KEY secret; without it the GIF button just stays hidden)
+    await needUser(req);
+    if (!GIPHY_KEY) return { enabled: false, gifs: [] };
+    if (b && b.probe) return { enabled: true, gifs: [] };
+    const q = String((b && b.q) || "").trim().slice(0, 40);
+    const url = `https://api.giphy.com/v1/gifs/${q ? "search" : "trending"}?api_key=${encodeURIComponent(GIPHY_KEY)}&limit=24&rating=pg-13` + (q ? "&q=" + encodeURIComponent(q) : "");
+    try {
+      const r = await fetch(url); if (!r.ok) throw new Error("giphy " + r.status);
+      const j = await r.json();
+      return { enabled: true, gifs: (j.data || []).map(g => ({ u: g.images.fixed_height.url, p: (g.images.fixed_height_small || g.images.fixed_height).url })).filter(g => g.u && g.p) };
+    } catch (e) { console.error(e); return { enabled: true, gifs: [] }; }
+  },
+
   async turn(req) {                                         // network helpers for voice/video calls (only for paired people)
     await needUser(req);
     const stun = { urls: "stun:stun.cloudflare.com:3478" };
@@ -806,18 +820,30 @@ export class PairRoom extends DurableObject {
     let m; try { m = JSON.parse(data); } catch (e) { return; }
     if (!m || typeof m !== "object") return;
     const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
-    if (m.t !== "rtc" && m.t !== "post" && data.length > 4000) return;
+    if (m.t !== "rtc" && m.t !== "post" && !(m.t === "chat" && m.img) && data.length > 4000) return;
     if (m.t === "chat") {
+      const kind = ["sticker", "img", "gif"].includes(m.kind) ? m.kind : "";
       const text = String(m.text || "").replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F]/g, "").trim().slice(0, 1000);
-      if (!text) return;
+      let img = "", url = "";
+      if (kind === "gif") { url = String(m.url || ""); if (url.length > 400 || !/^https:\/\/media[0-9]*\.giphy\.com\/[A-Za-z0-9_\-\/.?=&%]+$/.test(url)) return; }
+      else if (kind) {                                          // stickers and photos: already shrunk by the phone; kept apart from the message so history stays small
+        img = String(m.img || "");
+        const re = kind === "sticker" ? /^data:image\/(png|webp|jpeg);base64,[A-Za-z0-9+\/=]+$/ : /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/;
+        if (img.length > (kind === "sticker" ? 160000 : 380000) || !re.test(img)) return;
+      }
+      if (!text && !kind) return;
       if (this.limited(me)) { try { ws.send(JSON.stringify({ t: "slow" })); } catch (e) {} return; }
+      let reply, post;
+      if (m.reply) { const q = await this.ctx.storage.get("m:" + padSeq(parseInt(m.reply, 10) || 0)); if (q && !q.del) reply = { id: q.id, from: q.from, text: (q.text || "").slice(0, 100), kind: q.kind || "" }; }
+      if (m.post) { const pp = await this.ctx.storage.get("p:" + padSeq(parseInt(m.post, 10) || 0)); if (pp) post = { id: pp.id, from: pp.from, cap: (pp.cap || "").slice(0, 60) }; }
       const id = ++this.seq, msg = { id, from: me, text, at: Date.now() };
-      this.send({ t: "msg", msg, cid: String(m.cid || "").slice(0, 40) });                  // to everyone, the sender included (that is their "sent" tick)
-      const puts = { seq: id }; puts["m:" + padSeq(id)] = msg;
+      if (kind) msg.kind = kind; if (url) msg.url = url; if (reply) msg.reply = reply; if (post) msg.post = post;
+      this.send({ t: "msg", msg, img: img || undefined, cid: String(m.cid || "").slice(0, 40) });   // to everyone, the sender included (that is their "sent" tick)
+      const puts = { seq: id }; puts["m:" + padSeq(id)] = msg; if (img) puts["b:" + padSeq(id)] = img;
       await this.ctx.storage.put(puts, { allowUnconfirmed: true });                          // saved in the background: nobody waits for the disk
       if (id % 50 === 0) {
         const old = await this.ctx.storage.list({ prefix: "m:", limit: 200, end: "m:" + padSeq(id - CHAT_KEEP) });
-        if (old.size) await this.ctx.storage.delete([...old.keys()]);
+        if (old.size) await this.ctx.storage.delete([...old.keys(), ...[...old.keys()].map(k => "b:" + k.slice(2))]);
       }
     } else if (m.t === "rtc") {                                // voice/video call signalling: just passed to the partner, instantly
       const t = Date.now(), r = this.rtcHits.get(me) || { n: 0, reset: t + 10000 };
@@ -841,11 +867,20 @@ export class PairRoom extends DurableObject {
       const i = post.likes.indexOf(me); if (i >= 0) post.likes.splice(i, 1); else post.likes.push(me);
       this.send({ t: "like", id: post.id, likes: post.likes });
       await this.ctx.storage.put(key, post, { allowUnconfirmed: true });
-    } else if (m.t === "react") {                              // double-tap a chat bubble = heart
-      const key = "m:" + padSeq(parseInt(m.id, 10) || 0), msg = await this.ctx.storage.get(key); if (!msg) return;
-      msg.r = msg.r || {}; if (msg.r[me]) delete msg.r[me]; else msg.r[me] = "\u2764\uFE0F";
+    } else if (m.t === "react") {                              // emoji reaction on a chat bubble (tap the same one again to remove it)
+      const key = "m:" + padSeq(parseInt(m.id, 10) || 0), msg = await this.ctx.storage.get(key); if (!msg || msg.del) return;
+      const E = ["\u2764\uFE0F", "\u{1F602}", "\u{1F62E}", "\u{1F622}", "\u{1F525}", "\u{1F44D}"], e = E.includes(m.e) ? m.e : E[0];
+      msg.r = msg.r || {}; if (msg.r[me] === e) delete msg.r[me]; else msg.r[me] = e;
       this.send({ t: "react", id: msg.id, r: msg.r });
       await this.ctx.storage.put(key, msg, { allowUnconfirmed: true });
+    } else if (m.t === "del") {                                // unsend (your own messages only)
+      const id = parseInt(m.id, 10) || 0, key = "m:" + padSeq(id), msg = await this.ctx.storage.get(key);
+      if (!msg || msg.from !== me || msg.del) return;
+      await this.ctx.storage.put(key, { id, from: me, at: msg.at, text: "", del: true }); await this.ctx.storage.delete("b:" + padSeq(id));
+      this.send({ t: "del", id });
+    } else if (m.t === "med") {                                // a photo/sticker that is not in this phone's cache yet
+      const k = m.k === "p" ? "p" : "b", id = parseInt(m.id, 10) || 0, v = await this.ctx.storage.get(k + ":" + padSeq(id)); if (!v) return;
+      try { ws.send(JSON.stringify({ t: "med", k, id, img: k === "p" ? v.img : v })); } catch (e) {}
     } else if (m.t === "feed") {
       const rows = await this.ctx.storage.list({ prefix: "p:", reverse: true, limit: 24 });
       for (const post of rows.values()) { try { ws.send(JSON.stringify({ t: "post", post, old: 1 })); } catch (e) {} }
@@ -922,7 +957,7 @@ export default {
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     const bad = () => new Response(JSON.stringify({ code: "SERVER" }), { status: 500, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
     if (!env.DB) return bad();
-    DB = env.DB; ROOM = env.ROOM; TURN_ID = env.TURN_KEY_ID || ""; TURN_TOKEN = env.TURN_KEY_API_TOKEN || ""; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
+    DB = env.DB; ROOM = env.ROOM; GIPHY_KEY = env.GIPHY_API_KEY || ""; TURN_ID = env.TURN_KEY_ID || ""; TURN_TOKEN = env.TURN_KEY_API_TOKEN || ""; SINGLE_SESSION = env.SINGLE_SESSION === "1"; ADMIN_PASSWORD = env.ADMIN_PASSWORD || "";
     try { await init(); } catch (e) { console.error(e); return bad(); }
     if (url.pathname === "/api/ws") return chatSocket(request, env);
     return handle(request, { ip: request.headers.get("CF-Connecting-IP") });
