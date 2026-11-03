@@ -291,6 +291,31 @@ function c4Check(b) {                                          // 6 rows x 7 col
   return b.every(c => c !== null) ? { w: -1, line: [] } : null;
 }
 const emptyBoard = type => Array(type === "c4" ? 42 : 9).fill(null);
+function gameMove(g, me, b) {                                  // one move, used by the live (WebSocket) path and the plain HTTP route alike
+  if (g.id !== String(b.gid) || g.status !== "active") throw fail(409, "GAME_GONE");
+  const idx = g.players.indexOf(me);
+  if (idx < 0 || g.turn !== idx) throw fail(409, "NOT_YOUR_TURN");
+  let cell;
+  if (g.type === "ttt") { cell = Number(b.cell); if (!Number.isInteger(cell) || cell < 0 || cell > 8 || g.board[cell] !== null) throw fail(400, "BAD_MOVE"); }
+  else { const col = Number(b.col); if (!Number.isInteger(col) || col < 0 || col > 6) throw fail(400, "BAD_MOVE");
+    for (let r = 5; r >= 0; r--) if (g.board[r * 7 + col] === null) { cell = r * 7 + col; break; }
+    if (cell === undefined) throw fail(400, "BAD_MOVE"); }
+  g.board[cell] = idx; g.last = cell;
+  const res2 = g.type === "ttt" ? tttCheck(g.board) : c4Check(g.board);
+  if (res2) {
+    g.status = "done"; g.winner = res2.w; g.line = res2.line;
+    if (res2.w === -1) g.score.draws = (g.score.draws || 0) + 1; else g.score[g.players[res2.w]] = (g.score[g.players[res2.w]] || 0) + 1;
+  } else g.turn = idx ^ 1;
+  return g;
+}
+function gameRematch(g) {                                      // same game again; whoever went second now goes first
+  if (g.status !== "done") return g;
+  g.status = "active"; g.board = emptyBoard(g.type); g.winner = null; g.line = []; g.last = null; g.first = g.first ^ 1; g.turn = g.first;
+  return g;
+}
+async function pushGame(key, game) {                           // tell the partner's open chat connection about a change made over plain HTTP, instantly
+  try { if (ROOM) await ROOM.get(ROOM.idFromName(key)).fetch("https://room/gpush", { method: "POST", body: JSON.stringify({ game }) }); } catch (e) { console.error(e); }
+}
 function carryScore(prev, a, b) { const sc = prev && prev.score || {}; return { [a]: sc[a] || 0, [b]: sc[b] || 0, draws: sc.draws || 0 }; }
 
 const routes = {
@@ -642,6 +667,7 @@ const routes = {
     await st.setJSON(`m/${other}/${id}`, { from: me, type: "game", gtype: type, gid, status: "pending", text, at: now, read: false }, { onlyIfNew: true });   // offline? it waits in their Mail
     try { await st.setJSON(`o/${me}/${id}`, { to: other, type: "game", gtype: type, gid, status: "pending", text, at: now, read: false }, { onlyIfNew: true }); } catch (e) { console.error(e); }
     await st.setJSON(`g/${key}`, game);
+    await pushGame(key, game);
     return { game };
   },
 
@@ -655,28 +681,14 @@ const routes = {
     try { await updateLetter(me, mailId, l => { l.status = status; l.read = true; return l; }); } catch (e) { console.error(e); }
     try { await patchSent(other, mailId, { status }); } catch (e) { console.error(e); }
     await notify(other, { kind: accept ? "game_yes" : "game_no", by: me, snip: GAMES[game.type] });
+    await pushGame(key, game);
     return { game };
   },
 
   async game_move(req, res, b) {
     const { me, key } = await pairCtx(req);
-    const game = await casGame(key, g => {
-      if (g.id !== String(b.gid) || g.status !== "active") throw fail(409, "GAME_GONE");
-      const idx = g.players.indexOf(me);
-      if (idx < 0 || g.turn !== idx) throw fail(409, "NOT_YOUR_TURN");
-      let cell;
-      if (g.type === "ttt") { cell = Number(b.cell); if (!Number.isInteger(cell) || cell < 0 || cell > 8 || g.board[cell] !== null) throw fail(400, "BAD_MOVE"); }
-      else { const col = Number(b.col); if (!Number.isInteger(col) || col < 0 || col > 6) throw fail(400, "BAD_MOVE");
-        for (let r = 5; r >= 0; r--) if (g.board[r * 7 + col] === null) { cell = r * 7 + col; break; }
-        if (cell === undefined) throw fail(400, "BAD_MOVE"); }
-      g.board[cell] = idx; g.last = cell;
-      const res2 = g.type === "ttt" ? tttCheck(g.board) : c4Check(g.board);
-      if (res2) {
-        g.status = "done"; g.winner = res2.w; g.line = res2.line;
-        if (res2.w === -1) g.score.draws = (g.score.draws || 0) + 1; else g.score[g.players[res2.w]] = (g.score[g.players[res2.w]] || 0) + 1;
-      } else g.turn = idx ^ 1;
-      return g;
-    });
+    const game = await casGame(key, g => gameMove(g, me, b));
+    await pushGame(key, game);
     return { game };
   },
 
@@ -690,19 +702,16 @@ const routes = {
       g.chat = (g.chat || []).concat({ from: me, text, at: Date.now() }).slice(-40);
       return g;
     });
+    await pushGame(key, game);
     return { game };
   },
 
-  async game_rematch(req) {                                    // same game again; whoever went second now goes first
+  async game_rematch(req) {
     const { key } = await pairCtx(req);
-    const game = await casGame(key, g => {
-      if (g.status !== "done") return g;                       // the other person already started it
-      g.status = "active"; g.board = emptyBoard(g.type); g.winner = null; g.line = []; g.last = null; g.first = g.first ^ 1; g.turn = g.first;
-      return g;
-    });
+    const game = await casGame(key, g => gameRematch(g));
+    await pushGame(key, game);
     return { game };
   },
-
   async game_quit(req) {                                       // leave a game, or take back an invite nobody answered yet
     const { me, other, key } = await pairCtx(req);
     const cur = await getGame(key);
@@ -713,6 +722,7 @@ const routes = {
     }
     if (g0.status === "ended" || g0.status === "declined") return { game: g0 };
     const game = await casGame(key, g => { g.status = "ended"; g.endedBy = me; return g; });
+    await pushGame(key, game);
     return { game };
   },
 
@@ -774,22 +784,28 @@ const padSeq = n => String(n).padStart(10, "0");
 export class PairRoom extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
-    this.seq = 0; this.seen = {}; this.pseq = 0; this.hits = new Map(); this.rtcHits = new Map();
+    this.seq = 0; this.seen = {}; this.pseq = 0; this.g = null; this.key = ""; this.pq = Promise.resolve(); DB = env.DB; this.hits = new Map(); this.rtcHits = new Map();
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));   // keep-alive answered without waking the object
     this.ctx.blockConcurrencyWhile(async () => {
       this.seq = (await this.ctx.storage.get("seq")) || 0;
       this.seen = (await this.ctx.storage.get("seen")) || {};
       this.pseq = (await this.ctx.storage.get("pseq")) || 0;
+      this.g = (await this.ctx.storage.get("g")) || null; this.key = (await this.ctx.storage.get("key")) || "";
     });
   }
   async fetch(request) {
     const url = new URL(request.url);
     if (url.pathname === "/clear") {
       for (const w of this.ctx.getWebSockets()) { try { w.close(4001, "unpaired"); } catch (e) {} }
-      await this.ctx.storage.deleteAll(); this.seq = 0; this.pseq = 0; this.seen = {};
+      await this.ctx.storage.deleteAll(); this.seq = 0; this.pseq = 0; this.g = null; this.seen = {};
+      return new Response("ok");
+    }
+    if (url.pathname === "/gpush") {                           // the plain HTTP game routes report every change here, so the partner sees it at once
+      try { const { game } = await request.json(); this.g = game || null; await this.ctx.storage.put("g", this.g, { allowUnconfirmed: true }); this.send({ t: "game", game: this.g }); } catch (e) {}
       return new Response("ok");
     }
     if (request.headers.get("Upgrade") !== "websocket") return new Response("Expected a WebSocket", { status: 426 });
+    const gk = request.headers.get("X-SM-Key") || ""; if (gk && gk !== this.key) { this.key = gk; await this.ctx.storage.put("key", gk); }
     const me = request.headers.get("X-SM-User") || "";
     if (!me) return new Response("No user", { status: 400 });
     const pair = new WebSocketPair(), client = pair[0], server = pair[1];
@@ -884,6 +900,8 @@ export class PairRoom extends DurableObject {
     } else if (m.t === "feed") {
       const rows = await this.ctx.storage.list({ prefix: "p:", reverse: true, limit: 24 });
       for (const post of rows.values()) { try { ws.send(JSON.stringify({ t: "post", post, old: 1 })); } catch (e) {} }
+    } else if (m.t === "gmove" || m.t === "grematch") {         // tic-tac-toe / connect 4 move: checked here, sent to both phones now, saved to the database right after
+      await this.gameOp(ws, me, m);
     } else if (m.t === "typing") {
       this.send({ t: "typing", u: me, on: m.on !== false }, ws);
     } else if (m.t === "seen") {
@@ -894,6 +912,27 @@ export class PairRoom extends DurableObject {
         await this.ctx.storage.put("seen", this.seen, { allowUnconfirmed: true });
       }
     }
+  }
+  async gameOp(ws, me, m) {
+    const apply = g => { if (m.t === "gmove") gameMove(g, me, m); else gameRematch(g); return g; };
+    try {
+      if (!this.key) throw fail(409, "SERVER");
+      if (!this.g) { const cur = await getGame(this.key); this.g = cur ? cur.data : null; }
+      if (!this.g) throw fail(404, "NO_GAME");
+      const next = apply(structuredClone(this.g)); next.ver = (this.g.ver || 0) + 1; next.updatedAt = Date.now();
+      this.g = next; this.send({ t: "game", game: next });
+      this.ctx.storage.put("g", next, { allowUnconfirmed: true });
+      const ver = next.ver;
+      await (this.pq = this.pq.then(async () => {
+        try {
+          const final = await casGame(this.key, apply);
+          this.g = final; this.ctx.storage.put("g", final, { allowUnconfirmed: true });
+          if (final.ver !== ver) this.send({ t: "game", game: final });
+        } catch (e) {                                          // the saved game disagrees (someone quit at the same moment): the saved one wins
+          try { const cur = await getGame(this.key); this.g = cur ? cur.data : null; this.ctx.storage.put("g", this.g, { allowUnconfirmed: true }); this.send({ t: "game", game: this.g }); } catch (x) {}
+        }
+      }).catch(() => {}));
+    } catch (e) { try { ws.send(JSON.stringify({ t: "gerr", code: (e && e.code) || "SERVER" })); } catch (x) {} }
   }
   async webSocketClose(ws, code, reason) {
     try { ws.close(code === 1005 || code === 1006 ? 1000 : code, "bye"); } catch (e) {}
@@ -915,7 +954,7 @@ async function chatSocket(req, env) {                          // GET /api/ws - 
   const s = await sessionUser(req);
   if (!s) return err(401, "UNAUTH");
   if (!s.rec.pair) return err(409, "NOT_PAIRED");
-  const h = new Headers(req.headers); h.set("X-SM-User", s.rec.username);
+  const h = new Headers(req.headers); h.set("X-SM-User", s.rec.username); h.set("X-SM-Key", pairKey(s.rec.username, s.rec.pair.with));
   return env.ROOM.get(env.ROOM.idFromName(pairKey(s.rec.username, s.rec.pair.with))).fetch(new Request(req, { headers: h }));
 }
 

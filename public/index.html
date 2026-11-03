@@ -763,7 +763,11 @@
   #ptMaker .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
   #ptMaker input[type=text] { width: min(80vw, 280px); box-sizing: border-box; padding: 9px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font-size: 16px; }
   #ptMaker button:not(.gm-btn) { padding: 10px 14px; border: 1px solid #8fb0e6; border-radius: 9px; background: #fff; color: #12315f; font: 13px Tahoma, sans-serif; cursor: pointer; min-height: 44px; }
-  #ptChat.feed #ptTray, #ptChat.feed #ptReplyBar { display: none; }
+  #ptChat.feed #ptTray, #ptChat.feed #ptReplyBar, #ptChat.feed #ptAttach { display: none; }
+  #ptAttach { display: flex; align-items: center; gap: 8px; padding: 6px; background: rgba(255,255,255,.9); border: 1px solid #c3d3ee; border-radius: 10px; font-size: 12.5px; }
+  #ptAttach[hidden] { display: none; } #ptAttach img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; flex: none; } #ptAttTxt { flex: 1; min-width: 0; }
+  #ptAttX { border: 0; background: none; font-size: 22px; width: 38px; height: 38px; cursor: pointer; color: #12315f; }
+  #ptChat.drag #ptLog { outline: 3px dashed #e0457b; outline-offset: -3px; }
   .pt-post .rep { display: flex; gap: 6px; padding: 0 10px 10px; }
   .pt-post .rep input { flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid #c3d3ee; border-radius: 18px; font-size: 16px; color: #12315f; }
   .pt-post .rep button { border: 0; background: none; color: #2f6fe0; font: bold 13px Tahoma, sans-serif; cursor: pointer; min-width: 56px; }
@@ -1094,6 +1098,7 @@
         <div id="ptLog" role="log" aria-live="polite"></div>
         <div id="ptTyping" hidden></div>
         <div id="ptFeed"><div class="pt-newpost"><input id="ptCap" maxlength="300" placeholder="Write a caption..." aria-label="Caption"><label class="gm-btn" for="ptPic">+ Photo</label><input id="ptPic" type="file" accept="image/*" hidden></div><div id="ptPosts"></div></div>
+        <div id="ptAttach" hidden><img id="ptAttImg" alt="Photo to send"><span id="ptAttTxt">Photo ready - add a caption if you like, then press Send.</span><button id="ptAttX" type="button" aria-label="Remove photo">&times;</button></div>
         <div id="ptReplyBar" hidden><span id="ptReplyTxt"></span><button id="ptReplyX" type="button" aria-label="Cancel reply">&times;</button></div>
         <div id="ptTray" hidden><div class="pt-tabs" role="tablist"><button id="ptTrStk" type="button" role="tab" aria-selected="true">Stickers</button><button id="ptTrGif" type="button" role="tab" aria-selected="false" hidden>GIF</button></div><div id="ptStkGrid"></div><div id="ptGifBox" hidden><input id="ptGifQ" type="search" placeholder="Search GIFs..." aria-label="Search GIFs"><div id="ptGifGrid"></div></div></div>
         <form id="ptForm" autocomplete="off"><button class="pt-ib" id="ptStk" type="button" aria-label="Stickers and GIFs">&#9786;</button><button class="pt-ib" id="ptImgB" type="button" aria-label="Send a photo">&#128444;</button><input id="ptImgIn" type="file" accept="image/*" hidden><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
@@ -2696,7 +2701,7 @@ function phLoad(file) {
   if (!file || !/^image\//.test(file.type)) return say("THAT ISN'T A PICTURE.");
   const u = URL.createObjectURL(file), im = new Image();
   im.onload = () => { URL.revokeObjectURL(u); const w = im.naturalWidth, h = im.naturalHeight, sc = Math.min(1, 1200 / Math.max(w, h)), c = document.createElement("canvas");
-    c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(h * sc)); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); phSrc = c; phRender(); say("PHOTO ADDED. IT SENDS WITH YOUR LETTER.", true); };
+    c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(h * sc)); { const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height); } phSrc = c; phRender(); say("PHOTO ADDED. IT SENDS WITH YOUR LETTER.", true); };
   im.onerror = () => { URL.revokeObjectURL(u); say("COULDN'T OPEN THAT PICTURE."); };
   im.src = u;
 }
@@ -3874,8 +3879,19 @@ async function gmDo(name, body) {
   catch (err) { GM.busy = false; gmErr(err); renderGames(); gmFetch(); }
 }
 const gmInvite = type => gmDo("game_invite", { type });
-const gmMove = m => gmDo("game_move", Object.assign({ gid: GM.game && GM.game.id }, m));
-const gmRematch = () => gmDo("game_rematch");
+function gmMove(m) {                                            // over the live connection: your move shows at once, theirs the instant the server has checked it
+  const g = GM.game;
+  if (g && g.status === "active" && PT.open && PT.hello) {
+    const my = g.players.indexOf(gmMe()); if (my < 0 || g.turn !== my) return;
+    const n = JSON.parse(JSON.stringify(g)); let cell = -1;
+    if (g.type === "ttt") { cell = Number(m.cell); if (!(cell >= 0 && cell < 9) || n.board[cell] !== null) return; }
+    else { const col = Number(m.col); if (!(col >= 0 && col < 7)) return; for (let r = 5; r >= 0; r--) if (n.board[r * 7 + col] === null) { cell = r * 7 + col; break; } if (cell < 0) return; }
+    n.board[cell] = my; n.last = cell; n.turn = my ^ 1; GM.game = n; renderGames();
+    try { PT.ws.send(JSON.stringify(Object.assign({ t: "gmove", gid: g.id }, m))); return; } catch (e) { gmFetch(); return; }
+  }
+  return gmDo("game_move", Object.assign({ gid: g && g.id }, m));
+}
+const gmRematch = () => { if (GM.game && GM.game.status === "done" && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify({ t: "grematch" })); return; } catch (e) {} } return gmDo("game_rematch"); };
 const gmQuit = () => gmDo("game_quit");
 async function gmAnswer(accept, gid) {
   hideGameInvite();
@@ -3909,7 +3925,8 @@ async function presenceTick() {                                               //
 }
 function gamesOpened() { renderGames(); presenceTick(); gmFetch(); }
 setInterval(presenceTick, PRESENCE_MS);
-setInterval(() => { if (!wins.games.hidden && !document.hidden) gmFetch(); }, GAME_POLL_MS);        // while the app is open, moves and chat show up within about a second
+let gmTick = 0;
+setInterval(() => { if (wins.games.hidden || document.hidden) return; if (PT.open && PT.hello && ++gmTick % 10) return; gmFetch(); }, GAME_POLL_MS);   // the live connection does the work; this is only a safety net (3s) - without it, 0.3s        // while the app is open, moves and chat show up within about a second
 document.addEventListener("visibilitychange", () => { if (!document.hidden) presenceTick(); });
 window.addEventListener("pagehide", () => { if (account.user && !LOCAL.on) api("presence", { off: true }).catch(() => {}); });
 {
@@ -4028,6 +4045,8 @@ function ptHandle(m) {
   } else if (m.t === "del") { const g = PT.msgs.find(x => x.id === m.id); if (g) { g.del = true; g.text = ""; g.kind = ""; g.reply = g.post = null; const el = ptLog.querySelector('.pt-m[data-id="' + m.id + '"]'); if (el) el.replaceWith(ptEl(g, false)); ptTicks(); }
     if (PT.reply && PT.reply.id === m.id) ptReplyClear();
   } else if (m.t === "med") { PT.med.set(m.k + m.id, m.img); document.querySelectorAll('img[data-med="' + m.k + m.id + '"]').forEach(i => { i.src = m.img; });
+  } else if (m.t === "game") { gmSetGame(m.game, true); if (m.game && m.game.status === "invited") presenceTick();
+  } else if (m.t === "gerr") { gmErr({ code: m.code }); gmFetch();
   } else if (m.t === "rtc") { callOnSig(m);
   } else if (m.t === "slow") { ptMsg.textContent = ""; $("ptState").textContent = "slow down a little"; }
 }
@@ -4064,7 +4083,7 @@ function ptRetry() { clearTimeout(PT.retry); if (!ptWanted()) return; PT.retry =
 function ptReset() {
   clearTimeout(PT.retry); const w = PT.ws; PT.ws = null; PT.open = false; PT.hello = false; PT.online = false;
   if (w) { try { w.close(); } catch (e) {} }
-  callEnd(false); PT.reply = null; $("ptReplyBar").hidden = true; PT.posts.clear(); $("ptPosts").textContent = ""; PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
+  callEnd(false); ptAttClear(); PT.reply = null; $("ptReplyBar").hidden = true; PT.posts.clear(); $("ptPosts").textContent = ""; PT.msgs = []; PT.seen = {}; PT.pend = []; PT.unread = 0; ptBadge.hidden = true; ptLog.textContent = ""; ptTyping(false); ptStatus();
 }
 setInterval(() => {                                                   // keep-alive + dead-line detection (a phone that lost signal never says goodbye)
   if (!PT.ws || !PT.open) return;
@@ -4116,8 +4135,8 @@ $("ptSend").addEventListener("click", async () => {
 });
 ptTo.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("ptSend").click(); } });
 $("ptForm").addEventListener("submit", e => {
-  e.preventDefault(); const v = ptIn.value; if (!v.trim()) return;
-  ptIn.value = ""; clearTimeout(PT.typingOut); PT.sentTyping = 0; ptSend(v); ptIn.focus();   // clear + show + send in the same tick: nothing waits for the network
+  e.preventDefault(); const v = ptIn.value; if (!v.trim() && !PT.att) return;
+  ptIn.value = ""; clearTimeout(PT.typingOut); PT.sentTyping = 0; if (PT.att) { const d = PT.att; ptAttClear(); ptSend(v, { kind: "img", img: d }); } else ptSend(v); ptIn.focus();   // clear + show + send in the same tick: nothing waits for the network
 });
 $("ptGo").addEventListener("pointerdown", e => e.preventDefault());                              // tapping Send keeps the phone keyboard open
 ptIn.addEventListener("input", () => {
@@ -4453,7 +4472,7 @@ ptLog.addEventListener("click", e => {
 $("ptImgB").addEventListener("click", () => $("ptImgIn").click());
 $("ptImgIn").addEventListener("change", async () => {
   const f = $("ptImgIn").files[0]; $("ptImgIn").value = ""; if (!f) return;
-  try { ptSend("", { kind: "img", img: await ptShrink(f) }); } catch (e) { callNote("Couldn't use that photo."); }
+  ptStage(f);
 });
 
 /* stickers (you make them from your own photos) + GIFs */
@@ -4513,6 +4532,25 @@ async function mkFinish(send) {
   $("ptMaker").hidden = true; if (send) ptSend("", { kind: "sticker", img: d }); stkGrid();
 }
 $("ptMkSend").addEventListener("click", () => mkFinish(true)); $("ptMkSave").addEventListener("click", () => mkFinish(false));
+
+/* ============================================================ photo + caption in ONE message (pick, paste or drag a picture in, like Discord/WhatsApp) */
+PT.att = null;
+function ptAttClear() { PT.att = null; $("ptAttach").hidden = true; $("ptAttImg").removeAttribute("src"); ptIn.placeholder = "Write something sweet..."; }
+async function ptStage(file) {
+  if (!file || !ptWanted()) return;
+  try { PT.att = await ptShrink(file); $("ptAttImg").src = PT.att; $("ptAttach").hidden = false; ptIn.placeholder = "Add a caption..."; if (PT.tab !== "chat") ptTab("chat"); ptIn.focus(); }
+  catch (e) { callNote("Couldn't use that picture."); }
+}
+$("ptAttX").addEventListener("click", ptAttClear);
+const ptImgOf = dt => { const l = dt && dt.items ? [...dt.items] : []; const it = l.find(x => x.kind === "file" && x.type.startsWith("image/")); return it ? it.getAsFile() : null; };
+document.addEventListener("paste", e => {                              // Ctrl+V / long-press > Paste with a copied image
+  if (wins.partner.hidden || !ptWanted() || PT.tab !== "chat" || !$("ptMaker").hidden) return;
+  const t = e.target; if (t && t !== ptIn && /^(INPUT|TEXTAREA)$/.test(t.tagName)) return;
+  const f = ptImgOf(e.clipboardData); if (f) { e.preventDefault(); ptStage(f); }
+});
+$("ptChat").addEventListener("dragover", e => { if (ptImgOf(e.dataTransfer) || (e.dataTransfer && [...(e.dataTransfer.types || [])].includes("Files"))) { e.preventDefault(); $("ptChat").classList.add("drag"); } });
+$("ptChat").addEventListener("dragleave", e => { if (!$("ptChat").contains(e.relatedTarget)) $("ptChat").classList.remove("drag"); });
+$("ptChat").addEventListener("drop", e => { $("ptChat").classList.remove("drag"); const f = e.dataTransfer && [...e.dataTransfer.files].find(x => x.type.startsWith("image/")); if (f) { e.preventDefault(); ptStage(f); } });
 
 
 
