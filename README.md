@@ -13,3 +13,7 @@ Deploy: `npx wrangler deploy`
 ## GIFs (optional)
 The GIF button only appears when a free Giphy key is set: create one at developers.giphy.com, then
 `npx wrangler secret put GIPHY_API_KEY`. Without it everything else (stickers, photos, replies...) still works.
+
+## Voice messages (Moonsta chat)
+Tap the mic (it replaces Send while the message box is empty), talk, tap Send. Up to 60 seconds each, stored with the chat like photos.
+The browser asks for microphone permission the first time. Needs HTTPS (Cloudflare gives you that). Nothing to configure.

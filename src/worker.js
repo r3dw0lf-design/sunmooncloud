@@ -838,13 +838,13 @@ export class PairRoom extends DurableObject {
     const a = ws.deserializeAttachment(), me = a && a.u; if (!me) return;
     if (m.t !== "rtc" && m.t !== "post" && !(m.t === "chat" && m.img) && data.length > 4000) return;
     if (m.t === "chat") {
-      const kind = ["sticker", "img", "gif"].includes(m.kind) ? m.kind : "";
+      const kind = ["sticker", "img", "gif", "voice"].includes(m.kind) ? m.kind : "";
       const text = String(m.text || "").replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F]/g, "").trim().slice(0, 1000);
       let img = "", url = "";
       if (kind === "gif") { url = String(m.url || ""); if (url.length > 400 || !/^https:\/\/media[0-9]*\.giphy\.com\/[A-Za-z0-9_\-\/.?=&%]+$/.test(url)) return; }
       else if (kind) {                                          // stickers and photos: already shrunk by the phone; kept apart from the message so history stays small
         img = String(m.img || "");
-        const re = kind === "sticker" ? /^data:image\/(png|webp|jpeg);base64,[A-Za-z0-9+\/=]+$/ : /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/;
+        const re = kind === "sticker" ? /^data:image\/(png|webp|jpeg);base64,[A-Za-z0-9+\/=]+$/ : kind === "voice" ? /^data:audio\/(mp4|webm|ogg|mpeg|aac|x-m4a|wav|x-wav);base64,[A-Za-z0-9+\/=]+$/ : /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/;   // voice notes: a minute of speech from the phone's recorder
         if (img.length > (kind === "sticker" ? 160000 : 380000) || !re.test(img)) return;
       }
       if (!text && !kind) return;
@@ -854,6 +854,8 @@ export class PairRoom extends DurableObject {
       if (m.post) { const pp = await this.ctx.storage.get("p:" + padSeq(parseInt(m.post, 10) || 0)); if (pp) post = { id: pp.id, from: pp.from, cap: (pp.cap || "").slice(0, 60) }; }
       const id = ++this.seq, msg = { id, from: me, text, at: Date.now() };
       if (kind) msg.kind = kind; if (url) msg.url = url; if (reply) msg.reply = reply; if (post) msg.post = post;
+      if (kind === "voice") { const d = Math.round(Number(m.dur)); msg.dur = d >= 1 && d <= 120 ? d : 1; const wf = String(m.wf || ""); if (/^[0-9]{8,64}$/.test(wf)) msg.wf = wf; }   // length in seconds + loudness bars for the player
+      if (kind === "sticker") { const sw = Math.round(Number(m.w)); if (sw >= 40 && sw <= 240) msg.w = sw; }   // how wide the maker wanted it shown
       this.send({ t: "msg", msg, img: img || undefined, cid: String(m.cid || "").slice(0, 40) });   // to everyone, the sender included (that is their "sent" tick)
       const puts = { seq: id }; puts["m:" + padSeq(id)] = msg; if (img) puts["b:" + padSeq(id)] = img;
       await this.ctx.storage.put(puts, { allowUnconfirmed: true });                          // saved in the background: nobody waits for the disk

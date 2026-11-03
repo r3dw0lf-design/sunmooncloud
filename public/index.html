@@ -758,11 +758,49 @@
   .stk-new { font-size: 30px; color: #6a4de0; }
   .stk i { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #e0301e; color: #fff; font: 16px/24px Tahoma, sans-serif; text-align: center; font-style: normal; cursor: pointer; }
   #ptGifQ { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font-size: 16px; margin-bottom: 6px; }
-  #ptMaker { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; background: #f4f7ff; border-radius: 8px; overflow-y: auto; color: #12315f; }
-  #ptMkCv { width: min(70vw, 256px); height: auto; aspect-ratio: 1; flex: none; background: repeating-conic-gradient(#e6ecfa 0 25%, #fff 0 50%) 0 0 / 16px 16px; border-radius: 14px; border: 1px solid #c3d3ee; }
-  #ptMaker .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  #ptMaker input[type=text] { width: min(80vw, 280px); box-sizing: border-box; padding: 9px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font-size: 16px; }
-  #ptMaker button:not(.gm-btn) { padding: 10px 14px; border: 1px solid #8fb0e6; border-radius: 9px; background: #fff; color: #12315f; font: 13px Tahoma, sans-serif; cursor: pointer; min-height: 44px; }
+  #ptMaker { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; background: #f4f7ff; border-radius: 8px; color: #12315f; overflow: hidden; }
+  .mk-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 12px 14px; }
+  .mk-title { flex: none; }
+  #ptMkStage { flex: none; width: min(86vw, 340px); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+  #ptMkCv { display: block; touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; background: repeating-conic-gradient(#e6ecfa 0 25%, #fff 0 50%) 0 0 / 16px 16px; border-radius: 14px; border: 1px solid #c3d3ee; transition: width .15s, height .15s; }
+  #ptMkCv:active { cursor: grabbing; }
+  .mk-hint { flex: none; margin: -4px 0 0; font-size: 12px; color: #5d7299; text-align: center; }
+  .mk-zrow { flex: none; display: flex; align-items: center; gap: 8px; width: min(86vw, 340px); }
+  .mk-zrow input[type=range] { flex: 1; min-width: 0; height: 44px; margin: 0; accent-color: #6a4de0; touch-action: pan-y; }
+  .mk-grp { flex: none; display: flex; flex-direction: column; gap: 4px; width: min(86vw, 340px); font-size: 12px; color: #5d7299; }
+  .mk-seg { display: flex; gap: 6px; }
+  #ptMaker button { font: 13px Tahoma, sans-serif; color: #12315f; }
+  #ptMaker .mk-seg button, #ptMaker .mk-s, .mk-bar button:not(.gm-btn) { border: 1px solid #8fb0e6; border-radius: 9px; background: #fff; cursor: pointer; min-height: 44px; padding: 8px 12px; }
+  #ptMaker .mk-seg button { flex: 1; padding: 8px 4px; }
+  #ptMaker .mk-seg button[aria-pressed="true"] { background: #6a4de0; border-color: #6a4de0; color: #fff; font-weight: bold; }
+  #ptMaker .mk-s { flex: none; min-width: 56px; }
+  #ptMaker input[type=text] { flex: none; width: min(86vw, 340px); box-sizing: border-box; padding: 9px 10px; border: 1px solid #8fb0e6; border-radius: 9px; font-size: 16px; }
+  .mk-pick { flex: none; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: min(86vw, 340px); cursor: pointer; }
+  .mk-bar { flex: none; display: flex; gap: 8px; justify-content: center; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); background: #e9efff; border-top: 1px solid #c3d3ee; }
+  #ptMaker .mk-bar .gm-btn { min-height: 44px; color: #fff; }
+  .pt-stk.sized { height: auto; max-height: 240px; max-width: 100%; }
+  /* voice messages */
+  #ptGo[hidden], #ptMic[hidden], #ptRec[hidden] { display: none; }
+  #ptMic { min-width: 56px; font-size: 18px; }
+  #ptRec { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 4px; padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px)); background: rgba(255,255,255,.9); border: 1px solid #c3d3ee; border-radius: 12px; color: #12315f; }
+  #ptChat.rec #ptForm { display: none; }
+  #ptRec button:not(.gm-btn) { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #fde8e6; font-size: 20px; cursor: pointer; }
+  #ptRec .gm-btn { min-height: 44px; min-width: 64px; }
+  .rec-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: #e0301e; animation: recpulse 1s infinite; }
+  @keyframes recpulse { 50% { opacity: .25; } }
+  #ptRecT { flex: none; min-width: 38px; font: bold 14px Tahoma, sans-serif; font-variant-numeric: tabular-nums; }
+  #ptRecW { flex: 1; min-width: 0; height: 36px; }
+  .pt-voice { display: flex; align-items: center; gap: 6px; width: 252px; max-width: 100%; padding: 2px 0; white-space: normal; }
+  .vc-p { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(0,0,0,.14); color: inherit; font-size: 15px; line-height: 40px; padding: 0; cursor: pointer; }
+  .pt-voice.load .vc-p { opacity: .5; }
+  .vc-w { flex: 1; min-width: 0; height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 1px; overflow: hidden; cursor: pointer; touch-action: pan-y; }
+  .vc-w i { flex: 1 1 0; max-width: 4px; min-width: 1px; border-radius: 2px; background: currentColor; opacity: .3; pointer-events: none; }
+  .vc-w i.on { opacity: .95; }
+  .vc-t { flex: none; min-width: 30px; font-size: 11px; text-align: right; font-variant-numeric: tabular-nums; opacity: .8; }
+  .vc-r { display: none; flex: none; min-width: 34px; min-height: 28px; border: 0; border-radius: 12px; background: rgba(0,0,0,.14); color: inherit; font: bold 11px Tahoma, sans-serif; padding: 0 6px; cursor: pointer; }
+  .pt-voice.on .vc-r { display: inline-block; }
+  @media (pointer: coarse), (max-width: 700px) { .vc-w { height: 40px; } }
+  #ptChat.feed #ptRec { display: none; }
   #ptChat.feed #ptTray, #ptChat.feed #ptReplyBar, #ptChat.feed #ptAttach { display: none; }
   #ptAttach { display: flex; align-items: center; gap: 8px; padding: 6px; background: rgba(255,255,255,.9); border: 1px solid #c3d3ee; border-radius: 10px; font-size: 12.5px; }
   #ptAttach[hidden] { display: none; } #ptAttach img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; flex: none; } #ptAttTxt { flex: 1; min-width: 0; }
@@ -778,7 +816,8 @@
   #ptViewImg { max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: 50% 50%; will-change: transform; -webkit-user-drag: none; pointer-events: none; }
   .pv-bar { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: 10px; display: flex; gap: 8px; z-index: 2; }
   .pv-bar button, .pv-bar a { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #ffffff55; border-radius: 50%; background: rgba(30,30,30,.7); color: #fff; font: 22px Tahoma, sans-serif; text-decoration: none; cursor: pointer; }
-  .pt-img, .pt-pq img, #ptAttImg { cursor: zoom-in; }
+  .pt-img, .pt-stk, .pt-pq img, #ptAttImg { cursor: zoom-in; }
+  #ptViewImg.big { width: min(92vw, 92vh); height: min(92vw, 92vh); object-fit: contain; }
   .pt-zoom { position: absolute; right: 8px; bottom: 8px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; font-size: 18px; cursor: pointer; }
   @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
@@ -1109,7 +1148,8 @@
         <div id="ptAttach" hidden><img id="ptAttImg" alt="Photo to send"><span id="ptAttTxt">Photo ready - add a caption if you like, then press Send.</span><button id="ptAttX" type="button" aria-label="Remove photo">&times;</button></div>
         <div id="ptReplyBar" hidden><span id="ptReplyTxt"></span><button id="ptReplyX" type="button" aria-label="Cancel reply">&times;</button></div>
         <div id="ptTray" hidden><div class="pt-tabs" role="tablist"><button id="ptTrStk" type="button" role="tab" aria-selected="true">Stickers</button><button id="ptTrGif" type="button" role="tab" aria-selected="false" hidden>GIF</button></div><div id="ptStkGrid"></div><div id="ptGifBox" hidden><input id="ptGifQ" type="search" placeholder="Search GIFs..." aria-label="Search GIFs"><div id="ptGifGrid"></div></div></div>
-        <form id="ptForm" autocomplete="off"><button class="pt-ib" id="ptStk" type="button" aria-label="Stickers and GIFs">&#9786;</button><button class="pt-ib" id="ptImgB" type="button" aria-label="Send a photo">&#128444;</button><input id="ptImgIn" type="file" accept="image/*" hidden><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit">Send</button></form>
+        <form id="ptForm" autocomplete="off"><button class="pt-ib" id="ptStk" type="button" aria-label="Stickers and GIFs">&#9786;</button><button class="pt-ib" id="ptImgB" type="button" aria-label="Send a photo">&#128444;</button><input id="ptImgIn" type="file" accept="image/*" hidden><input id="ptIn" maxlength="1000" placeholder="Write something sweet..." aria-label="Chat message" enterkeyhint="send"><button class="gm-btn" id="ptGo" type="submit" hidden>Send</button><button class="gm-btn" id="ptMic" type="button" aria-label="Record a voice message" hidden>&#127908;</button></form>
+        <div id="ptRec" hidden><button id="ptRecX" type="button" aria-label="Cancel recording">&#128465;</button><span class="rec-dot" aria-hidden="true"></span><span id="ptRecT" role="timer">0:00</span><canvas id="ptRecW" width="240" height="40" aria-hidden="true"></canvas><button class="gm-btn" id="ptRecGo" type="button" aria-label="Send voice message">Send</button></div>
       </div>
       <div id="ptCall" hidden>
         <video id="ptRemote" autoplay playsinline></video>
@@ -1118,7 +1158,20 @@
         <div class="pt-ctl"><button id="ptMute" type="button">Mute</button><button id="ptCam" type="button">Camera off</button><button id="ptFlip" type="button">Flip</button><button id="ptHang" type="button" class="end">End</button></div>
       </div>
           <div id="ptMenu" role="menu" hidden><div class="emo"><button type="button" data-e="❤️">❤️</button><button type="button" data-e="😂">😂</button><button type="button" data-e="😮">😮</button><button type="button" data-e="😢">😢</button><button type="button" data-e="🔥">🔥</button><button type="button" data-e="👍">👍</button></div><button type="button" data-a="reply">Reply</button><button type="button" data-a="copy">Copy</button><button type="button" data-a="unsend">Unsend</button></div>
-      <div id="ptMaker" hidden><b>Make a sticker</b><canvas id="ptMkCv" width="256" height="256"></canvas><input id="ptMkZoom" type="range" min="1" max="3" step=".05" value="1" aria-label="Zoom"><input id="ptMkTxt" type="text" maxlength="24" placeholder="Add text (optional)" aria-label="Sticker text"><div class="row"><label class="gm-btn" for="ptMkFile">Choose photo</label><input id="ptMkFile" type="file" accept="image/*" hidden><button id="ptMkShape" type="button">Rounded</button></div><div class="row"><button class="gm-btn" id="ptMkSend" type="button">Save &amp; send</button><button id="ptMkSave" type="button">Save</button><button id="ptMkX" type="button">Cancel</button></div></div>
+      <div id="ptMaker" hidden>
+        <div class="mk-body">
+          <b class="mk-title">Make a sticker</b>
+          <div id="ptMkStage"><canvas id="ptMkCv" width="280" height="280" aria-label="Sticker preview. Drag to move the photo, pinch to zoom."></canvas></div>
+          <p class="mk-hint" id="ptMkHint">Tap the box to choose a photo</p>
+          <div class="mk-zrow"><button type="button" id="ptMkFit" class="mk-s">Fit</button><input id="ptMkZoom" type="range" min="1" max="4" step=".01" value="1" aria-label="Zoom"><button type="button" id="ptMkFill" class="mk-s">Fill</button></div>
+          <div class="mk-grp"><span>Size</span><div class="mk-seg" id="ptMkSize" role="group" aria-label="Sticker size"><button type="button" data-v="s">Small</button><button type="button" data-v="m" aria-pressed="true">Medium</button><button type="button" data-v="l">Large</button></div></div>
+          <div class="mk-grp"><span>Frame</span><div class="mk-seg" id="ptMkAspect" role="group" aria-label="Sticker frame"><button type="button" data-v="sq" aria-pressed="true">Square</button><button type="button" data-v="wide">Wide</button><button type="button" data-v="tall">Tall</button></div></div>
+          <div class="mk-grp"><span>Shape</span><div class="mk-seg" id="ptMkShape" role="group" aria-label="Sticker shape"><button type="button" data-v="round" aria-pressed="true">Rounded</button><button type="button" data-v="circle">Circle</button><button type="button" data-v="square">Sharp</button></div></div>
+          <input id="ptMkTxt" type="text" maxlength="24" placeholder="Add text (optional)" aria-label="Sticker text">
+          <label class="gm-btn mk-pick" for="ptMkFile">Choose / change photo</label><input id="ptMkFile" type="file" accept="image/*" hidden>
+        </div>
+        <div class="mk-bar"><button class="gm-btn" id="ptMkSend" type="button">Save &amp; send</button><button id="ptMkSave" type="button">Save</button><button id="ptMkX" type="button">Cancel</button></div>
+      </div>
     </div></div></section>
   <div id="startMenu" hidden><div class="smh">Sun &amp; Moon OS</div><button data-m="sun" type="button">Sun &amp; Moon</button><button data-m="mail" type="button">Mail</button><button data-m="games" type="button">Mini Games</button><button data-m="partner" type="button">Moonsta</button><button data-m="settings" type="button">Settings</button><button data-m="reboot" type="button">Restart</button><button data-m="out" type="button">Log out</button></div>
   <div id="taskbar"><button id="startBtn" type="button">start</button><div id="tasks"></div><div id="tray"><button id="trayMail" type="button" hidden></button><button id="sfxBtn" type="button" title="Desktop sounds" aria-label="Desktop sounds" aria-pressed="true">&#9835;</button><span id="clock"></span></div></div>
@@ -3984,10 +4037,11 @@ function ptEl(m, pend) {
   const add = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; d.appendChild(e); return e; };
   if (m.del) add("span", "", "Message unsent");
   else {
-    if (m.reply) { const q = add("div", "pt-q", m.reply.from + ": " + (m.reply.text || (m.reply.kind === "sticker" ? "Sticker" : m.reply.kind === "gif" ? "GIF" : "Photo"))); q.dataset.go = m.reply.id; }
+    if (m.reply) { const q = add("div", "pt-q", m.reply.from + ": " + (m.reply.text || (m.reply.kind === "sticker" ? "Sticker" : m.reply.kind === "gif" ? "GIF" : m.reply.kind === "voice" ? "Voice message" : "Photo"))); q.dataset.go = m.reply.id; }
     if (m.post) { const q = add("div", "pt-pq"), im = document.createElement("img"); im.alt = ""; im.dataset.med = "p" + m.post.id; ptMedFill(im); const t = document.createElement("span"); t.textContent = (m.post.from === me ? "Your photo" : m.post.from + "'s photo") + (m.post.cap ? ": " + m.post.cap : ""); q.append(im, t); }
     if (m.kind === "gif") { const im = add("img", "pt-stk"); im.alt = "GIF"; im.src = m.url; im.draggable = false; }
-    else if (m.kind) { const im = add("img", m.kind === "sticker" ? "pt-stk" : "pt-img"); im.alt = m.kind === "sticker" ? "Sticker" : "Photo"; im.draggable = false; if (m.id) { im.dataset.med = "b" + m.id; ptMedFill(im); } else im.src = m.img; }
+    else if (m.kind === "voice") vcBuild(add("div", "pt-voice"), m);
+    else if (m.kind) { const im = add("img", m.kind === "sticker" ? "pt-stk" : "pt-img"); im.alt = m.kind === "sticker" ? "Sticker" : "Photo"; im.draggable = false; if (m.kind === "sticker") stkSized(im, m.w); if (m.id) { im.dataset.med = "b" + m.id; ptMedFill(im); } else im.src = m.img; }
     if (m.text) add("span", "", m.text);
   }
   const sm = document.createElement("small"); sm.textContent = ptTime(m.at); d.appendChild(sm);
@@ -4036,13 +4090,13 @@ function ptHandle(m) {
     if (g.from === me) {
       const i = PT.pend.findIndex(p => p.cid === m.cid); if (i >= 0) PT.pend.splice(i, 1);
       const el = m.cid ? ptLog.querySelector('.pt-m[data-cid="' + CSS.escape(m.cid) + '"]') : null;
-      if (el) { el.classList.remove("pend"); el.dataset.id = g.id; el.querySelectorAll("img.pt-img,img.pt-stk").forEach(i => { if (g.kind !== "gif") i.dataset.med = "b" + g.id; }); el.querySelector("small").firstChild.textContent = ptTime(g.at); ptTicks(); } else ptAdd(g, false);
+      if (el) { el.classList.remove("pend"); el.dataset.id = g.id; el.querySelectorAll("img.pt-img,img.pt-stk,.pt-voice").forEach(i => { if (g.kind !== "gif") i.dataset.med = "b" + g.id; }); el.querySelector("small").firstChild.textContent = ptTime(g.at); ptTicks(); } else ptAdd(g, false);
     } else {
       ptTyping(false); ptAdd(g, false);
       if (ptViewing()) { ptSendSeen(); sfx.seen(); }
       else {
         ptCount(); sfx.mail();
-        if (!desk.hidden && Date.now() - PT.lastToast > 4000) { PT.lastToast = Date.now(); showToast([["t-pair", other.toUpperCase() + ": " + (g.text || (g.kind === "sticker" ? "sent a sticker" : g.kind === "gif" ? "sent a GIF" : g.kind === "img" ? "sent a photo" : "")).slice(0, 60)]], "partner"); }
+        if (!desk.hidden && Date.now() - PT.lastToast > 4000) { PT.lastToast = Date.now(); showToast([["t-pair", other.toUpperCase() + ": " + (g.text || (g.kind === "sticker" ? "sent a sticker" : g.kind === "gif" ? "sent a GIF" : g.kind === "voice" ? "sent a voice message" : g.kind === "img" ? "sent a photo" : "")).slice(0, 60)]], "partner"); }
       }
     }
   } else if (m.t === "typing" && m.u !== me) { ptTyping(m.on !== false);
@@ -4053,7 +4107,7 @@ function ptHandle(m) {
   } else if (m.t === "react") { const g = PT.msgs.find(x => x.id === m.id); if (g) g.r = m.r; const el = ptLog.querySelector('.pt-m[data-id="' + m.id + '"]'); if (el) ptHeart(el, m.r);
   } else if (m.t === "del") { const g = PT.msgs.find(x => x.id === m.id); if (g) { g.del = true; g.text = ""; g.kind = ""; g.reply = g.post = null; const el = ptLog.querySelector('.pt-m[data-id="' + m.id + '"]'); if (el) el.replaceWith(ptEl(g, false)); ptTicks(); }
     if (PT.reply && PT.reply.id === m.id) ptReplyClear();
-  } else if (m.t === "med") { PT.med.set(m.k + m.id, m.img); document.querySelectorAll('img[data-med="' + m.k + m.id + '"]').forEach(i => { i.src = m.img; });
+  } else if (m.t === "med") { PT.med.set(m.k + m.id, m.img); if (VO.wait === m.k + m.id) voStart(); document.querySelectorAll('img[data-med="' + m.k + m.id + '"]').forEach(i => { i.src = m.img; });
   } else if (m.t === "game") { gmSetGame(m.game, true); if (m.game && m.game.status === "invited") presenceTick();
   } else if (m.t === "gerr") { gmErr({ code: m.code }); gmFetch();
   } else if (m.t === "rtc") { callOnSig(m);
@@ -4061,12 +4115,12 @@ function ptHandle(m) {
 }
 function ptTransmit(p) {
   if (!PT.pend.includes(p)) PT.pend.push(p);
-  if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify({ t: "chat", cid: p.cid, text: p.text, kind: p.kind, img: p.img, url: p.url, reply: p.reply ? p.reply.id : 0, post: p.post ? p.post.id : 0 })); return; } catch (e) {} }
+  if (PT.ws && PT.open && PT.hello) { try { PT.ws.send(JSON.stringify({ t: "chat", cid: p.cid, text: p.text, kind: p.kind, img: p.img, url: p.url, w: p.w || 0, dur: p.dur || 0, wf: p.wf || "", reply: p.reply ? p.reply.id : 0, post: p.post ? p.post.id : 0 })); return; } catch (e) {} }
   ptConnect();
 }
 function ptSend(text, x) {
   x = x || {}; text = String(text || "").replace(/\s+/g, " ").trim().slice(0, 1000); if ((!text && !x.kind) || !ptWanted()) return;
-  const p = { cid: Date.now().toString(36) + (++PT.cid), text, at: Date.now(), from: ptMe(), kind: x.kind || "", img: x.img || "", url: x.url || "" };
+  const p = { cid: Date.now().toString(36) + (++PT.cid), text, at: Date.now(), from: ptMe(), kind: x.kind || "", img: x.img || "", url: x.url || "" }; if (x.kind === "sticker" && x.w) p.w = x.w; if (x.kind === "voice") { p.dur = x.dur || 0; p.wf = x.wf || ""; }
   if (PT.reply && !x.post) { p.reply = PT.reply; ptReplyClear(); }
   if (x.post) { const o = PT.posts.get(x.post); p.post = { id: x.post, from: o ? o.post.from : "", cap: o ? (o.post.cap || "").slice(0, 60) : "" }; }
   ptAdd(p, true); ptTransmit(p); sfx.bloop();
@@ -4433,7 +4487,7 @@ function ptReplyClear() { PT.reply = null; $("ptReplyBar").hidden = true; }
 function ptReplyMsg(g) {
   if (!g || g.del) return;
   PT.reply = { id: g.id, from: g.from, text: (g.text || "").slice(0, 100), kind: g.kind || "" };
-  $("ptReplyTxt").textContent = "Replying to " + (g.from === ptMe() ? "yourself" : g.from) + ": " + (g.text ? g.text.slice(0, 60) : g.kind === "sticker" ? "Sticker" : g.kind === "gif" ? "GIF" : "Photo");
+  $("ptReplyTxt").textContent = "Replying to " + (g.from === ptMe() ? "yourself" : g.from) + ": " + (g.text ? g.text.slice(0, 60) : g.kind === "sticker" ? "Sticker" : g.kind === "gif" ? "GIF" : g.kind === "voice" ? "Voice message" : "Photo");
   $("ptReplyBar").hidden = false; ptIn.focus();
 }
 const ptMsgOf = b => b && b.dataset.id ? PT.msgs.find(x => x.id === Number(b.dataset.id)) : null;
@@ -4487,15 +4541,20 @@ $("ptImgIn").addEventListener("change", async () => {
 
 /* stickers (you make them from your own photos) + GIFs */
 const stkKey = () => "moonsta.stk." + ptMe();
-const stkLoad = () => { try { return JSON.parse(localStorage.getItem(stkKey()) || "[]"); } catch (e) { return []; } };
+const stkLoad = () => { try { return JSON.parse(localStorage.getItem(stkKey()) || "[]").map(v => typeof v === "string" ? { d: v } : v).filter(v => v && typeof v.d === "string"); } catch (e) { return []; } };
 const stkSave = a => { try { localStorage.setItem(stkKey(), JSON.stringify(a.slice(-24))); return true; } catch (e) { return false; } };
+function stkSized(im, w) {                                             // every sticker shows at the size its maker picked (old ones: half their pixel width)
+  im.classList.add("sized");
+  const set = v => { v = Math.round(Number(v) || 0); if (v >= 40) { im.style.width = Math.min(v, 240) + "px"; im.style.height = "auto"; } };
+  if (w) set(w); else im.addEventListener("load", () => set(im.naturalWidth / 2));
+}
 function stkGrid() {
   const g = $("ptStkGrid"); g.textContent = "";
   const add = document.createElement("button"); add.type = "button"; add.className = "stk-new"; add.textContent = "+"; add.setAttribute("aria-label", "Make a sticker"); add.onclick = mkOpen; g.appendChild(add);
-  for (const d of stkLoad().slice().reverse()) {
-    const w = document.createElement("div"), b = document.createElement("button"), im = document.createElement("img"), x = document.createElement("i"); w.className = "stk";
-    b.type = "button"; im.src = d; im.alt = "Sticker"; b.appendChild(im); b.onclick = () => { ptSend("", { kind: "sticker", img: d }); ptTray(false); };
-    x.textContent = "\u00d7"; x.setAttribute("role", "button"); x.setAttribute("aria-label", "Delete sticker"); x.onclick = e => { e.stopPropagation(); stkSave(stkLoad().filter(s => s !== d)); stkGrid(); };
+  for (const st of stkLoad().slice().reverse()) {
+    const d = st.d, w = document.createElement("div"), b = document.createElement("button"), im = document.createElement("img"), x = document.createElement("i"); w.className = "stk";
+    b.type = "button"; im.src = d; im.alt = "Sticker"; b.appendChild(im); b.onclick = () => { ptSend("", { kind: "sticker", img: d, w: st.w || 0 }); ptTray(false); };
+    x.textContent = "\u00d7"; x.setAttribute("role", "button"); x.setAttribute("aria-label", "Delete sticker"); x.onclick = e => { e.stopPropagation(); stkSave(stkLoad().filter(o => o.d !== d)); stkGrid(); };
     w.append(b, x); g.appendChild(w);
   }
 }
@@ -4513,42 +4572,237 @@ async function gifLoad(q) {
 }
 $("ptGifQ").addEventListener("input", () => { clearTimeout(gifT); gifT = setTimeout(() => gifLoad($("ptGifQ").value.trim()), 350); });
 
-/* sticker maker: pick a photo, zoom, add text, choose a shape */
-const MK = { img: null, shape: "round" };
-const mkRR = (x, a, b, w, h, r) => { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); };
-function mkDraw() {
-  const c = $("ptMkCv"), x = c.getContext("2d"), S = 256, r = MK.shape === "circle" ? (S - 12) / 2 : MK.shape === "square" ? 8 : 44;
-  x.clearRect(0, 0, S, S);
-  if (!MK.img) { x.fillStyle = "#6a7fa5"; x.font = "16px Tahoma, sans-serif"; x.textAlign = "center"; x.fillText("Choose a photo", S / 2, S / 2); return; }
-  x.save(); mkRR(x, 6, 6, S - 12, S - 12, r); x.clip();
-  const k = Math.max(S / MK.img.width, S / MK.img.height) * Number($("ptMkZoom").value), w = MK.img.width * k, h = MK.img.height * k; x.drawImage(MK.img, (S - w) / 2, (S - h) / 2, w, h); x.restore();
-  mkRR(x, 6, 6, S - 12, S - 12, r); x.lineWidth = 9; x.strokeStyle = "#fff"; x.stroke();
+/* sticker maker: choose the area of the photo (drag + pinch), pick a size, frame and shape, add text */
+const MK = { img: null, shape: "round", size: "m", aspect: "sq", zoom: 1, ox: 0, oy: 0 };
+const MK_LONG = { s: 192, m: 280, l: 400 };                            // pixels of the longest side that get sent
+const MK_SHOW = { s: 96, m: 140, l: 200 };                             // CSS pixels it shows at in the chat
+const MK_PREV = { s: .62, m: .8, l: 1 };                               // the editing box shrinks too, so you can see the size change
+const MK_RATIO = { sq: [1, 1], wide: [4, 3], tall: [3, 4] };
+const mkRR = (x, a, b, w, h, r) => { r = Math.min(r, w / 2, h / 2); x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); };
+function mkDims(scale) {
+  const [rw, rh] = MK_RATIO[MK.aspect], L = MK_LONG[MK.size] * (scale || 1), k = L / Math.max(rw, rh);
+  return [Math.round(rw * k), Math.round(rh * k)];
+}
+function mkCover(W, H) { return MK.img ? Math.max(W / MK.img.width, H / MK.img.height) : 1; }
+function mkFitZoom(W, H) { return MK.img ? Math.min(W / MK.img.width, H / MK.img.height) / mkCover(W, H) : 1; }   // zoom at which the whole photo is visible
+function mkClamp() {                                                   // keep the photo covering the frame (or fully inside it when smaller)
+  if (!MK.img) return; const [W, H] = mkDims(), k = mkCover(W, H) * MK.zoom;
+  const mx = Math.abs(MK.img.width * k - W) / 2 / W, my = Math.abs(MK.img.height * k - H) / 2 / H;
+  MK.ox = Math.max(-mx, Math.min(mx, MK.ox)); MK.oy = Math.max(-my, Math.min(my, MK.oy));
+}
+function mkPaint(c, W, H) {                                            // draws the sticker onto canvas c at W x H (preview and export use the same code)
+  c.width = W; c.height = H; const x = c.getContext("2d"), m = Math.min(W, H);
+  x.clearRect(0, 0, W, H);
+  if (!MK.img) { x.fillStyle = "#6a7fa5"; x.font = Math.round(m * .065) + "px Tahoma, sans-serif"; x.textAlign = "center"; x.fillText("Tap to choose a photo", W / 2, H / 2); return; }
+  const pad = Math.round(m * .025), iw = W - pad * 2, ih = H - pad * 2;
+  const r = MK.shape === "circle" ? Math.min(iw, ih) / 2 : MK.shape === "square" ? m * .03 : m * .17;
+  const k = mkCover(W, H) * MK.zoom, w = MK.img.width * k, h = MK.img.height * k;
+  x.save(); mkRR(x, pad, pad, iw, ih, r); x.clip();
+  x.drawImage(MK.img, W / 2 + MK.ox * W - w / 2, H / 2 + MK.oy * H - h / 2, w, h); x.restore();
+  mkRR(x, pad, pad, iw, ih, r); x.lineWidth = m * .035; x.strokeStyle = "#fff"; x.stroke();
   const t = $("ptMkTxt").value.trim();
-  if (t) { x.font = "bold 34px Tahoma, Arial, sans-serif"; x.textAlign = "center"; x.lineJoin = "round"; x.lineWidth = 8; x.strokeStyle = "#12315f"; x.strokeText(t, S / 2, S - 34, S - 40); x.fillStyle = "#fff"; x.fillText(t, S / 2, S - 34, S - 40); }
+  if (t) { const fs = Math.round(m * .133); x.font = "bold " + fs + "px Tahoma, Arial, sans-serif"; x.textAlign = "center"; x.lineJoin = "round"; x.lineWidth = m * .031; x.strokeStyle = "#12315f"; x.strokeText(t, W / 2, H - fs * 1.05, W - m * .16); x.fillStyle = "#fff"; x.fillText(t, W / 2, H - fs * 1.05, W - m * .16); }
 }
-function mkOpen() { MK.img = null; $("ptMkTxt").value = ""; $("ptMkZoom").value = 1; $("ptMaker").hidden = false; mkDraw(); }
-function mkExport() {
-  const c = $("ptMkCv"); let d = c.toDataURL("image/webp", .82);
-  if (!d.startsWith("data:image/webp")) { const t = document.createElement("canvas"); t.width = t.height = 176; t.getContext("2d").drawImage(c, 0, 0, 176, 176); d = t.toDataURL("image/png"); }
-  return d.length > 150000 ? null : d;
+function mkDraw() {
+  const c = $("ptMkCv"), [W, H] = mkDims(), box = $("ptMkStage").clientWidth || 280, f = box * MK_PREV[MK.size] / Math.max(W, H);
+  c.style.width = Math.round(W * f) + "px"; c.style.height = Math.round(H * f) + "px";
+  if (MK.img) { const z = $("ptMkZoom"), fit = Math.min(1, mkFitZoom(W, H)); z.min = fit.toFixed(3); z.max = 4; MK.zoom = Math.max(fit, Math.min(4, MK.zoom)); z.value = MK.zoom; }
+  mkClamp(); mkPaint(c, W, H);
+  $("ptMkHint").textContent = MK.img ? "Drag to move the photo \u00b7 pinch or slide to zoom" : "Tap the box to choose a photo";
 }
-$("ptMkFile").addEventListener("change", () => { const f = $("ptMkFile").files[0]; $("ptMkFile").value = ""; if (!f) return; const u = URL.createObjectURL(f), im = new Image(); im.onload = () => { MK.img = im; URL.revokeObjectURL(u); mkDraw(); }; im.src = u; });
-$("ptMkZoom").addEventListener("input", mkDraw); $("ptMkTxt").addEventListener("input", mkDraw);
-$("ptMkShape").addEventListener("click", () => { MK.shape = MK.shape === "round" ? "circle" : MK.shape === "circle" ? "square" : "round"; $("ptMkShape").textContent = MK.shape === "round" ? "Rounded" : MK.shape === "circle" ? "Circle" : "Square"; mkDraw(); });
+function mkSeg(id, key) {
+  $(id).addEventListener("click", e => {
+    const b = e.target.closest("button[data-v]"); if (!b) return; MK[key] = b.dataset.v;
+    for (const o of $(id).children) o.setAttribute("aria-pressed", o === b); mkDraw();
+  });
+}
+function mkOpen() {
+  Object.assign(MK, { img: null, zoom: 1, ox: 0, oy: 0 }); $("ptMkTxt").value = "";
+  $("ptMaker").hidden = false; $("ptMaker").querySelector(".mk-body").scrollTop = 0; mkDraw();
+}
+function mkExport() {                                                  // data URL under the server's limit, or null
+  for (let n = 0, scale = 1; n < 5; n++, scale *= .85) {               // if it is too heavy, lower quality first, then pixels (the shown size stays the same)
+    const [W, H] = mkDims(scale), c = document.createElement("canvas"); mkPaint(c, W, H);
+    for (const q of [.85, .65, .45]) {
+      const d = c.toDataURL("image/webp", q);
+      if (!d.startsWith("data:image/webp")) break;                     // this browser (Safari) cannot make WebP: use PNG below
+      if (d.length <= 150000) return d;
+    }
+    const p = c.toDataURL("image/png"); if (p.length <= 150000) return p;
+  }
+  return null;
+}
+function mkLoad(f) { if (!f) return; const u = URL.createObjectURL(f), im = new Image(); im.onload = () => { MK.img = im; MK.zoom = 1; MK.ox = MK.oy = 0; URL.revokeObjectURL(u); mkDraw(); }; im.onerror = () => { URL.revokeObjectURL(u); callNote("Couldn't open that picture."); }; im.src = u; }
+$("ptMkFile").addEventListener("change", () => { const f = $("ptMkFile").files[0]; $("ptMkFile").value = ""; mkLoad(f); });
+$("ptMkZoom").addEventListener("input", () => { MK.zoom = Number($("ptMkZoom").value); mkDraw(); });
+$("ptMkFit").addEventListener("click", () => { if (!MK.img) return; const [W, H] = mkDims(); MK.zoom = mkFitZoom(W, H); MK.ox = MK.oy = 0; mkDraw(); });
+$("ptMkFill").addEventListener("click", () => { MK.zoom = 1; MK.ox = MK.oy = 0; mkDraw(); });
+$("ptMkTxt").addEventListener("input", mkDraw);
+mkSeg("ptMkSize", "size"); mkSeg("ptMkAspect", "aspect"); mkSeg("ptMkShape", "shape");
 $("ptMkX").addEventListener("click", () => { $("ptMaker").hidden = true; });
-async function mkFinish(send) {
-  if (!MK.img) return; const d = mkExport(); if (!d) return callNote("That sticker is too big - try zooming out.");
-  if (!stkSave(stkLoad().concat(d))) callNote("Phone storage is full - delete a sticker first.");
-  $("ptMaker").hidden = true; if (send) ptSend("", { kind: "sticker", img: d }); stkGrid();
+{ // drag to move, two fingers to pinch, wheel to zoom, tap an empty box to pick a photo
+  const cv = $("ptMkCv"), ptr = new Map(); let pinch = 0, moved = 0;
+  cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId, { x: e.clientX, y: e.clientY }); moved = 0; pinch = 0; });
+  cv.addEventListener("pointermove", e => {
+    const o = ptr.get(e.pointerId); if (!o || !MK.img) return;
+    const r = cv.getBoundingClientRect();
+    if (ptr.size === 1) { MK.ox += (e.clientX - o.x) / r.width; MK.oy += (e.clientY - o.y) / r.height; moved += Math.abs(e.clientX - o.x) + Math.abs(e.clientY - o.y); }
+    o.x = e.clientX; o.y = e.clientY;
+    if (ptr.size === 2) { const [a, b] = [...ptr.values()], d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch) MK.zoom *= d / pinch; pinch = d; moved = 9; }
+    mkDraw();
+  });
+  const up = e => { const had = ptr.delete(e.pointerId); pinch = 0; if (had && !MK.img && !moved && e.type === "pointerup") $("ptMkFile").click(); };
+  cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+  cv.addEventListener("wheel", e => { if (!MK.img) return; e.preventDefault(); MK.zoom *= Math.exp(-e.deltaY * .0015); mkDraw(); }, { passive: false });
+}
+function mkShowW() { const [W, H] = mkDims(); return Math.round(MK_SHOW[MK.size] * W / Math.max(W, H)); }   // longest side shows at the picked size; tall stickers are narrower
+function mkFinish(send) {
+  if (!MK.img) return callNote("Choose a photo first.");
+  const d = mkExport(); if (!d) return callNote("That sticker is too detailed - try Small.");
+  const st = { d, w: mkShowW() };
+  if (!stkSave(stkLoad().concat(st))) callNote("Phone storage is full - delete a sticker first.");
+  $("ptMaker").hidden = true; if (send) ptSend("", { kind: "sticker", img: d, w: st.w }); stkGrid();
 }
 $("ptMkSend").addEventListener("click", () => mkFinish(true)); $("ptMkSave").addEventListener("click", () => mkFinish(false));
+window.addEventListener("resize", () => { if (!$("ptMaker").hidden) mkDraw(); });
+
+
+/* ============================================================ voice messages: tap the mic, talk, tap Send. Tap play on a note to listen. */
+const VO = { a: null, v: null, wait: "", raf: 0, rate: 1, urls: new Map(), n: 0 };
+const VR = { rec: null, stream: null, ac: null, an: null, chunks: [], peaks: [], t0: 0, iv: 0, mime: "", keep: false, on: false };
+const VR_MAX = 60;                                                     // seconds per voice message
+const voFmt = t => { t = Math.max(0, Math.round(t)); return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); };
+const vrOk = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+function ptMicSync() {                                                 // empty box: show the mic; something typed or a photo waiting: show Send
+  const empty = !ptIn.value.trim() && !PT.att, mic = vrOk() && empty;
+  $("ptMic").hidden = !mic; $("ptGo").hidden = mic;
+}
+ptIn.addEventListener("input", ptMicSync); $("ptForm").addEventListener("submit", () => setTimeout(ptMicSync, 0)); ptMicSync();
+
+function vrCleanup() {
+  clearInterval(VR.iv); VR.iv = 0; VR.on = false;
+  try { VR.stream && VR.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+  try { VR.ac && VR.ac.close(); } catch (e) {}
+  VR.stream = VR.ac = VR.an = null; $("ptChat").classList.remove("rec"); $("ptRec").hidden = true; ptMicSync();
+}
+function vrWave() {                                                    // live bars while recording
+  const c = $("ptRecW"), x = c.getContext("2d"), W = c.width, H = c.height, n = 40, bw = W / n, p = VR.peaks.slice(-n);
+  x.clearRect(0, 0, W, H); x.fillStyle = "#6a4de0";
+  for (let i = 0; i < n; i++) { const v = p[p.length - n + i] || 0, h = Math.max(3, v * H); x.fillRect(i * bw + 1, (H - h) / 2, bw - 2, h); }
+}
+function vrTick() {
+  const t = (Date.now() - VR.t0) / 1000; $("ptRecT").textContent = voFmt(t);
+  if (VR.an) { const b = new Uint8Array(VR.an.fftSize); VR.an.getByteTimeDomainData(b); let m = 0; for (const v of b) m = Math.max(m, Math.abs(v - 128)); VR.peaks.push(Math.min(1, m / 90)); vrWave(); }
+  if (wins.partner.hidden || PT.tab !== "chat") return vrStop(false);   // left the chat: throw the recording away
+  if (t >= VR_MAX) vrStop(true);
+}
+async function vrStart() {
+  if (VR.on || !ptWanted()) return;
+  if (!vrOk()) return callNote("Voice messages aren't supported in this browser.");
+  if (CALL.st !== "idle") return callNote("End the call first to record a voice message.");
+  if (VO.a) voStop();
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+  catch (e) { return callNote(e && (e.name === "NotAllowedError" || e.name === "SecurityError") ? "Allow the microphone to send voice messages." : e && e.name === "NotFoundError" ? "No microphone found." : "Couldn't start the microphone."); }
+  VR.mime = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; } }) || "";
+  let rec; try { rec = new MediaRecorder(stream, Object.assign({ audioBitsPerSecond: 28000 }, VR.mime ? { mimeType: VR.mime } : {})); }
+  catch (e) { stream.getTracks().forEach(t => t.stop()); return callNote("Couldn't start recording."); }
+  VR.stream = stream; VR.rec = rec; VR.chunks = []; VR.peaks = []; VR.keep = false; VR.on = true;
+  try { const AC = window.AudioContext || window.webkitAudioContext; VR.ac = new AC(); const src = VR.ac.createMediaStreamSource(stream); VR.an = VR.ac.createAnalyser(); VR.an.fftSize = 512; src.connect(VR.an); } catch (e) { VR.ac = VR.an = null; }
+  rec.ondataavailable = e => { if (e.data && e.data.size) VR.chunks.push(e.data); };
+  rec.onstop = () => vrDone(rec);
+  rec.onerror = () => { VR.keep = false; vrStop(false); };
+  rec.start(1000); VR.t0 = Date.now(); $("ptRecT").textContent = "0:00"; $("ptChat").classList.add("rec"); $("ptRec").hidden = false;
+  VR.iv = setInterval(vrTick, 90); vrTick();
+}
+function vrStop(send) {
+  if (!VR.on) return; VR.keep = !!send; const dur = (Date.now() - VR.t0) / 1000;
+  if (send && dur < .7) { VR.keep = false; callNote("Hold on a little longer to record a voice message."); }
+  clearInterval(VR.iv); VR.iv = 0; VR.dur = dur;
+  try { if (VR.rec && VR.rec.state !== "inactive") VR.rec.stop(); else vrDone(VR.rec); } catch (e) { vrDone(VR.rec); }
+}
+function vrDone(rec) {
+  const keep = VR.keep, chunks = VR.chunks, peaks = VR.peaks, dur = VR.dur || 0, type = (rec && rec.mimeType) || VR.mime || "audio/webm";
+  VR.chunks = []; VR.peaks = []; VR.rec = null; vrCleanup();
+  if (!keep || !chunks.length) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    let d = String(fr.result || ""); d = d.replace(/^data:([^;,]*)[^,]*;base64,/, (a, t) => "data:" + (/^audio\//.test(t) ? t : type.split(";")[0]) + ";base64,");
+    if (d.length > 370000) return callNote("That voice message is too long - keep it under a minute.");
+    const n = 40, wf = []; let mx = 0.001; const seg = peaks.length / n;
+    for (let i = 0; i < n; i++) { let v = 0; for (let j = Math.floor(i * seg); j < Math.max(Math.floor(i * seg) + 1, Math.floor((i + 1) * seg)); j++) v = Math.max(v, peaks[j] || 0); wf.push(v); mx = Math.max(mx, v); }
+    ptSend("", { kind: "voice", img: d, dur: Math.max(1, Math.min(120, Math.round(dur))), wf: wf.map(v => Math.min(9, Math.round(v / mx * 9))).join("") });
+  };
+  fr.readAsDataURL(new Blob(chunks, { type: type.split(";")[0] }));
+}
+$("ptMic").addEventListener("click", vrStart);
+$("ptRecX").addEventListener("click", () => vrStop(false));
+$("ptRecGo").addEventListener("click", () => vrStop(true));
+
+/* playing a voice note */
+function vcBuild(el, m) {
+  if (m.id) el.dataset.med = "b" + m.id; if (m.img) el._src = m.img; el._dur = Number(m.dur) || 0;
+  const b = document.createElement("button"); b.type = "button"; b.className = "vc-p"; b.setAttribute("aria-label", "Play voice message"); b.textContent = "\u25B6\uFE0E";
+  const w = document.createElement("div"); w.className = "vc-w";
+  for (const ch of /^[0-9]{8,64}$/.test(m.wf || "") ? m.wf : "5".repeat(32)) { const i = document.createElement("i"); i.style.height = (4 + Number(ch) * 2.2) + "px"; w.appendChild(i); }
+  const t = document.createElement("span"); t.className = "vc-t"; t.textContent = voFmt(el._dur);
+  const r = document.createElement("button"); r.type = "button"; r.className = "vc-r"; r.setAttribute("aria-label", "Playback speed"); r.textContent = VO.rate + "\u00d7";
+  el.append(b, w, t, r);
+}
+function voUi(v, playing, frac, secs) {
+  v.classList.toggle("on", playing); const b = v.querySelector(".vc-p"); b.textContent = playing ? "\u275A\u275A" : "\u25B6\uFE0E"; b.setAttribute("aria-label", playing ? "Pause voice message" : "Play voice message");
+  const bars = v.querySelectorAll(".vc-w i"), on = Math.round(frac * bars.length); bars.forEach((i, k) => i.classList.toggle("on", k < on));
+  v.querySelector(".vc-t").textContent = voFmt(frac > 0 || playing ? secs : v._dur);
+}
+function voStop() {
+  cancelAnimationFrame(VO.raf); VO.wait = ""; const v = VO.v;
+  if (VO.a) { try { VO.a.pause(); } catch (e) {} VO.a = null; }
+  if (v) { v.classList.remove("load"); voUi(v, false, 0, 0); } VO.v = null;
+}
+function voLoop() {
+  const a = VO.a, v = VO.v; if (!a || !v) return;
+  const total = v._dur || (isFinite(a.duration) ? a.duration : 0) || 1;
+  voUi(v, !a.paused, Math.min(1, a.currentTime / total), a.currentTime); VO.raf = requestAnimationFrame(voLoop);
+}
+function b64Blob(d) {                                                  // data URL -> Blob (blob URLs seek properly, long data URLs do not on some phones)
+  const m = /^data:([^;,]+)[^,]*;base64,(.*)$/.exec(d); if (!m) return null;
+  const bin = atob(m[2]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return new Blob([u], { type: m[1] });
+}
+function voStart(seekFrac) {
+  const v = VO.v; if (!v) return; const key = v.dataset.med || (v._k = v._k || "x" + (++VO.n)), data = PT.med.get(v.dataset.med || "") || v._src;
+  if (!data) {                                                         // not on this phone yet: ask the server, play when it arrives
+    if (!(PT.open && PT.hello)) { voStop(); return callNote("Connect to listen to this voice message."); }
+    VO.wait = v.dataset.med; v.classList.add("load"); try { PT.ws.send(JSON.stringify({ t: "med", k: "b", id: Number(v.dataset.med.slice(1)) })); } catch (e) {} return;
+  }
+  VO.wait = ""; v.classList.remove("load");
+  let u = VO.urls.get(key); if (!u) { const b = b64Blob(data); if (!b) { voStop(); return callNote("Couldn't play that voice message."); } u = URL.createObjectURL(b); VO.urls.set(key, u); }
+  const a = new Audio(u); a.preload = "auto"; a.playbackRate = VO.rate; VO.a = a;
+  a.onended = () => { if (VO.a === a) voStop(); };
+  a.onerror = () => { if (VO.a === a) { voStop(); callNote("Your browser can't play this voice message."); } };
+  const go = () => { if (seekFrac) { try { a.currentTime = seekFrac * (v._dur || a.duration || 0); } catch (e) {} } };
+  a.addEventListener("loadedmetadata", go, { once: true });
+  a.play().then(() => { cancelAnimationFrame(VO.raf); voLoop(); }).catch(() => { if (VO.a === a) { voStop(); callNote("Tap play again to listen."); } });
+}
+ptLog.addEventListener("click", e => {
+  const v = e.target.closest(".pt-voice"); if (!v) return;
+  if (e.target.closest(".vc-r")) { VO.rate = VO.rate === 1 ? 1.5 : VO.rate === 1.5 ? 2 : 1; if (VO.a) VO.a.playbackRate = VO.rate; for (const r of ptLog.querySelectorAll(".vc-r")) r.textContent = VO.rate + "\u00d7"; return; }
+  const w = e.target.closest(".vc-w"), same = VO.v === v;
+  if (w && same && VO.a) { const r = w.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); VO.a.currentTime = f * (v._dur || VO.a.duration || 0); return; }
+  if (e.target.closest(".vc-p") || w) {
+    if (same && VO.a) { if (VO.a.paused) VO.a.play().then(() => { cancelAnimationFrame(VO.raf); voLoop(); }).catch(() => {}); else { VO.a.pause(); voUi(v, false, VO.a.currentTime / (v._dur || VO.a.duration || 1), VO.a.currentTime); cancelAnimationFrame(VO.raf); } return; }
+    voStop(); VO.v = v;
+    const r = w ? w.getBoundingClientRect() : null; voStart(r ? Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) : 0);
+  }
+});
+document.addEventListener("visibilitychange", () => { if (document.hidden && VR.on) vrStop(false); });
 
 /* ============================================================ photo + caption in ONE message (pick, paste or drag a picture in, like Discord/WhatsApp) */
 PT.att = null;
-function ptAttClear() { PT.att = null; $("ptAttach").hidden = true; $("ptAttImg").removeAttribute("src"); ptIn.placeholder = "Write something sweet..."; }
+function ptAttClear() { PT.att = null; setTimeout(ptMicSync, 0); $("ptAttach").hidden = true; $("ptAttImg").removeAttribute("src"); ptIn.placeholder = "Write something sweet..."; }
 async function ptStage(file) {
   if (!file || !ptWanted()) return;
-  try { PT.att = await ptShrink(file); $("ptAttImg").src = PT.att; $("ptAttach").hidden = false; ptIn.placeholder = "Add a caption..."; if (PT.tab !== "chat") ptTab("chat"); ptIn.focus(); }
+  try { PT.att = await ptShrink(file); $("ptAttImg").src = PT.att; $("ptAttach").hidden = false; ptIn.placeholder = "Add a caption..."; ptMicSync(); if (PT.tab !== "chat") ptTab("chat"); ptIn.focus(); }
   catch (e) { callNote("Couldn't use that picture."); }
 }
 $("ptAttX").addEventListener("click", ptAttClear);
@@ -4570,7 +4824,7 @@ function pvClamp(anim) {                                               // keeps 
   const bx = Math.max(0, (i.offsetWidth * PV.s - st.width) / 2), by = Math.max(0, (i.offsetHeight * PV.s - st.height) / 2);
   PV.x = Math.max(-bx, Math.min(bx, PV.x)); PV.y = Math.max(-by, Math.min(by, PV.y)); pvApply(anim);
 }
-function ptView(src) { if (!src) return; PV.s = 1; PV.x = PV.y = 0; PV.ptrs.clear(); PV.g = null; $("ptViewImg").src = src; $("ptViewSave").href = src; $("ptView").hidden = false; pvApply(false); }
+function ptView(src, big) { if (!src) return; $("ptViewImg").classList.toggle("big", !!big); const ext = (/^data:image\/(\w+)/.exec(src) || [])[1] || (/\.gif/i.test(src) ? "gif" : "jpg"); $("ptViewSave").download = "moonsta-" + (big ? "sticker." : "photo.") + ext; PV.s = 1; PV.x = PV.y = 0; PV.ptrs.clear(); PV.g = null; $("ptViewImg").src = src; $("ptViewSave").href = src; $("ptView").hidden = false; pvApply(false); }
 function pvClose() { $("ptView").hidden = true; $("ptViewImg").removeAttribute("src"); PV.ptrs.clear(); PV.g = null; }
 function pvZoom(ns, cx, cy, anim) {                                    // zoom around a point (coordinates measured from the screen centre)
   ns = Math.max(1, Math.min(8, ns)); const k = ns / PV.s; PV.x = cx - (cx - PV.x) * k; PV.y = cy - (cy - PV.y) * k; PV.s = ns; pvClamp(anim);
@@ -4625,9 +4879,9 @@ document.addEventListener("keydown", e => {
 });
 PT.vt = 0;
 ptLog.addEventListener("click", e => {                                 // single tap on a chat photo opens it (waits a beat so a double-tap heart still works)
-  const im = e.target.closest("img.pt-img, .pt-pq img"); if (!im || !im.getAttribute("src")) return;
+  const im = e.target.closest("img.pt-img, img.pt-stk, .pt-pq img"); if (!im || !im.getAttribute("src")) return;
   if (PT.vt) { clearTimeout(PT.vt); PT.vt = 0; return; }
-  PT.vt = setTimeout(() => { PT.vt = 0; ptView(im.src); }, 280);
+  PT.vt = setTimeout(() => { PT.vt = 0; ptView(im.src, im.classList.contains("pt-stk")); }, 280);
 });
 $("ptAttImg").addEventListener("click", () => ptView($("ptAttImg").src));
 
