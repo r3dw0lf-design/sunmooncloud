@@ -772,6 +772,14 @@
   .pt-post .rep input { flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid #c3d3ee; border-radius: 18px; font-size: 16px; color: #12315f; }
   .pt-post .rep button { border: 0; background: none; color: #2f6fe0; font: bold 13px Tahoma, sans-serif; cursor: pointer; min-width: 56px; }
   @media (pointer: coarse), (max-width: 700px) { .pt-ib { width: 44px; min-height: 44px; } .stk i { width: 28px; height: 28px; line-height: 28px; } }
+  /* ---- photo viewer: pinch / wheel / double-tap zoom, drag to pan ---- */
+  #ptView { position: fixed; inset: 0; z-index: 9700; background: rgba(0,0,0,.94); display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
+  #ptView[hidden] { display: none; }
+  #ptViewImg { max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: 50% 50%; will-change: transform; -webkit-user-drag: none; pointer-events: none; }
+  .pv-bar { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: 10px; display: flex; gap: 8px; z-index: 2; }
+  .pv-bar button, .pv-bar a { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #ffffff55; border-radius: 50%; background: rgba(30,30,30,.7); color: #fff; font: 22px Tahoma, sans-serif; text-decoration: none; cursor: pointer; }
+  .pt-img, .pt-pq img, #ptAttImg { cursor: zoom-in; }
+  .pt-zoom { position: absolute; right: 8px; bottom: 8px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; font-size: 18px; cursor: pointer; }
   @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
     background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
@@ -1120,6 +1128,7 @@
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <div id="gmInvite" role="alertdialog" aria-labelledby="gmInvT" hidden><b id="gmInvT"></b><p id="gmInvP"></p><div class="gm-row"><button class="gm-btn" id="gmInvYes" type="button">Play!</button><button class="gm-btn no" id="gmInvNo" type="button">Decline</button><button class="gm-btn alt" id="gmInvLater" type="button">Later</button></div></div>
 
+<div id="ptView" role="dialog" aria-label="Photo viewer" hidden><img id="ptViewImg" alt="" draggable="false"><div class="pv-bar"><button id="ptViewOut" type="button" aria-label="Zoom out">&minus;</button><button id="ptViewIn" type="button" aria-label="Zoom in">+</button><button id="ptViewReset" type="button" aria-label="Fit to screen">&#9635;</button><a id="ptViewSave" download="moonsta-photo.jpg" aria-label="Save photo">&#8681;</a><button id="ptViewX" type="button" aria-label="Close">&times;</button></div></div>
 <div id="ptRing" role="alertdialog" aria-labelledby="ptRingT" hidden><b id="ptRingT"></b><p id="ptRingP"></p><div class="gm-row"><button class="gm-btn" id="ptRingYes" type="button">Answer</button><button class="gm-btn no" id="ptRingNo" type="button">Decline</button></div></div>
 
 <div id="adminPanel" hidden>
@@ -4334,6 +4343,7 @@ function ptPostUpsert(post, fresh) {
   el.querySelector("b").textContent = post.from; el.querySelector("small").textContent = new Date(post.at).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   el.querySelector("img").src = post.img; el.querySelector("p").textContent = post.cap || ""; if (!post.cap) el.querySelector("p").hidden = true;
   o = { post, el }; PT.posts.set(post.id, o); ptPostLike(o);
+  { const zb = document.createElement("button"); zb.type = "button"; zb.className = "pt-zoom"; zb.textContent = "\u2922"; zb.setAttribute("aria-label", "Zoom photo"); zb.addEventListener("click", () => ptView(post.img)); el.querySelector(".pic").appendChild(zb); }
   { const ri = el.querySelector(".rep input"), rb = el.querySelector(".rep button");
     const go = () => { const t = ri.value.trim(); if (!t) return; ptSend(t, { post: post.id }); ri.value = ""; rb.textContent = "Sent \u2713"; setTimeout(() => { rb.textContent = "Send"; }, 1400); };
     rb.addEventListener("click", go); ri.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); go(); } }); }
@@ -4551,6 +4561,75 @@ document.addEventListener("paste", e => {                              // Ctrl+V
 $("ptChat").addEventListener("dragover", e => { if (ptImgOf(e.dataTransfer) || (e.dataTransfer && [...(e.dataTransfer.types || [])].includes("Files"))) { e.preventDefault(); $("ptChat").classList.add("drag"); } });
 $("ptChat").addEventListener("dragleave", e => { if (!$("ptChat").contains(e.relatedTarget)) $("ptChat").classList.remove("drag"); });
 $("ptChat").addEventListener("drop", e => { $("ptChat").classList.remove("drag"); const f = e.dataTransfer && [...e.dataTransfer.files].find(x => x.type.startsWith("image/")); if (f) { e.preventDefault(); ptStage(f); } });
+
+/* ============================================================ photo viewer (zoom) */
+const PV = { s: 1, x: 0, y: 0, ptrs: new Map(), g: null, moved: false, sx: 0, sy: 0, lastTap: 0, lx: 0, ly: 0 };
+function pvApply(anim) { const i = $("ptViewImg"); i.style.transition = anim ? "transform .22s ease-out" : "none"; i.style.transform = "translate(" + PV.x + "px," + PV.y + "px) scale(" + PV.s + ")"; }
+function pvClamp(anim) {                                               // keeps the picture's edges from leaving the screen; also snaps back if you pinched smaller than the screen
+  PV.s = Math.max(1, Math.min(8, PV.s)); const st = $("ptView").getBoundingClientRect(), i = $("ptViewImg");
+  const bx = Math.max(0, (i.offsetWidth * PV.s - st.width) / 2), by = Math.max(0, (i.offsetHeight * PV.s - st.height) / 2);
+  PV.x = Math.max(-bx, Math.min(bx, PV.x)); PV.y = Math.max(-by, Math.min(by, PV.y)); pvApply(anim);
+}
+function ptView(src) { if (!src) return; PV.s = 1; PV.x = PV.y = 0; PV.ptrs.clear(); PV.g = null; $("ptViewImg").src = src; $("ptViewSave").href = src; $("ptView").hidden = false; pvApply(false); }
+function pvClose() { $("ptView").hidden = true; $("ptViewImg").removeAttribute("src"); PV.ptrs.clear(); PV.g = null; }
+function pvZoom(ns, cx, cy, anim) {                                    // zoom around a point (coordinates measured from the screen centre)
+  ns = Math.max(1, Math.min(8, ns)); const k = ns / PV.s; PV.x = cx - (cx - PV.x) * k; PV.y = cy - (cy - PV.y) * k; PV.s = ns; pvClamp(anim);
+}
+const pvC = (cx, cy) => { const r = $("ptView").getBoundingClientRect(); return [cx - r.left - r.width / 2, cy - r.top - r.height / 2]; };
+$("ptView").addEventListener("wheel", e => {
+  e.preventDefault(); const [x, y] = pvC(e.clientX, e.clientY);
+  if (e.ctrlKey) pvZoom(PV.s * Math.exp(-e.deltaY * 0.012), x, y);                                    // trackpad pinch
+  else if (Math.abs(e.deltaY) >= 50 && e.deltaX === 0) pvZoom(PV.s * Math.exp(-e.deltaY * 0.0018), x, y);   // mouse wheel
+  else if (PV.s > 1) { PV.x -= e.deltaX; PV.y -= e.deltaY; pvClamp(false); }                          // two-finger swipe on a trackpad moves around
+}, { passive: false });
+if (!("ontouchstart" in window)) {                                      // desktop Safari reports trackpad pinch as "gesture" events
+  let gs = 1;
+  $("ptView").addEventListener("gesturestart", e => { e.preventDefault(); gs = PV.s; });
+  $("ptView").addEventListener("gesturechange", e => { e.preventDefault(); const [x, y] = pvC(e.clientX, e.clientY); pvZoom(gs * e.scale, x, y); });
+}
+function pvStartGesture() {
+  const [a, b] = [...PV.ptrs.values()], [mx, my] = pvC((a.x + b.x) / 2, (a.y + b.y) / 2);
+  PV.g = { d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, s0: PV.s, x0: PV.x, y0: PV.y, mx, my };
+}
+$("ptView").addEventListener("pointerdown", e => {
+  if (e.target.closest(".pv-bar")) return;
+  try { $("ptView").setPointerCapture(e.pointerId); } catch (er) {}
+  PV.ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (PV.ptrs.size === 1) { PV.moved = false; PV.sx = e.clientX; PV.sy = e.clientY; }
+  else if (PV.ptrs.size === 2) { PV.moved = true; pvStartGesture(); }
+});
+$("ptView").addEventListener("pointermove", e => {
+  const p = PV.ptrs.get(e.pointerId); if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+  if (Math.hypot(e.clientX - PV.sx, e.clientY - PV.sy) > 6) PV.moved = true;
+  if (PV.ptrs.size >= 2 && PV.g) {                                      // pinch: the spot between your fingers stays under them, so it zooms freely and moves with your fingers
+    const [a, b] = [...PV.ptrs.values()], [mx, my] = pvC((a.x + b.x) / 2, (a.y + b.y) / 2), g = PV.g;
+    const s = Math.max(0.5, Math.min(10, g.s0 * Math.hypot(a.x - b.x, a.y - b.y) / g.d0)), k = s / g.s0;
+    PV.s = s; PV.x = mx - (g.mx - g.x0) * k; PV.y = my - (g.my - g.y0) * k; pvApply(false);
+  } else if (PV.s > 1) { PV.x += dx; PV.y += dy; pvClamp(false); }
+});
+const pvUp = e => {
+  if (!PV.ptrs.has(e.pointerId)) return; const was = PV.ptrs.size; PV.ptrs.delete(e.pointerId);
+  if (was >= 2) { PV.g = null; pvClamp(true); return; }                 // let go of a pinch: settle (and spring back if smaller than the screen)
+  if (PV.moved) { if (PV.s === 1 && e.type === "pointerup" && e.clientY - PV.sy > 110) pvClose(); return; }   // swipe down = close
+  const now = Date.now(), [x, y] = pvC(e.clientX, e.clientY);
+  if (now - PV.lastTap < 320 && Math.hypot(e.clientX - PV.lx, e.clientY - PV.ly) < 40) { PV.lastTap = 0; PV.s > 1 ? pvZoom(1, 0, 0, true) : pvZoom(2.5, x, y, true); }   // double-tap shortcut
+  else { PV.lastTap = now; PV.lx = e.clientX; PV.ly = e.clientY; if (e.target === $("ptView")) setTimeout(() => { if (PV.lastTap === now && PV.s === 1) pvClose(); }, 330); }
+};
+$("ptView").addEventListener("pointerup", pvUp); $("ptView").addEventListener("pointercancel", pvUp);
+$("ptViewIn").addEventListener("click", () => pvZoom(PV.s * 1.5, 0, 0, true)); $("ptViewOut").addEventListener("click", () => pvZoom(PV.s / 1.5, 0, 0, true));
+$("ptViewReset").addEventListener("click", () => pvZoom(1, 0, 0, true)); $("ptViewX").addEventListener("click", pvClose);
+document.addEventListener("keydown", e => {
+  if ($("ptView").hidden) return;
+  if (e.key === "Escape") pvClose(); else if (e.key === "+" || e.key === "=") pvZoom(PV.s * 1.4, 0, 0); else if (e.key === "-") pvZoom(PV.s / 1.4, 0, 0); else if (e.key === "0") pvZoom(1, 0, 0);
+});
+PT.vt = 0;
+ptLog.addEventListener("click", e => {                                 // single tap on a chat photo opens it (waits a beat so a double-tap heart still works)
+  const im = e.target.closest("img.pt-img, .pt-pq img"); if (!im || !im.getAttribute("src")) return;
+  if (PT.vt) { clearTimeout(PT.vt); PT.vt = 0; return; }
+  PT.vt = setTimeout(() => { PT.vt = 0; ptView(im.src); }, 280);
+});
+$("ptAttImg").addEventListener("click", () => ptView($("ptAttImg").src));
 
 
 
