@@ -17,3 +17,7 @@ The GIF button only appears when a free Giphy key is set: create one at develope
 ## Voice messages (Moonsta chat)
 Tap the mic (it replaces Send while the message box is empty), talk, tap Send. Up to 60 seconds each, stored with the chat like photos.
 The browser asks for microphone permission the first time. Needs HTTPS (Cloudflare gives you that). Nothing to configure.
+
+## Animations
+A small motion layer (CSS block "MOTION LAYER" + the `fx` helper in index.html): hearts burst on reactions and likes, tap ripples, pop-ins for windows/menus/bubbles/stickers/badges.
+It turns itself off automatically when the device has "reduce motion" switched on.

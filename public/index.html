@@ -820,6 +820,121 @@
   #ptViewImg.big { width: min(92vw, 92vh); height: min(92vw, 92vh); object-fit: contain; }
   .pt-zoom { position: absolute; right: 8px; bottom: 8px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; font-size: 18px; cursor: pointer; }
   @media (prefers-reduced-motion: reduce) { .pt-m { animation: none; } }
+  /* ================= MOTION LAYER: a small animation on everything. All of it switches off when the phone/computer says "reduce motion". ================= */
+  @media (prefers-reduced-motion: no-preference) {
+    :root { --spring: cubic-bezier(.34, 1.56, .64, 1); --ease: cubic-bezier(.22, .8, .3, 1); }
+
+    /* every button, input and tab: smooth colour changes and a little squish when pressed */
+    :where(button, select, summary, .chip, .gm-btn, .dt-icon, .task, .wbtn, .stk) { transition: scale .14s var(--spring), translate .18s var(--ease), filter .15s, background-color .15s, color .15s, border-color .15s, box-shadow .18s; }
+    :where(input, textarea, select) { transition: border-color .15s, box-shadow .2s, background-color .15s; }
+    :where(button, .chip, .gm-btn, .dt-icon, .task, .wbtn):active:not(:disabled) { scale: .94; }
+    @media (hover: hover) {
+      .gm-btn:not(:disabled):hover, .chip:hover { translate: 0 -1px; }
+      .wbtn:hover { scale: 1.12; filter: brightness(1.15); }
+      .dt-icon:hover { translate: 0 -3px; }
+      .dt-icon svg { transition: transform .22s var(--spring); }
+      .dt-icon:hover svg { transform: scale(1.12) rotate(-3deg); }
+      .stk:hover { scale: 1.1; }
+      .gm-card { transition: translate .2s var(--ease), box-shadow .2s; } .gm-card:hover { translate: 0 -2px; box-shadow: 0 6px 14px rgba(0,40,110,.22); }
+      .gm-cell:not(:disabled):hover { scale: 1.05; }
+      #startMenu button { transition: background-color .12s, color .12s, padding-left .18s var(--ease); } #startMenu button:hover { padding-left: 20px; }
+      #icMenu button:hover { padding-left: 14px; } #icMenu button { transition: padding-left .15s var(--ease), background-color .12s, color .12s; }
+      #ptMenu .emo button { transition: scale .16s var(--spring), background-color .12s; } #ptMenu .emo button:hover { scale: 1.35; }
+      #ptMenu [data-a] { transition: padding-left .15s var(--ease), background-color .12s; } #ptMenu [data-a]:hover { padding-left: 18px; }
+      .pt-stk:hover { animation: stkwig .5s ease-in-out; }
+    }
+    .pt-tabs button { transition: background-color .2s, color .2s, border-color .2s, scale .14s var(--spring); }
+    .gm-pl { transition: background-color .25s, border-color .25s, box-shadow .25s, scale .25s var(--spring); } .gm-pl.turn { scale: 1.06; }
+
+    /* things that appear: pop, slide or fade in */
+    #desktop:not([hidden]) { animation: fxfade .5s ease-out; }
+    #authGate:not([hidden]) { animation: fxrise .4s var(--ease); }
+    main.rig { animation: fxrise .5s var(--ease); }
+    .task { animation: taskin .3s var(--spring); }
+    #startMenu:not([hidden]) > button, #startMenu:not([hidden]) > .smh { animation: itemin .24s var(--ease) both; }
+    #startMenu:not([hidden]) > :nth-child(2){animation-delay:56ms}#startMenu:not([hidden]) > :nth-child(3){animation-delay:84ms}#startMenu:not([hidden]) > :nth-child(4){animation-delay:112ms}#startMenu:not([hidden]) > :nth-child(5){animation-delay:140ms}#startMenu:not([hidden]) > :nth-child(6){animation-delay:168ms}#startMenu:not([hidden]) > :nth-child(7){animation-delay:196ms}#startMenu:not([hidden]) > :nth-child(8){animation-delay:224ms}#startMenu:not([hidden]) > :nth-child(9){animation-delay:252ms}#startMenu:not([hidden]) > :nth-child(10){animation-delay:280ms}
+    #icMenu:not([hidden]) { animation: popfrom .18s var(--spring); transform-origin: top left; }
+    #ptMenu:not([hidden]) { animation: popfrom .22s var(--spring); transform-origin: bottom center; }
+    #ptMenu:not([hidden]) .emo button { animation: emoin .36s var(--spring) both; }
+    #ptMenu:not([hidden]) .emo button:nth-child(1){animation-delay:0ms}#ptMenu:not([hidden]) .emo button:nth-child(2){animation-delay:40ms}#ptMenu:not([hidden]) .emo button:nth-child(3){animation-delay:80ms}#ptMenu:not([hidden]) .emo button:nth-child(4){animation-delay:120ms}#ptMenu:not([hidden]) .emo button:nth-child(5){animation-delay:160ms}#ptMenu:not([hidden]) .emo button:nth-child(6){animation-delay:200ms}#ptMenu:not([hidden]) .emo button:nth-child(7){animation-delay:240ms}
+    #ptTray:not([hidden]), #ptMaker:not([hidden]) { animation: sheetup .26s var(--ease); }
+    #ptReplyBar:not([hidden]), #ptRec:not([hidden]) { animation: sheetup .22s var(--ease); }
+    #ptCall:not([hidden]), #ptView:not([hidden]) { animation: fxfade .25s ease-out; }
+    #ptView:not([hidden]) img { animation: zoomin .3s var(--spring); }
+    #ptRing:not([hidden]) { animation: ringin .45s var(--spring), ringshake 1.8s ease-in-out .5s infinite; }
+    #ptGo:not([hidden]), #ptMic:not([hidden]) { animation: popin .26s var(--spring); }
+    #ptStkGrid > *, #ptTray .stk { animation: popin .3s var(--spring) both; }
+    #ptStkGrid > :nth-child(1){animation-delay:24ms}#ptStkGrid > :nth-child(2){animation-delay:48ms}#ptStkGrid > :nth-child(3){animation-delay:72ms}#ptStkGrid > :nth-child(4){animation-delay:96ms}#ptStkGrid > :nth-child(5){animation-delay:120ms}#ptStkGrid > :nth-child(6){animation-delay:144ms}#ptStkGrid > :nth-child(7){animation-delay:168ms}#ptStkGrid > :nth-child(8){animation-delay:192ms}#ptStkGrid > :nth-child(9){animation-delay:216ms}#ptStkGrid > :nth-child(10){animation-delay:240ms}#ptStkGrid > :nth-child(11){animation-delay:264ms}#ptStkGrid > :nth-child(12){animation-delay:288ms}
+    #ptChat:not(.feed) #ptLog, #ptChat.feed #ptPosts { animation: fxfade .28s ease-out; }
+    .pt-post { animation: postin .4s var(--spring) both; }
+    .pt-post:nth-child(1){animation-delay:55ms}.pt-post:nth-child(2){animation-delay:110ms}.pt-post:nth-child(3){animation-delay:165ms}.pt-post:nth-child(4){animation-delay:220ms}.pt-post:nth-child(5){animation-delay:275ms}.pt-post:nth-child(6){animation-delay:330ms}
+    .inrow { animation: rowin .3s var(--ease) both; } .inrow.new { animation: rowin .3s var(--ease) both, newglow 2s ease-in-out .3s infinite; }
+    .gm-lobby > * { animation: popin .35s var(--spring) both; }
+    .gm-lobby > :nth-child(1){animation-delay:70ms}.gm-lobby > :nth-child(2){animation-delay:140ms}.gm-lobby > :nth-child(3){animation-delay:210ms}.gm-lobby > :nth-child(4){animation-delay:280ms}
+
+    /* chat bubbles: yours slide in from the right, theirs from the left; stickers bounce */
+    .pt-m { transition: transform .18s, opacity .3s; }
+    .pt-m.fresh { animation: ptsend .34s var(--spring); transform-origin: 100% 100%; }
+    .pt-m.fresh:not(.me) { animation-name: ptrecv; transform-origin: 0 100%; }
+    .pt-m.fresh.bare .pt-stk { animation: stkpop .6s var(--spring); }
+    .pt-m.flash { animation: flashpulse .9s ease-out; }
+    img.pt-img { animation: fxfade .45s ease-out; }
+    img.pt-img:not([src]), img.pt-stk:not([src]) { min-height: 120px; background: linear-gradient(90deg, #0001, #fff6, #0001) 0 0 / 200% 100%; animation: shimmer 1.1s linear infinite; }
+    .tk.seen { animation: tkpop .4s var(--spring); display: inline-block; }
+    #ptTyping:not([hidden])::after { content: ""; display: inline-block; width: 1.3em; text-align: left; animation: dots 1.2s steps(1, end) infinite; }
+    #ptTyping:not([hidden]) { animation: fxfade .2s ease-out; }
+    .pt-voice.on .vc-p { animation: vring 1.2s ease-out infinite; }
+    .pt-voice.load .vc-p { animation: loadpulse .9s ease-in-out infinite; }
+    .vc-w i { transition: opacity .15s; }
+    #ptDot.on, .gm-status.on .gm-dot { animation: presence 2.2s ease-out infinite; }
+
+    /* hearts */
+    .pt-r { animation: hbeat 2.6s ease-in-out infinite; transform-origin: center; }
+    .pt-r.pop { animation: rpop .6s var(--spring), hbeat 2.6s ease-in-out .6s infinite; }
+    .pt-post .acts button.on { animation: likebounce .55s var(--spring); }
+    #fxLayer { position: fixed; inset: 0; z-index: 99999; pointer-events: none; overflow: hidden; }
+    #fxLayer .fx-h { position: absolute; left: 0; top: 0; line-height: 1; will-change: transform, opacity; filter: drop-shadow(0 2px 6px rgba(224,69,123,.35)); }
+    #fxLayer .fx-rip { position: absolute; border-radius: 50%; border: 2px solid rgba(255,255,255,.95); box-shadow: 0 0 10px rgba(110,160,255,.7), inset 0 0 8px rgba(110,160,255,.4); will-change: transform, opacity; }
+
+    /* badges, status lines, lamps */
+    .bdg:not([hidden]) { animation: bdgpop .4s var(--spring), bdgring 2.4s ease-out .5s infinite; }
+    .bdg.bump { animation: bdgpop .4s var(--spring); }
+    .fx-note { animation: notepop .35s var(--spring); }
+    #toast:not([hidden]) { animation: toastIn .35s var(--spring); }
+
+    @keyframes fxfade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fxrise { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+    @keyframes popin { from { opacity: 0; scale: .5; } to { opacity: 1; scale: 1; } }
+    @keyframes popfrom { from { opacity: 0; scale: .8; } to { opacity: 1; scale: 1; } }
+    @keyframes zoomin { from { opacity: 0; scale: .82; } to { opacity: 1; scale: 1; } }
+    @keyframes sheetup { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+    @keyframes taskin { from { opacity: 0; scale: .6; translate: 0 10px; } to { opacity: 1; scale: 1; translate: 0 0; } }
+    @keyframes itemin { from { opacity: 0; translate: -12px 0; } to { opacity: 1; translate: 0 0; } }
+    @keyframes rowin { from { opacity: 0; translate: -14px 0; } to { opacity: 1; translate: 0 0; } }
+    @keyframes emoin { from { opacity: 0; scale: .2; translate: 0 10px; } to { opacity: 1; scale: 1; translate: 0 0; } }
+    @keyframes postin { from { opacity: 0; translate: 0 22px; scale: .97; } to { opacity: 1; translate: 0 0; scale: 1; } }
+    @keyframes ptsend { from { opacity: 0; transform: translate(28px, 10px) scale(.75); } to { opacity: 1; transform: none; } }
+    @keyframes ptrecv { from { opacity: 0; transform: translate(-28px, 10px) scale(.75); } to { opacity: 1; transform: none; } }
+    @keyframes stkpop { 0% { scale: .2; rotate: -14deg; opacity: 0; } 60% { scale: 1.15; rotate: 6deg; opacity: 1; } 100% { scale: 1; rotate: 0deg; } }
+    @keyframes stkwig { 25% { rotate: -6deg; } 75% { rotate: 6deg; } }
+    @keyframes flashpulse { 0%, 100% { scale: 1; } 30% { scale: 1.04; } }
+    @keyframes tkpop { from { scale: 0; } to { scale: 1; } }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+    @keyframes vring { from { box-shadow: 0 0 0 0 rgba(106,77,224,.5); } to { box-shadow: 0 0 0 12px rgba(106,77,224,0); } }
+    @keyframes loadpulse { 50% { opacity: .35; } }
+    @keyframes presence { from { box-shadow: 0 0 0 0 rgba(47,214,106,.65); } to { box-shadow: 0 0 0 9px rgba(47,214,106,0); } }
+    @keyframes hbeat { 0%, 100% { scale: 1; } 8% { scale: 1.18; } 16% { scale: 1; } 24% { scale: 1.12; } 32% { scale: 1; } }
+    @keyframes rpop { 0% { transform: scale(0) rotate(-20deg); } 55% { transform: scale(1.5) rotate(8deg); } 100% { transform: scale(1) rotate(0); } }
+    @keyframes likebounce { 0% { scale: 1; } 30% { scale: 1.5; } 55% { scale: .9; } 80% { scale: 1.15; } 100% { scale: 1; } }
+    @keyframes bdgpop { from { scale: 0; } 60% { scale: 1.35; } to { scale: 1; } }
+    @keyframes bdgring { from { box-shadow: 0 0 0 0 rgba(224,48,30,.6); } to { box-shadow: 0 0 0 8px rgba(224,48,30,0); } }
+    @keyframes notepop { from { opacity: 0; scale: .9; } to { opacity: 1; scale: 1; } }
+    @keyframes newglow { 50% { text-shadow: 0 0 12px #ff6fae; } }
+    @keyframes ringin { from { opacity: 0; translate: 0 -40px; scale: .9; } to { opacity: 1; translate: 0 0; scale: 1; } }
+    @keyframes ringshake { 0%, 100% { rotate: 0deg; } 4%, 12% { rotate: -1.2deg; } 8%, 16% { rotate: 1.2deg; } 20% { rotate: 0deg; } }
+  }
+
   #gmInvite { position: fixed; z-index: 9500; left: 0; right: 0; margin: 0 auto; top: calc(14px + env(safe-area-inset-top, 0px)); width: min(92vw, 380px); padding: 14px 16px; border-radius: 12px;
     background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid #fff; box-shadow: 0 12px 40px rgba(0,25,70,.55); font: 13px Tahoma, sans-serif; color: #12315f; animation: winin .22s ease-out; }
   #gmInvite[hidden] { display: none; }
@@ -4063,7 +4178,7 @@ function ptRender() {
 function ptAdd(m, pend) {                                             // one new bubble, added without redrawing the rest
   const none = ptLog.querySelector(".none"); if (none) none.remove();
   const stick = ptNear() || m.from === ptMe();
-  ptLog.appendChild(ptEl(m, pend)); ptTicks(); if (stick) ptBottom();
+  const el = ptEl(m, pend); el.classList.add("fresh"); ptLog.appendChild(el); ptTicks(); if (stick) ptBottom();
 }
 function ptSendSeen() {
   const last = PT.msgs.length ? PT.msgs[PT.msgs.length - 1].id : 0, me = ptMe();
@@ -4073,7 +4188,7 @@ function ptSendSeen() {
 function ptSeenIfViewing() { if (ptViewing()) ptSendSeen(); ptCount(); }
 function ptTyping(on) {
   const el = $("ptTyping"); clearTimeout(PT.typingIn);
-  el.hidden = !on; if (on) { el.textContent = ptOther() + " is typing..."; PT.typingIn = setTimeout(() => { el.hidden = true; }, 4500); }
+  el.hidden = !on; if (on) { el.textContent = ptOther() + " is typing"; PT.typingIn = setTimeout(() => { el.hidden = true; }, 4500); }
 }
 function ptHandle(m) {
   const me = ptMe(), other = ptOther();
@@ -4374,8 +4489,10 @@ ptCallBtns();
 PT.posts = new Map(); PT.tab = "chat"; PT.feedWs = null;
 function ptHeart(el, r) {
   const old = el.querySelector(".pt-r"); if (old) old.remove();
+  const first = el._r === undefined, prev = el._r || {}, add = r ? Object.keys(r).find(u => r[u] !== prev[u]) : null; el._r = r ? Object.assign({}, r) : {};
   const n = r ? Object.keys(r).length : 0; el.classList.toggle("hr", n > 0);
-  if (n) { const b = document.createElement("span"); b.className = "pt-r"; b.textContent = "\u2764\uFE0F" + (n > 1 ? " " + n : ""); el.appendChild(b); }
+  if (!first && add && !(el._fx && Date.now() - el._fx < 900)) fx.hearts(el, r[add]);          // someone (you or them) just reacted: burst of hearts
+  if (n) { const b = document.createElement("span"); b.className = "pt-r" + (!first && add ? " pop" : ""); b.textContent = "\u2764\uFE0F" + (n > 1 ? " " + n : ""); el.appendChild(b); }
 }
 function ptTab(t) {
   PT.tab = t; $("ptChat").classList.toggle("feed", t === "feed");
@@ -4387,6 +4504,7 @@ $("ptTabChat").addEventListener("click", () => ptTab("chat")); $("ptTabFeed").ad
 function ptLike(id) { if (PT.open && PT.hello) PT.ws.send(JSON.stringify({ t: "like", id })); }
 function ptPostLike(o) {
   const me = ptMe(), on = o.post.likes.includes(me), b = o.el.querySelector(".acts button");
+  if (on && o.was === false) fx.hearts(b, "\u2764\uFE0F", 8); o.was = on;
   b.classList.toggle("on", on); b.textContent = (on ? "\u2764\uFE0F " : "\u2661 ") + (o.post.likes.length || "");
 }
 function ptPostUpsert(post, fresh) {
@@ -4402,7 +4520,7 @@ function ptPostUpsert(post, fresh) {
     const go = () => { const t = ri.value.trim(); if (!t) return; ptSend(t, { post: post.id }); ri.value = ""; rb.textContent = "Sent \u2713"; setTimeout(() => { rb.textContent = "Send"; }, 1400); };
     rb.addEventListener("click", go); ri.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); go(); } }); }
   const pop = el.querySelector(".pop");
-  const dbl = () => { if (!ptDbl()) return; if (!post.likes.includes(ptMe())) ptLike(post.id); pop.classList.remove("go"); void pop.offsetWidth; pop.classList.add("go"); }; const pic = el.querySelector(".pic"); pic.addEventListener("dblclick", dbl); onDouble(pic, ".pic", dbl);
+  const dbl = () => { if (!ptDbl()) return; if (!post.likes.includes(ptMe())) ptLike(post.id); pop.classList.remove("go"); void pop.offsetWidth; pop.classList.add("go"); fx.hearts(pop, "\u2764\uFE0F", 10); }; const pic = el.querySelector(".pic"); pic.addEventListener("dblclick", dbl); onDouble(pic, ".pic", dbl);
   el.querySelector(".acts button").addEventListener("click", () => ptLike(post.id));
   const box = $("ptPosts"); let at = null;
   for (const c of box.children) { if (Number(c.dataset.id) < post.id) { at = c; break; } }
@@ -4427,7 +4545,7 @@ $("ptPic").addEventListener("change", async () => {
   try { const img = await ptShrink(f); PT.ws.send(JSON.stringify({ t: "post", img, cap: $("ptCap").value })); $("ptCap").value = ""; }
   catch (e) { callNote("Couldn't use that photo."); }
 });
-const ptReact = b => { if (b && b.dataset.id && PT.open && PT.hello && ptDbl()) PT.ws.send(JSON.stringify({ t: "react", id: Number(b.dataset.id) })); };
+const ptReact = b => { if (b && b.dataset.id && PT.open && PT.hello && ptDbl()) { if (!(b._r && b._r[ptMe()])) { fx.hearts(b); b._fx = Date.now(); } } if (b && b.dataset.id && PT.open && PT.hello && ptDbl()) PT.ws.send(JSON.stringify({ t: "react", id: Number(b.dataset.id) })); };
 ptLog.addEventListener("dblclick", e => ptReact(e.target.closest(".pt-m"))); onDouble(ptLog, ".pt-m", ptReact);
 
 /* ============================================================ MOONSTA on mobile */
@@ -4667,6 +4785,41 @@ $("ptMkSend").addEventListener("click", () => mkFinish(true)); $("ptMkSave").add
 window.addEventListener("resize", () => { if (!$("ptMaker").hidden) mkDraw(); });
 
 
+
+/* ============================================================ motion helpers: floating hearts, tap ripples, little pops */
+const fx = (() => {
+  const mq = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  const ok = () => !mq.matches && !!Element.prototype.animate;
+  let layer = null, live = 0;
+  const box = () => layer || (layer = Object.assign(document.createElement("div"), { id: "fxLayer" }), layer.setAttribute("aria-hidden", "true"), document.body.appendChild(layer), layer);
+  const at = f => { if (f && f.getBoundingClientRect) { const r = f.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; } return [f.x, f.y]; };
+  function hearts(from, emoji, n) {                                    // a burst of hearts (or any emoji) floating up from an element or {x, y}
+    if (!ok() || !from || live > 40) return; const [x, y] = at(from), L = box(); n = n || 7; emoji = emoji || "\u2764\uFE0F";
+    for (let i = 0; i < n; i++) {
+      const h = document.createElement("span"); h.className = "fx-h"; h.textContent = emoji; const big = i === 0;
+      h.style.left = x + "px"; h.style.top = y + "px"; h.style.fontSize = (big ? 38 : 14 + Math.random() * 14) + "px"; L.appendChild(h); live++;
+      const dx = big ? 0 : (Math.random() - .5) * 130, dy = big ? -34 : -(70 + Math.random() * 100), rot = big ? 0 : (Math.random() - .5) * 70, T = big ? "translate(-50%, -50%)" : "translate(-50%, -50%)";
+      h.animate([
+        { transform: T + " scale(.2) rotate(0deg)", opacity: 0 },
+        { transform: `translate(calc(-50% + ${dx * .3}px), calc(-50% + ${dy * .3}px)) scale(${big ? 1.5 : 1.15}) rotate(${rot * .3}deg)`, opacity: 1, offset: .22 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${big ? 1.2 : .8}) rotate(${rot}deg)`, opacity: 0 }
+      ], { duration: big ? 900 : 850 + Math.random() * 550, delay: big ? 0 : 60 + i * 45, easing: "cubic-bezier(.2,.7,.3,1)", fill: "both" }).onfinish = () => { h.remove(); live--; };
+    }
+  }
+  function ripple(x, y) {                                              // a soft ring where you tapped
+    if (!ok() || live > 40) return; const r = document.createElement("span"); r.className = "fx-rip"; r.style.cssText = `left:${x - 22}px;top:${y - 22}px;width:44px;height:44px`; box().appendChild(r); live++;
+    r.animate([{ transform: "scale(.2)", opacity: .9 }, { transform: "scale(1.5)", opacity: 0 }], { duration: 480, easing: "cubic-bezier(.2,.7,.3,1)" }).onfinish = () => { r.remove(); live--; };
+  }
+  const tappable = "button, .dt-icon, .chip, .task, [role=button], label.gm-btn, .stk, .gm-cell";
+  document.addEventListener("pointerdown", e => { const t = e.target.closest && e.target.closest(tappable); if (t && !t.disabled && !t.closest("#ptView")) ripple(e.clientX, e.clientY); }, { passive: true, capture: true });
+  const bump = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+  function watch() {                                                   // badge numbers and status lines pop when their text changes
+    for (const b of document.querySelectorAll(".bdg")) new MutationObserver(() => { if (ok() && !b.hidden) bump(b, "bump"); }).observe(b, { childList: true, characterData: true, subtree: true });
+    for (const n of document.querySelectorAll("[aria-live]")) { if (n.id === "ptLog" || n.id === "gmLog" || n.id === "toast") continue; new MutationObserver(() => { if (ok() && n.textContent.trim()) bump(n, "fx-note"); }).observe(n, { childList: true, characterData: true, subtree: true }); }
+  }
+  return { hearts, ripple, bump, watch, ok };
+})();
+
 /* ============================================================ voice messages: tap the mic, talk, tap Send. Tap play on a note to listen. */
 const VO = { a: null, v: null, wait: "", raf: 0, rate: 1, urls: new Map(), n: 0 };
 const VR = { rec: null, stream: null, ac: null, an: null, chunks: [], peaks: [], t0: 0, iv: 0, mime: "", keep: false, on: false };
@@ -4677,7 +4830,7 @@ function ptMicSync() {                                                 // empty 
   const empty = !ptIn.value.trim() && !PT.att, mic = vrOk() && empty;
   $("ptMic").hidden = !mic; $("ptGo").hidden = mic;
 }
-ptIn.addEventListener("input", ptMicSync); $("ptForm").addEventListener("submit", () => setTimeout(ptMicSync, 0)); ptMicSync();
+fx.watch(); ptIn.addEventListener("input", ptMicSync); $("ptForm").addEventListener("submit", () => setTimeout(ptMicSync, 0)); ptMicSync();
 
 function vrCleanup() {
   clearInterval(VR.iv); VR.iv = 0; VR.on = false;
